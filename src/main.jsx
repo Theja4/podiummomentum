@@ -106,12 +106,12 @@ function Hero() {
     <Header />
     <div className="hero-inner">
       <h1 className="hero-title">
-        <span>Build a <em>10X better website</em> that</span>
+        <span>Build a <em>10X better website</em> that</span>{' '}
         <span>makes your company unforgettable</span>
       </h1>
       <div className="hero-band">
         <div className="hero-media">
-          <ShowreelPlayer variant="hero" />
+          <ShowreelPlayer variant="hero" autoplayOnLoad />
         </div>
         <div className="hero-side">
           <p>{BRAND} helps scaling tech teams turn an outdated brand and website into <em>a credible growth asset that wins serious buyers</em>. We reposition you to reflect what you’ve become, not what you were when you started.</p>
@@ -139,224 +139,184 @@ function MetricsMarquee() {
   return <div className="marquee"><div className="marquee-track">{[...items, ...items].map((x, i) => <span key={i}>/ {x}</span>)}</div></div>
 }
 
-function formatShowreelTime(seconds) {
-  if (!Number.isFinite(seconds) || seconds < 0) return '0:00'
-  const total = Math.floor(seconds)
-  const mins = Math.floor(total / 60)
-  const secs = total % 60
-  return `${mins}:${String(secs).padStart(2, '0')}`
-}
-
-function readVideoDuration(video) {
-  const d = video?.duration
-  if (!Number.isFinite(d) || d <= 0) return 0
-  return d
-}
-
 function ShowreelThumb() {
   return (
-    <div className="who-brand-thumb">
+    <div className="who-brand-thumb" aria-hidden="true">
       <p className="who-hi">Hi we are,</p>
       <img className="who-brand-logo" src={`${A}logo-footer.png`} alt={BRAND} />
     </div>
   )
 }
 
-function ShowreelPlayer({ variant = 'about' }) {
+function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
   const videoRef = useRef(null)
-  const trackRef = useRef(null)
-  const savedTime = useRef(0)
-  const scrubbing = useRef(false)
-  const [open, setOpen] = useState(false)
+  const autoplayFired = useRef(false)
   const [playing, setPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [current, setCurrent] = useState(0)
+  const [started, setStarted] = useState(false)
+  const [muted, setMuted] = useState(true)
 
-  const syncTime = video => {
-    if (!video || scrubbing.current) return
-    const d = readVideoDuration(video)
-    const t = Number.isFinite(video.currentTime) ? video.currentTime : 0
-    setCurrent(t)
-    setDuration(d)
-    setProgress(d ? Math.min(100, (t / d) * 100) : 0)
-  }
-
-  const close = () => {
+  const playMuted = () => {
     const video = videoRef.current
-    if (video) {
-      savedTime.current = video.currentTime || 0
-      video.pause()
-    }
-    setPlaying(false)
-    setOpen(false)
+    if (!video) return
+    video.muted = true
+    setMuted(true)
+    video.play().then(() => {
+      setStarted(true)
+      setPlaying(true)
+    }).catch(() => {})
   }
-
-  const openPlayer = () => setOpen(true)
 
   const togglePlay = e => {
     e?.stopPropagation()
     const video = videoRef.current
     if (!video) return
-    if (video.paused) video.play().catch(() => {})
-    else video.pause()
-  }
-
-  const seekFromClientX = clientX => {
-    const track = trackRef.current
-    const video = videoRef.current
-    const d = readVideoDuration(video)
-    if (!track || !video || !d) return
-    const rect = track.getBoundingClientRect()
-    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
-    video.currentTime = ratio * d
-    setProgress(ratio * 100)
-    setCurrent(video.currentTime)
-    setDuration(d)
-  }
-
-  const onTrackPointerDown = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    scrubbing.current = true
-    seekFromClientX(e.clientX)
-    const onMove = ev => seekFromClientX(ev.clientX)
-    const onUp = () => {
-      scrubbing.current = false
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerup', onUp)
+    if (video.paused) {
+      video.muted = muted
+      video.play().then(() => {
+        setStarted(true)
+        setPlaying(true)
+      }).catch(() => {
+        video.muted = true
+        setMuted(true)
+        video.play().then(() => {
+          setStarted(true)
+          setPlaying(true)
+        }).catch(() => {})
+      })
+    } else {
+      video.pause()
+      setPlaying(false)
     }
-    window.addEventListener('pointermove', onMove)
-    window.addEventListener('pointerup', onUp)
   }
 
+  const toggleMute = e => {
+    e?.stopPropagation()
+    const video = videoRef.current
+    if (!video) return
+    const next = !video.muted
+    video.muted = next
+    setMuted(next)
+    if (!next && video.paused) {
+      video.play().then(() => {
+        setStarted(true)
+        setPlaying(true)
+      }).catch(() => {})
+    }
+  }
+
+  // Autoplay muted in-card when ready. If ready immediately on land, wait 2s.
   useEffect(() => {
-    if (!open) return
-    const onKey = e => {
-      if (e.key === 'Escape') close()
-      if (e.key === ' ' || e.key === 'k') {
-        e.preventDefault()
-        togglePlay()
-      }
-    }
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    document.addEventListener('keydown', onKey)
+    if (!autoplayOnLoad || autoplayFired.current) return
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const pageStart = performance.now()
+    let cancelled = false
+    let timer = 0
+    let readyOnce = false
 
     const video = videoRef.current
-    if (video) {
-      const resume = Math.min(savedTime.current || 0, readVideoDuration(video) || savedTime.current || 0)
-      video.currentTime = resume
-      video.play().catch(() => {})
+    if (!video) return
+
+    const launch = () => {
+      if (cancelled || autoplayFired.current || readyOnce) return
+      readyOnce = true
+      const elapsed = performance.now() - pageStart
+      const wait = elapsed < 2000 ? 2000 - elapsed : 0
+      timer = window.setTimeout(() => {
+        if (cancelled || autoplayFired.current) return
+        autoplayFired.current = true
+        playMuted()
+      }, wait)
     }
+
+    const onReady = () => launch()
+    video.addEventListener('canplaythrough', onReady, { once: true })
+    video.addEventListener('canplay', onReady, { once: true })
+    video.preload = 'auto'
+    video.load()
+    if (video.readyState >= 3) launch()
 
     return () => {
-      document.body.style.overflow = prevOverflow
-      document.removeEventListener('keydown', onKey)
+      cancelled = true
+      window.clearTimeout(timer)
+      video.removeEventListener('canplaythrough', onReady)
+      video.removeEventListener('canplay', onReady)
     }
-  }, [open])
+  }, [autoplayOnLoad])
 
-  const playBtn = (
-    <span className="who-play" aria-hidden="true">
-      <img src={`${A}play-showreel.svg`} alt="" />
-    </span>
+  const shellClass = variant === 'hero' ? 'hero-video' : 'who-video'
+  const media = (
+    <div className={`${shellClass} ${playing ? 'is-playing' : ''} ${started ? 'is-started' : ''}`}>
+      {!started && <ShowreelThumb />}
+      <video
+        ref={videoRef}
+        className={variant === 'hero' ? 'hero-vid' : 'who-vid'}
+        src={`${A}showreel.mp4`}
+        poster={`${A}showreel-brand-bg.png`}
+        playsInline
+        muted={muted}
+        preload={autoplayOnLoad ? 'auto' : 'metadata'}
+        onClick={togglePlay}
+        onPlay={() => {
+          setPlaying(true)
+          setStarted(true)
+        }}
+        onPause={() => setPlaying(false)}
+        onEnded={() => {
+          setPlaying(false)
+          setStarted(false)
+          const video = videoRef.current
+          if (video) video.currentTime = 0
+        }}
+        onVolumeChange={e => setMuted(e.currentTarget.muted)}
+      />
+      <div className="who-controls">
+        <button
+          type="button"
+          className="who-play"
+          onClick={togglePlay}
+          aria-label={playing ? `Pause ${BRAND} showreel` : `Play ${BRAND} showreel`}
+        >
+          {playing
+            ? <span className="who-play-pause" aria-hidden="true" />
+            : <img src={`${A}play-showreel.svg`} alt="" />}
+        </button>
+        {started && (
+          <button
+            type="button"
+            className="who-mute"
+            onClick={toggleMute}
+            aria-label={muted ? 'Unmute showreel' : 'Mute showreel'}
+            aria-pressed={!muted}
+          >
+            {muted ? (
+              <svg className="who-mute-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+                <path d="M11 5 6.5 9H3v6h3.5L11 19V5Z" fill="currentColor" />
+                <path d="m16 9.5 5 5M21 9.5l-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg className="who-mute-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+                <path d="M11 5 6.5 9H3v6h3.5L11 19V5Z" fill="currentColor" />
+                <path d="M15.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M18.2 5.8a9 9 0 0 1 0 12.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            )}
+          </button>
+        )}
+      </div>
+    </div>
   )
 
-  const openOnActivate = e => {
-    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return
-    if (e.type === 'keydown') e.preventDefault()
-    openPlayer()
-  }
+  if (variant === 'hero') return media
 
   return (
-    <>
-      {variant === 'hero'
-        ? <div
-            className="hero-video is-clickable"
-            role="button"
-            tabIndex={0}
-            onClick={openPlayer}
-            onKeyDown={openOnActivate}
-            aria-label={`Play ${BRAND} showreel`}
-          >
-            <ShowreelThumb />
-            {playBtn}
-          </div>
-        : <div className="who-vid-wrap" data-reveal="scale">
-            <div
-              className="who-video is-clickable"
-              role="button"
-              tabIndex={0}
-              onClick={openPlayer}
-              onKeyDown={openOnActivate}
-              aria-label={`Play ${BRAND} showreel`}
-            >
-              <ShowreelThumb />
-              {playBtn}
-            </div>
-            <div className="who-btm">
-              <span>Showreel</span>
-              <img src={`${A}logo-showreel.png`} alt="" className="who-logo" />
-            </div>
-          </div>}
-
-      {open && (
-        <div className="showreel-modal" role="dialog" aria-modal="true" aria-label={`${BRAND} showreel`} onClick={close}>
-          <div className="showreel-frame" onClick={e => e.stopPropagation()}>
-            <div className="showreel-glass" aria-hidden="true" />
-            <video
-              ref={videoRef}
-              className="showreel-video"
-              src={`${A}showreel.mp4`}
-              poster={`${A}showreel-brand-bg.png`}
-              playsInline
-              preload="metadata"
-              onClick={togglePlay}
-              onLoadedMetadata={e => syncTime(e.currentTarget)}
-              onDurationChange={e => syncTime(e.currentTarget)}
-              onTimeUpdate={e => syncTime(e.currentTarget)}
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-              onEnded={() => {
-                setPlaying(false)
-                setProgress(100)
-              }}
-            />
-            <div className="showreel-controls">
-              <button type="button" className="showreel-btn" onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
-                {playing ? <span className="showreel-icon-pause" aria-hidden="true" /> : <span className="showreel-icon-play" aria-hidden="true" />}
-              </button>
-              <div
-                className="showreel-track"
-                ref={trackRef}
-                onPointerDown={onTrackPointerDown}
-                role="slider"
-                aria-label="Seek"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={Math.round(progress)}
-                tabIndex={0}
-                onKeyDown={e => {
-                  const video = videoRef.current
-                  const d = readVideoDuration(video)
-                  if (!video || !d) return
-                  if (e.key === 'ArrowRight') video.currentTime = Math.min(d, video.currentTime + 5)
-                  if (e.key === 'ArrowLeft') video.currentTime = Math.max(0, video.currentTime - 5)
-                }}
-              >
-                <div className="showreel-track-rail" />
-                <div className="showreel-track-fill" style={{ width: `${progress}%` }} />
-                <div className="showreel-thumb" style={{ left: `${progress}%` }} />
-              </div>
-              <span className="showreel-time">{formatShowreelTime(current)} / {formatShowreelTime(duration)}</span>
-              <button type="button" className="showreel-btn showreel-close" onClick={close} aria-label="Close showreel">
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    <div className="who-vid-wrap" data-reveal="scale">
+      {media}
+      <div className="who-btm">
+        <span>Showreel</span>
+        <img src={`${A}logo-showreel.png`} alt="" className="who-logo" />
+      </div>
+    </div>
   )
 }
 
