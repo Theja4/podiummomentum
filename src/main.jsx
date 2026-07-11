@@ -199,23 +199,36 @@ function Header() {
 function Hero() {
   return <section id="top" className="hero">
     <div className="hero-inner">
-      <h1 className="hero-title">
-        <span>Build a <em>10X better website.</em> Become unforgettable.</span>
-      </h1>
-      <div className="hero-band">
-        <div className="hero-media">
-          <ShowreelPlayer variant="hero" autoplayOnLoad />
-        </div>
-        <div className="hero-side">
-          <p>We turn ambitious tech companies into category leaders with <em>sharper positioning, standout design, and websites that win serious buyers.</em></p>
-          <div className="hero-action"><Button light href={CONTACT_PATH}>Start a project</Button></div>
-          <div className="hero-rating">
-            <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}brand-mark.svg`} alt="" /></span>
-            <div className="hero-rating-copy">
-              <span><b>4.9 Stars</b> &nbsp;Average client rating</span>
-              <span className="hero-stars" aria-hidden="true">★★★★★</span>
+      {/* Above-the-fold block: on mobile this fills the first screen so rating requires scroll */}
+      <div className="hero-fold">
+        <h1 className="hero-title">
+          <span>Build a <em>10X better website.</em> Become unforgettable.</span>
+        </h1>
+        <div className="hero-band">
+          <div className="hero-media">
+            <ShowreelPlayer variant="hero" autoplayOnLoad />
+          </div>
+          <div className="hero-side">
+            <p className="hero-side-desktop">We turn ambitious tech companies into category leaders with <em>sharper positioning, standout design, and websites that win serious buyers.</em></p>
+            <p className="hero-side-mobile">We turn ambitious tech companies into category leaders with <em>sharper positioning</em> and websites that win serious buyers.</p>
+            <div className="hero-action"><Button light href={CONTACT_PATH}>Start a project</Button></div>
+            <div className="hero-rating hero-rating-desktop">
+              <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}brand-mark.svg`} alt="" /></span>
+              <div className="hero-rating-copy">
+                <span className="hero-rating-score"><b>4.9</b> Stars</span>
+                <span className="hero-rating-label">Average client rating</span>
+                <span className="hero-stars" aria-hidden="true">★★★★★</span>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="hero-rating hero-rating-mobile">
+        <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}brand-mark.svg`} alt="" /></span>
+        <div className="hero-rating-copy">
+          <span className="hero-rating-score"><b>4.9</b> Stars</span>
+          <span className="hero-rating-label">Average client rating</span>
+          <span className="hero-stars" aria-hidden="true">★★★★★</span>
         </div>
       </div>
       <div className="hero-trust">
@@ -421,10 +434,12 @@ function About() {
         <ShowreelPlayer />
       </div>
       <div className="who-right">
-        <h2 data-reveal="line">Most of our clients experience the same gap between what they are and how they're perceived.</h2>
+        <h2 className="who-headline who-headline-desktop" data-reveal="line">Most of our clients experience the same gap between what they are and how they're perceived.</h2>
+        <h2 className="who-headline who-headline-mobile" data-reveal="line">The gap between what you are and how you're perceived is costing you.</h2>
         <div className="who-copy">
-          <p data-reveal="line">{BRAND} is a design agency for tech and corporate leaders at turning points: pre raise, post acquisition, market expansion, or a full repositioning. We've seen what happens when a company's brand lags behind its ambition. Investors notice. Deals stall. Talent looks elsewhere.</p>
-          <p data-reveal="line">We close that gap by turning internal truth into external perception through clarity, position, signal, proof, and memory.</p>
+          <p className="who-copy-desktop" data-reveal="line">{BRAND} is a design agency for tech and corporate leaders at turning points: pre raise, post acquisition, market expansion, or a full repositioning. We've seen what happens when a company's brand lags behind its ambition. Investors notice. Deals stall. Talent looks elsewhere.</p>
+          <p className="who-copy-desktop" data-reveal="line">We close that gap by turning internal truth into external perception through clarity, position, signal, proof, and memory.</p>
+          <p className="who-copy-mobile" data-reveal="line">We help tech leaders close that gap—turning internal truth into market perception through clarity, position, and proof.</p>
         </div>
         <div data-reveal="up" className="who-cta"><Button href="#work">About us</Button></div>
       </div>
@@ -609,11 +624,18 @@ function Challenge() {
     const center = el.querySelector('.tcx-error-center')
     if (window.innerWidth < 992) {
       const io = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add('tcx-mobile-live')
-          io.disconnect()
+        if (!entry.isIntersecting) return
+        el.classList.add('tcx-mobile-live')
+        // One soft pulse on the centerpiece after cards start landing.
+        if (center) {
+          window.setTimeout(() => {
+            center.classList.remove('is-pulse')
+            void center.offsetWidth
+            center.classList.add('is-pulse')
+          }, 420)
         }
-      }, { threshold: .3 })
+        io.disconnect()
+      }, { threshold: .22, rootMargin: '0px 0px -8% 0px' })
       io.observe(el)
       return () => io.disconnect()
     }
@@ -655,25 +677,27 @@ function Challenge() {
           <div className="tcx-tag tcx-tag-red">Challenge</div>
           <h2 className="tcx-error-heading">Your product scaled.<br />Your website hasn’t caught up.</h2>
         </div>
-        <div className="tcx-error-visual">
-          <img className="tcx-error-center" src={`${A}tc-error-computer.webp`} alt="Outdated website throwing errors" />
-        </div>
-        <div className="tcx-error-bg" aria-hidden="true">
-          {[0, 1, 2, 3, 4, 5, 6].map(col => {
-            const card = { 1: challengeCards[0], 2: challengeCards[1], 4: challengeCards[2], 5: challengeCards[3] }[col]
-            return (
-              <div className={`tcx-divider ${col === 3 ? 'is-center' : ''}`} key={col}>
-                {card && (
-                  <div className={`tcx-error-card ${card[1]}`} data-tcx-card={card[0]}>
-                    <span className="tcx-error-dot" />
-                    <div className={`tcx-error-card-visual ${card[2]}`}>
-                      <img src={card[3]} alt="" loading="lazy" />
+        <div className="tcx-error-stage">
+          <div className="tcx-error-visual">
+            <img className="tcx-error-center" src={`${A}tc-error-computer.webp`} alt="Outdated website throwing errors" />
+          </div>
+          <div className="tcx-error-bg" aria-hidden="true">
+            {[0, 1, 2, 3, 4, 5, 6].map(col => {
+              const card = { 1: challengeCards[0], 2: challengeCards[1], 4: challengeCards[2], 5: challengeCards[3] }[col]
+              return (
+                <div className={`tcx-divider ${col === 3 ? 'is-center' : ''}`} key={col}>
+                  {card && (
+                    <div className={`tcx-error-card ${card[1]}`} data-tcx-card={card[0]} style={{ '--tcx-i': card[0] - 1 }}>
+                      <span className="tcx-error-dot" />
+                      <div className={`tcx-error-card-visual ${card[2]}`}>
+                        <img src={card[3]} alt="" loading="lazy" />
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>
