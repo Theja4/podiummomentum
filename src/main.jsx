@@ -197,10 +197,9 @@ function Header() {
 }
 
 function Hero() {
-  return <section id="top" className="hero">
-    <div className="hero-inner">
-      {/* Above-the-fold block: on mobile this fills the first screen so rating requires scroll */}
-      <div className="hero-fold">
+  return (
+    <section id="top" className="hero">
+      <div className="hero-inner">
         <h1 className="hero-title">
           <span>Build a <em>10X better website.</em> Become unforgettable.</span>
         </h1>
@@ -209,11 +208,17 @@ function Hero() {
             <ShowreelPlayer variant="hero" autoplayOnLoad />
           </div>
           <div className="hero-side">
-            <p className="hero-side-desktop">We turn ambitious tech companies into category leaders with <em>sharper positioning, standout design, and websites that win serious buyers.</em></p>
-            <p className="hero-side-mobile">We turn ambitious tech companies into category leaders with <em>sharper positioning</em> and websites that win serious buyers.</p>
-            <div className="hero-action"><Button light href={CONTACT_PATH}>Start a project</Button></div>
-            <div className="hero-rating hero-rating-desktop">
-              <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}brand-mark.svg`} alt="" /></span>
+            <p className="hero-lead">
+              We turn ambitious tech companies into category leaders with{' '}
+              <em>sharper positioning</em> and websites that win serious buyers.
+            </p>
+            <div className="hero-action">
+              <Button light href={CONTACT_PATH}>Start a project</Button>
+            </div>
+            <div className="hero-rating">
+              <span className="hero-rating-badge" aria-hidden="true">
+                <img src={`${A}brand-mark.svg`} alt="" />
+              </span>
               <div className="hero-rating-copy">
                 <span className="hero-rating-score"><b>4.9</b> Stars</span>
                 <span className="hero-rating-label">Average client rating</span>
@@ -222,22 +227,18 @@ function Hero() {
             </div>
           </div>
         </div>
-      </div>
-      <div className="hero-rating hero-rating-mobile">
-        <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}brand-mark.svg`} alt="" /></span>
-        <div className="hero-rating-copy">
-          <span className="hero-rating-score"><b>4.9</b> Stars</span>
-          <span className="hero-rating-label">Average client rating</span>
-          <span className="hero-stars" aria-hidden="true">★★★★★</span>
+        <div className="hero-trust">
+          <p>Trusted by 40+ ambitious<br />technology companies</p>
+          <div className="hero-logos">
+            {clientLogos.slice(0, 6).map(id => (
+              <img src={`${A}${id}.avif`} alt="Client" key={id} />
+            ))}
+          </div>
         </div>
       </div>
-      <div className="hero-trust">
-        <p>Trusted by 40+ ambitious<br />technology companies</p>
-        <div className="hero-logos">{clientLogos.slice(0, 6).map(id => <img src={`${A}${id}.avif`} alt="Client" key={id} />)}</div>
-      </div>
-    </div>
-    <MetricsMarquee />
-  </section>
+      <MetricsMarquee />
+    </section>
+  )
 }
 
 function MetricsMarquee() {
