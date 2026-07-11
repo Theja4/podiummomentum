@@ -43,8 +43,11 @@ const testimonials = [
 ]
 
 function Logo({ variant = 'header' }) {
-  const src = variant === 'footer' ? `${A}logo-footer.png` : variant === 'mark' ? `${A}logo-mark.png` : `${A}logo-header.png`
-  return <img className={`logo logo-${variant}`} src={src} alt={BRAND} />
+  if (variant === 'mark') return <img className="logo-mark" src={`${A}brand-mark.svg`} alt={BRAND} />
+  return <span className={`logo-lockup logo-${variant}`} aria-label={BRAND}>
+    <img className="logo-lockup-mark" src={`${A}brand-mark.svg`} alt="" />
+    <span className="logo-wordmark"><b>podium</b><em>momentum</em></span>
+  </span>
 }
 
 function Button({ children, light = false, href = '#' }) {
@@ -59,7 +62,7 @@ function Button({ children, light = false, href = '#' }) {
       <span className="pill-label">{children}</span>
       <img
         className={`pill-icon ${light ? 'pill-handwave' : 'pill-brand'}`}
-        src={light ? `${A}hand-wave.avif` : `${A}logo-icon.png`}
+        src={light ? `${A}hand-wave.avif` : `${A}brand-mark.svg`}
         alt=""
       />
     </a>
@@ -70,6 +73,11 @@ function Header() {
   const [open, setOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'dark')
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    try { localStorage.setItem('pm-theme', theme) } catch {}
+  }, [theme])
   useEffect(() => {
     let previous = window.scrollY
     let frame = 0
@@ -97,13 +105,31 @@ function Header() {
       <a href="#top">Home</a><a href="#about">About ↓</a><a href="#work">Works ↓</a>
       <a href="#services">Services ↓</a><a href="#contact">For Startups</a><a href="#faq">Resources ↓</a>
     </nav>
-    <div className="header-actions"><button className="menu" onClick={() => setOpen(!open)} aria-label="Toggle menu">{open ? '×' : '≡'}</button><Button light href="#contact">Let’s chat</Button></div>
+    <div className="header-actions">
+      <button className="menu" onClick={() => setOpen(!open)} aria-label="Toggle menu">{open ? '×' : '≡'}</button>
+      <Button light href="#contact">Let’s chat</Button>
+      <button
+        className="theme-toggle"
+        type="button"
+        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      >
+        {theme === 'dark'
+          ? <svg className="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.5" />
+              <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.28 5.28l1.42 1.42M17.3 17.3l1.42 1.42M18.72 5.28 17.3 6.7M6.7 17.3l-1.42 1.42" />
+            </svg>
+          : <svg className="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20.2 15.2A8.4 8.4 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z" />
+            </svg>}
+      </button>
+    </div>
   </header>
 }
 
 function Hero() {
   return <section id="top" className="hero">
-    <Header />
     <div className="hero-inner">
       <h1 className="hero-title">
         <span>Build a <em>10X better website</em> that</span>{' '}
@@ -117,7 +143,7 @@ function Hero() {
           <p>{BRAND} helps scaling tech teams turn an outdated brand and website into <em>a credible growth asset that wins serious buyers</em>. We reposition you to reflect what you’ve become, not what you were when you started.</p>
           <div className="hero-action"><Button light href="#contact">Let’s go</Button></div>
           <div className="hero-rating">
-            <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}logo-icon.png`} alt="" /></span>
+            <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}brand-mark.svg`} alt="" /></span>
             <div className="hero-rating-copy">
               <span><b>4.9 Stars</b> &nbsp;Average client rating</span>
               <span className="hero-stars" aria-hidden="true">★★★★★</span>
@@ -143,7 +169,7 @@ function ShowreelThumb() {
   return (
     <div className="who-brand-thumb" aria-hidden="true">
       <p className="who-hi">Hi we are,</p>
-      <img className="who-brand-logo" src={`${A}logo-footer.png`} alt={BRAND} />
+      <Logo variant="footer" />
     </div>
   )
 }
@@ -314,7 +340,7 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
       {media}
       <div className="who-btm">
         <span>Showreel</span>
-        <img src={`${A}logo-showreel.png`} alt="" className="who-logo" />
+        <img src={`${A}brand-mark.svg`} alt="" className="who-logo" />
       </div>
     </div>
   )
@@ -375,7 +401,7 @@ function FAQ() {
 function Testimonials() {
   const track = useRef(null)
   const slide = direction => track.current?.scrollBy({ left: direction * Math.min(460, track.current.clientWidth * .82), behavior: 'smooth' })
-  return <section className="testimonials"><div className="eyebrow" data-reveal="up">● &nbsp; Testimonials</div><div className="testimonial-track" ref={track}>{testimonials.map(([quote, name, role, img]) => <article key={name} data-reveal="card"><p>{quote}</p><div className="person"><img src={img} alt={name} /><div><b>{name}</b><span>{role}</span></div><i>in</i></div></article>)}</div><div className="track-control"><span></span><button onClick={() => slide(-1)} aria-label="Previous testimonial">←</button><button onClick={() => slide(1)} aria-label="Next testimonial">→</button></div></section>
+  return <section className="testimonials"><div className="testimonial-head"><div className="eyebrow" data-reveal="up">● &nbsp; Testimonials</div><h2 data-reveal="line">What our clients say about working with us.</h2></div><div className="testimonial-track" ref={track}>{testimonials.map(([quote, name, role, img]) => <article key={name} data-reveal="card"><p>{quote}</p><div className="person"><img src={img} alt={name} /><div><b>{name}</b><span>{role}</span></div><i>in</i></div></article>)}</div><div className="track-control"><span></span><button onClick={() => slide(-1)} aria-label="Previous testimonial">←</button><button onClick={() => slide(1)} aria-label="Next testimonial">→</button></div></section>
 }
 
 function Contact() {
@@ -384,9 +410,16 @@ function Contact() {
 
 function Choice({ title, options }) { const [selected, setSelected] = useState(''); return <fieldset><legend>{title}</legend><div className="choices">{options.map(o => <button className={selected === o ? 'selected' : ''} type="button" onClick={() => setSelected(o)} key={o}>{o}</button>)}</div></fieldset> }
 
+function SocialIcon({ name }) {
+  if (name === 'Behance') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.26 11.47s2.17-.16 2.17-2.7c0-2.54-1.78-3.78-4.04-3.78H0V19h7.39s4.53.14 4.53-4.14c0 0 .2-3.39-2.66-3.39ZM3.25 7.43h4.14s1.01 0 1.01 1.48-.6 1.69-1.28 1.69H3.25V7.43Zm3.94 9.13H3.25v-3.75h4.14s1.51-.02 1.51 1.93c0 1.64-1.12 1.82-1.71 1.82ZM18.31 8.5c-5.47 0-5.46 5.46-5.46 5.46s-.37 5.43 5.46 5.43c0 0 4.87.28 4.87-3.78h-2.5s.08 1.53-2.28 1.53c0 0-2.5.17-2.5-2.47h7.36s.8-6.17-4.95-6.17Zm-2.38 4.28s.31-2.19 2.5-2.19 2.16 2.19 2.16 2.19h-4.66ZM15.79 5.6h5.22v1.56h-5.22V5.6Z" /></svg>
+  if (name === 'LinkedIn') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.32 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.1 20.45H3.54V9H7.1v11.45Z" /></svg>
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.24 2.25h3.31l-7.23 8.26 8.51 11.24h-6.66l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.08 4.13H5.12l11.96 15.64Z" /></svg>
+}
+
 function Footer() {
   const cols = [['Company:','About','Services','Projects','For startups','Lab','Blog','Resources','Contacts','Careers','Testimonials'],['Services:','Web Design','Branding','UX and UI','Motion','SEO','Content Creation','Landing Page','Webflow Dev'],['Industries:','Healthcare','Fintech','Web3','Technology','Corporate','AI','Real Estate','Ecommerce','FMCG','Hospitality']]
-  return <footer data-reveal="footer">{cols.map(col => <div className="footer-col" key={col[0]}><b>{col[0]}</b>{col.slice(1).map((x, i) => <a href="#top" style={{ '--footer-i': i }} key={x}>{x}</a>)}</div>)}<div className="subscribe"><b>Subscribe to our news and updates</b><label><input placeholder="Your email here" /><span>→</span></label><small>By signing up, you agree to our Privacy Policy. We respect your data.</small><b>Follow us on:</b><div className="socials">{['◉','Bē','●','in','𝕏'].map((x, i) => <span style={{ '--footer-i': i }} key={x}>{x}</span>)}</div></div><div className="footer-bottom"><Logo variant="footer" /><span>© 2026 {BRAND}. All rights reserved &nbsp; ● &nbsp; <b>Privacy Policy</b></span><a href="#top" className="to-top">↑</a></div></footer>
+  const socials = ['Behance', 'LinkedIn', 'X']
+  return <footer data-reveal="footer">{cols.map(col => <div className="footer-col" key={col[0]}><b>{col[0]}</b>{col.slice(1).map((x, i) => <a href="#top" style={{ '--footer-i': i }} key={x}>{x}</a>)}</div>)}<div className="subscribe"><b>Subscribe to our news and updates</b><label className="subscribe-row"><input type="email" aria-label="Email address" placeholder="Your email here" /><button className="subscribe-action" type="button" aria-label="Subscribe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></button></label><small>By signing up, you agree to our Privacy Policy. We respect your data.</small><b>Follow us on:</b><div className="socials">{socials.map((name, i) => <a href="#top" aria-label={name} style={{ '--footer-i': i }} key={name}><SocialIcon name={name} /></a>)}</div></div><div className="footer-bottom"><Logo variant="footer" /><span>© 2026 {BRAND}. All rights reserved &nbsp; ● &nbsp; <b>Privacy Policy</b></span><a href="#top" className="to-top">↑</a></div></footer>
 }
 
 function App() {
@@ -428,7 +461,7 @@ function App() {
       document.body.classList.remove('page-loaded')
     }
   }, [])
-  return <><Hero /><main><About /><Work /><Clients /><Services /><FAQ /><Testimonials /><Contact /></main><Footer /></>
+  return <><Header /><Hero /><main><About /><Work /><Clients /><Services /><FAQ /><Testimonials /><Contact /></main><Footer /></>
 }
 
 createRoot(document.getElementById('root')).render(<App />)

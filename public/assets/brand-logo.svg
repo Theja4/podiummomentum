@@ -1,0 +1,11 @@
+<svg width="560" height="112" viewBox="0 0 560 112" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Podium Momentum</title>
+  <desc id="desc">Three ascending green momentum forms beside the Podium Momentum wordmark.</desc>
+  <g transform="translate(4 8) scale(.86)">
+    <path d="M8 85C8 70.6406 19.6406 59 34 59H39V96H8V85Z" fill="#AFF9C9"/>
+    <path d="M39 58C39 43.6406 50.6406 32 65 32H70V96H39V58Z" fill="#7CF0BD"/>
+    <path d="M70 31C70 16.6406 81.6406 5 96 5H101V96H70V31Z" fill="#67E0A3"/>
+  </g>
+  <text x="108" y="70" fill="#090B0A" font-family="Mazzard, Arial, sans-serif" font-size="42" font-weight="600" letter-spacing="-1.8">podium</text>
+  <text x="255" y="70" fill="#090B0A" font-family="Mazzard, Arial, sans-serif" font-size="42" font-weight="400" letter-spacing="-1.8">momentum</text>
+</svg>
