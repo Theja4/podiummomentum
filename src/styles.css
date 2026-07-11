@@ -84,3 +84,66 @@ body{overflow-x:hidden}.header{position:fixed;z-index:100;transition:transform .
 @media(prefers-reduced-motion:reduce){
   .showreel-modal,.showreel-frame{animation:none}
 }
+
+/* Statement hero: headline with marker highlight, media band, and trust strip. */
+.hero{height:auto;min-height:100vh;display:flex;flex-direction:column;padding:102px 60px 0;place-items:unset}
+.hero-inner{width:100%;max-width:1560px;margin:0 auto;flex:1;display:flex;flex-direction:column;justify-content:center}
+.hero-title{font-size:3.25rem;line-height:1.06;font-weight:500;letter-spacing:-.1rem;margin:0;max-width:24ch}
+.hero-title span{display:block}
+.hero-title em,.hero-side p em{font-style:normal;background:linear-gradient(180deg,transparent 12%,#d5e5f0 12% 90%,transparent 90%);box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.12em;padding:0 .08em}
+.hero-band{display:grid;grid-template-columns:1.05fr 1fr;gap:3rem;align-items:center;margin-top:1.8rem;border-top:1px solid #ececec;padding-top:1.8rem}
+.hero-media{min-width:0}
+.hero-video{position:relative;border-radius:24px;overflow:hidden;aspect-ratio:16/8.2;background:#0e0e0e}
+.hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;cursor:pointer}
+.hero-video .who-play{width:54px;height:54px}
+.hero-video .who-play img{width:50px;height:50px}
+.hero-side{display:flex;flex-direction:column;align-items:flex-start;gap:1.25rem;max-width:34rem}
+.hero-side p{font-size:1.25rem;line-height:1.38;letter-spacing:-.02rem;margin:0}
+.hero-action .pill{font-size:1.35rem;font-weight:500;padding:1.05rem 1.85rem;gap:.65rem}.hero-action .pill-icon,.hero-action .pill-handwave{width:1.25rem;height:1.25rem}
+.hero-action .pill:hover{transform:translateY(-2px)}
+.hero-rating{display:flex;align-items:center;gap:16px}
+.hero-rating-badge{width:46px;height:46px;border:1px solid #dfe5e8;border-radius:12px;display:grid;place-items:center;background:#fff}
+.hero-rating-badge img{width:23px;height:23px;object-fit:contain}
+.hero-rating-copy{display:flex;flex-direction:column;gap:4px;font-size:1rem}
+.hero-rating-copy b{font-weight:600}
+.hero-rating-copy>span:first-child{color:#6d7478}
+.hero-rating-copy b{color:var(--ink)}
+.hero-stars{color:var(--ink);letter-spacing:.18em;font-size:1.05rem;line-height:1}
+.hero-trust{display:flex;align-items:center;gap:3rem;margin-top:1.4rem;border-top:1px solid #ececec;padding:1.2rem 0 1.4rem}
+.hero-trust p{margin:0;font-size:12px;line-height:1.5;text-transform:uppercase;letter-spacing:.07em;color:#8a8a8a;padding-right:3rem;border-right:1px solid #e2e2e2;flex-shrink:0}
+.hero-logos{flex:1;display:flex;align-items:center;justify-content:space-between;gap:2.2rem;min-width:0}
+.hero-logos img{width:7.2rem;height:2.3rem;object-fit:contain;filter:grayscale(1);opacity:.5}
+.hero>.marquee{position:static;margin:auto -60px 0;width:auto;border-radius:0 0 28px 28px;flex-shrink:0}
+.hero-title span,.hero-band,.hero-trust{opacity:0;transform:translateY(34px)}
+.page-loaded .hero-title span,.page-loaded .hero-band,.page-loaded .hero-trust{opacity:1;transform:none;transition:opacity .85s cubic-bezier(.16,1,.3,1),transform .85s cubic-bezier(.16,1,.3,1)}
+.page-loaded .hero-title span:first-child{transition-delay:.12s}
+.page-loaded .hero-title span:nth-child(2){transition-delay:.22s}
+.page-loaded .hero-band{transition-delay:.36s}
+.page-loaded .hero-trust{transition-delay:.5s}
+@media(max-width:900px){
+  .hero{padding:104px 18px 0}
+  .hero-title{font-size:2.1rem;letter-spacing:-.06rem;max-width:none}
+  .hero-title span{display:inline}
+  .hero-band{grid-template-columns:1fr;gap:1.9rem;margin-top:1.9rem;padding-top:1.7rem}
+  .hero-side{max-width:none;gap:1.3rem}
+  .hero-side p{display:none}
+  .hero-trust{flex-direction:column;align-items:flex-start;gap:1.4rem;margin-top:2.2rem;padding:1.6rem 0 2.4rem}
+  .hero-trust p{padding-right:0;border-right:0}
+  .hero-logos{width:100%;flex-wrap:wrap;justify-content:flex-start;gap:1.6rem 2rem}
+  .hero-logos img{width:6.2rem;height:2.2rem}
+  .hero>.marquee{margin:auto -18px 0}
+}
+@media(prefers-reduced-motion:reduce){.hero-title span,.hero-band,.hero-trust{opacity:1!important;transform:none!important;transition:none!important}}
+
+/* Branded showreel card: Hi we are + two line logo. */
+.who-brand-thumb{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,1.4vw,16px);padding:clamp(16px,3vw,28px);background:linear-gradient(145deg,#f0f3f6 0%,#c8d0d6 42%,#8b949c 100%);border-radius:inherit}
+.who-hi{margin:0;font-family:Mazzard,Arial,sans-serif;font-size:clamp(1.05rem,1.6vw,1.35rem);font-weight:500;letter-spacing:-.02em;color:#080808;line-height:1.15}
+.who-brand-logo{width:min(72%,200px);height:auto;object-fit:contain;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,.12))}
+.hero-video .who-brand-thumb{border-radius:inherit}
+.hero-video .who-brand-logo{width:min(58%,260px)}
+.hero-video .who-hi{font-size:clamp(1.15rem,1.8vw,1.55rem)}
+.who-video .who-brand-thumb{z-index:1}
+.who-video .who-play{z-index:3}
+.who-video.is-clickable,.hero-video.is-clickable{cursor:pointer}
+.who-video.is-clickable:focus-visible,.hero-video.is-clickable:focus-visible{outline:2px solid #080808;outline-offset:3px}
+.who-video.is-clickable .who-play,.hero-video.is-clickable .who-play{pointer-events:none}

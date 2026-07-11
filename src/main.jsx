@@ -23,6 +23,8 @@ const projects = [
   },
 ]
 
+const clientLogos = ['a9cc6fba12268e37','43201ae504d0ad9f','cfecff048b60daa1','baa053d3454375d0','518e03fa4e4f8841','d2c8ca3a50aba890','ab3a9a6cf9778c11','9a6b3e2b11136ee0','c90888271d904160','e72cc835698ff331']
+
 const services = ['Website Design', 'Branding', 'UX and UI', 'Motion Design', 'SEO', 'Content Creation', 'Landing Page', 'Webflow Development']
 const faqs = [
   [`What does ${BRAND} do`, `${BRAND} is a strategic design partner that helps startups, tech companies, and corporate teams strengthen their brand, website, and digital product experience.`],
@@ -102,12 +104,32 @@ function Header() {
 function Hero() {
   return <section id="top" className="hero">
     <Header />
-    <div className="hero-copy">
-      <p className="hero-kicker">We help tech leaders shape the brand and digital presence that drives the next stage of growth.</p>
-      <h1><span>Strategy led creative partner for scaling</span><span>B2B tech companies</span></h1>
-      <div className="hero-cta"><Button light href="#contact">Book strategy call</Button></div>
+    <div className="hero-inner">
+      <h1 className="hero-title">
+        <span>Build a <em>10X better website</em> that</span>
+        <span>makes your company unforgettable</span>
+      </h1>
+      <div className="hero-band">
+        <div className="hero-media">
+          <ShowreelPlayer variant="hero" />
+        </div>
+        <div className="hero-side">
+          <p>{BRAND} helps scaling tech teams turn an outdated brand and website into <em>a credible growth asset that wins serious buyers</em>. We reposition you to reflect what you’ve become, not what you were when you started.</p>
+          <div className="hero-action"><Button light href="#contact">Let’s go</Button></div>
+          <div className="hero-rating">
+            <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}logo-icon.png`} alt="" /></span>
+            <div className="hero-rating-copy">
+              <span><b>4.9 Stars</b> &nbsp;Average client rating</span>
+              <span className="hero-stars" aria-hidden="true">★★★★★</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="hero-trust">
+        <p>Trusted by 40+ brands that<br />outpaced their “boring” competitors</p>
+        <div className="hero-logos">{clientLogos.slice(0, 6).map(id => <img src={`${A}${id}.avif`} alt="Client" key={id} />)}</div>
+      </div>
     </div>
-    <a className="down" href="#about" aria-label="Scroll to about">↓</a>
     <MetricsMarquee />
   </section>
 }
@@ -119,12 +141,28 @@ function MetricsMarquee() {
 
 function formatShowreelTime(seconds) {
   if (!Number.isFinite(seconds) || seconds < 0) return '0:00'
-  const mins = Math.floor(seconds / 60)
-  const secs = Math.floor(seconds % 60)
+  const total = Math.floor(seconds)
+  const mins = Math.floor(total / 60)
+  const secs = total % 60
   return `${mins}:${String(secs).padStart(2, '0')}`
 }
 
-function ShowreelPlayer() {
+function readVideoDuration(video) {
+  const d = video?.duration
+  if (!Number.isFinite(d) || d <= 0) return 0
+  return d
+}
+
+function ShowreelThumb() {
+  return (
+    <div className="who-brand-thumb">
+      <p className="who-hi">Hi we are,</p>
+      <img className="who-brand-logo" src={`${A}logo-footer.png`} alt={BRAND} />
+    </div>
+  )
+}
+
+function ShowreelPlayer({ variant = 'about' }) {
   const videoRef = useRef(null)
   const trackRef = useRef(null)
   const savedTime = useRef(0)
@@ -134,6 +172,15 @@ function ShowreelPlayer() {
   const [progress, setProgress] = useState(0)
   const [duration, setDuration] = useState(0)
   const [current, setCurrent] = useState(0)
+
+  const syncTime = video => {
+    if (!video || scrubbing.current) return
+    const d = readVideoDuration(video)
+    const t = Number.isFinite(video.currentTime) ? video.currentTime : 0
+    setCurrent(t)
+    setDuration(d)
+    setProgress(d ? Math.min(100, (t / d) * 100) : 0)
+  }
 
   const close = () => {
     const video = videoRef.current
@@ -158,12 +205,14 @@ function ShowreelPlayer() {
   const seekFromClientX = clientX => {
     const track = trackRef.current
     const video = videoRef.current
-    if (!track || !video || !video.duration) return
+    const d = readVideoDuration(video)
+    if (!track || !video || !d) return
     const rect = track.getBoundingClientRect()
     const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
-    video.currentTime = ratio * video.duration
+    video.currentTime = ratio * d
     setProgress(ratio * 100)
     setCurrent(video.currentTime)
+    setDuration(d)
   }
 
   const onTrackPointerDown = e => {
@@ -196,7 +245,8 @@ function ShowreelPlayer() {
 
     const video = videoRef.current
     if (video) {
-      video.currentTime = savedTime.current || 0
+      const resume = Math.min(savedTime.current || 0, readVideoDuration(video) || savedTime.current || 0)
+      video.currentTime = resume
       video.play().catch(() => {})
     }
 
@@ -206,20 +256,49 @@ function ShowreelPlayer() {
     }
   }, [open])
 
+  const playBtn = (
+    <span className="who-play" aria-hidden="true">
+      <img src={`${A}play-showreel.svg`} alt="" />
+    </span>
+  )
+
+  const openOnActivate = e => {
+    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return
+    if (e.type === 'keydown') e.preventDefault()
+    openPlayer()
+  }
+
   return (
     <>
-      <div className="who-vid-wrap" data-reveal="scale">
-        <div className="who-video">
-          <img className="who-vid" src={`${A}who-vid-thumb.png`} alt={`${BRAND} showreel preview`} />
-          <button type="button" className="who-play" onClick={openPlayer} aria-label={`Play ${BRAND} showreel`}>
-            <img src={`${A}play-showreel.svg`} alt="" />
-          </button>
-        </div>
-        <div className="who-btm">
-          <span>{BRAND} Showreel</span>
-          <img src={`${A}logo-showreel.png`} alt="" className="who-logo" />
-        </div>
-      </div>
+      {variant === 'hero'
+        ? <div
+            className="hero-video is-clickable"
+            role="button"
+            tabIndex={0}
+            onClick={openPlayer}
+            onKeyDown={openOnActivate}
+            aria-label={`Play ${BRAND} showreel`}
+          >
+            <ShowreelThumb />
+            {playBtn}
+          </div>
+        : <div className="who-vid-wrap" data-reveal="scale">
+            <div
+              className="who-video is-clickable"
+              role="button"
+              tabIndex={0}
+              onClick={openPlayer}
+              onKeyDown={openOnActivate}
+              aria-label={`Play ${BRAND} showreel`}
+            >
+              <ShowreelThumb />
+              {playBtn}
+            </div>
+            <div className="who-btm">
+              <span>Showreel</span>
+              <img src={`${A}logo-showreel.png`} alt="" className="who-logo" />
+            </div>
+          </div>}
 
       {open && (
         <div className="showreel-modal" role="dialog" aria-modal="true" aria-label={`${BRAND} showreel`} onClick={close}>
@@ -229,18 +308,13 @@ function ShowreelPlayer() {
               ref={videoRef}
               className="showreel-video"
               src={`${A}showreel.mp4`}
-              poster={`${A}who-vid-thumb.png`}
+              poster={`${A}showreel-brand-bg.png`}
               playsInline
-              preload="auto"
+              preload="metadata"
               onClick={togglePlay}
-              onLoadedMetadata={e => setDuration(e.currentTarget.duration || 0)}
-              onTimeUpdate={e => {
-                if (scrubbing.current) return
-                const { currentTime, duration: d } = e.currentTarget
-                setCurrent(currentTime)
-                setDuration(d || 0)
-                setProgress(d ? (currentTime / d) * 100 : 0)
-              }}
+              onLoadedMetadata={e => syncTime(e.currentTarget)}
+              onDurationChange={e => syncTime(e.currentTarget)}
+              onTimeUpdate={e => syncTime(e.currentTarget)}
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
               onEnded={() => {
@@ -264,13 +338,10 @@ function ShowreelPlayer() {
                 tabIndex={0}
                 onKeyDown={e => {
                   const video = videoRef.current
-                  if (!video || !video.duration) return
-                  if (e.key === 'ArrowRight') {
-                    video.currentTime = Math.min(video.duration, video.currentTime + 5)
-                  }
-                  if (e.key === 'ArrowLeft') {
-                    video.currentTime = Math.max(0, video.currentTime - 5)
-                  }
+                  const d = readVideoDuration(video)
+                  if (!video || !d) return
+                  if (e.key === 'ArrowRight') video.currentTime = Math.min(d, video.currentTime + 5)
+                  if (e.key === 'ArrowLeft') video.currentTime = Math.max(0, video.currentTime - 5)
                 }}
               >
                 <div className="showreel-track-rail" />
@@ -328,7 +399,7 @@ function Work() {
 }
 
 function Clients() {
-  const logos = ['a9cc6fba12268e37','43201ae504d0ad9f','cfecff048b60daa1','baa053d3454375d0','518e03fa4e4f8841','d2c8ca3a50aba890','ab3a9a6cf9778c11','9a6b3e2b11136ee0','c90888271d904160','e72cc835698ff331']
+  const logos = clientLogos
   return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><h2 data-reveal="line">We work with ambitious B2B tech companies whose ambition is ahead of how the market reads them, and where that gap is becoming commercial.</h2><p className="client-label" data-reveal="up">OUR CLIENTS</p><div className="logo-marquee"><div>{[...logos, ...logos].map((id, i) => <img src={`${A}${id}.avif`} alt="Client" key={i} />)}</div></div></section>
 }
 
