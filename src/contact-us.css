@@ -1,0 +1,296 @@
+/* ThunderClap contact-us clone — design tokens + layout for /contact-us */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap');
+
+body.cu-active{background:#0f1518!important;color:#fff}
+body.cu-active #root{min-height:100vh;background:#0f1518}
+
+.cu-page{
+  --bg-green:#0f1518;
+  --bg-green-light:#e7f6ea;
+  --primary-green:#abe5b1;
+  --primary-green-dark:#283b43;
+  --dark-slate:#135545;
+  --primary-light:#d0edd6;
+  --neutral-2:#e7edf0;
+  --neutral-3:#182126;
+  --dark-green:#1a2327;
+  --white:#fff;
+  --white-80:#fffc;
+  --orange-red:#f65443;
+  --text-muted:#adbbc1;
+  min-height:100vh;
+  background:var(--bg-green);
+  color:var(--white);
+  font-family:'DM Sans',Arial,sans-serif;
+  font-size:1rem;
+  line-height:1.5;
+  overflow-x:hidden;
+}
+.cu-page *,.cu-page *::before,.cu-page *::after{box-sizing:border-box}
+.cu-page img{display:block;max-width:100%}
+.cu-page a{color:inherit;text-decoration:none}
+.cu-page h1,.cu-page h2,.cu-page h3,.cu-page p{margin:0}
+.cu-container{width:100%;max-width:88rem;margin:0 auto;padding:0 5%}
+
+/* Nav */
+.cu-nav{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 5%;
+  background:rgba(15,21,24,.86);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid #243740;
+}
+.cu-nav-logo{display:inline-flex;align-items:center;gap:10px;line-height:1}
+.cu-nav-logo img{width:36px;height:36px;object-fit:contain}
+.cu-nav-logo span{display:flex;align-items:baseline;gap:.28em;font-size:1.15rem;letter-spacing:-.04em;color:var(--white)}
+.cu-nav-logo b{font-weight:600}.cu-nav-logo em{font-style:normal;font-weight:400;color:var(--primary-green)}
+.cu-nav-cta{
+  border:1px solid var(--dark-slate);
+  background:var(--dark-slate);
+  color:var(--primary-light);
+  letter-spacing:.06em;text-transform:uppercase;
+  border-radius:.2rem;padding:.7rem 1.15rem;font-size:.9rem;font-weight:500;
+  transition:background .25s ease,color .25s ease;
+}
+.cu-nav-cta:hover{background:var(--primary-green);color:#0f1518}
+
+/* Buttons */
+.cu-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.75rem;
+  border:1px solid var(--dark-slate);background:var(--dark-slate);color:var(--primary-light);
+  text-align:center;letter-spacing:.06em;text-transform:uppercase;border-radius:.2rem;
+  padding:.85rem 1.35rem;font-size:1rem;font-weight:500;line-height:1.2;cursor:pointer;
+  font-family:inherit;transition:background .3s ease,color .3s ease,border-color .3s ease;
+}
+.cu-btn:hover{background:var(--primary-green);border-color:var(--primary-green);color:#0f1518}
+
+/* Typography */
+.cu-h2{font-size:clamp(2rem,4vw,3.25rem);font-weight:500;line-height:1.05;letter-spacing:-.02em;color:var(--neutral-2)}
+.cu-h2 span,.cu-trust-title span{color:var(--primary-green)}
+.cu-center{text-align:center}
+
+/* Hero */
+.cu-hero{position:relative;z-index:2;padding:3.5rem 0 5rem;overflow:hidden}
+.cu-hero-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
+.cu-hero-gradient{position:absolute;right:-12%;top:-20%;width:min(70vw,52rem);opacity:.9}
+.cu-hero-decor{position:absolute;right:-8%;top:8%;width:min(55vw,40rem);opacity:.55}
+.cu-hero-grid{
+  position:relative;z-index:1;
+  display:flex;justify-content:space-between;align-items:stretch;gap:3rem;
+}
+.cu-hero-left{flex:1;max-width:38.4375rem;display:flex;flex-direction:column;gap:3.25rem}
+.cu-hero-right{flex:1;max-width:38rem}
+.cu-hero-left .cu-h2{color:var(--white);font-weight:400;max-width:18ch}
+
+/* Trust / logos */
+.cu-trust{display:flex;flex-direction:column;gap:2rem}
+.cu-trust-top{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.cu-trust-title{color:var(--white);text-transform:uppercase;letter-spacing:.02em;line-height:1.5;font-size:1.125rem;max-width:16ch}
+.cu-clutch{display:flex;align-items:center;gap:1rem}
+.cu-clutch-icon{width:3rem;height:3rem;object-fit:contain}
+.cu-clutch-row{display:flex;align-items:center;gap:.45rem;color:var(--white);font-size:.875rem;line-height:1}
+.cu-stars{display:flex;gap:1px}
+.cu-stars img{width:1rem;height:1rem}
+.cu-clutch-score{display:block;margin-top:.25rem;color:rgba(255,255,255,.6);font-size:.875rem;line-height:1}
+.cu-logo-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem 2rem;align-items:center;
+}
+.cu-logo-cell{display:flex;align-items:center;justify-content:center;min-height:1.75rem}
+.cu-logo-cell img{width:100%;height:1.5rem;object-fit:contain;opacity:.85}
+.cu-logo-cell.is-amazon{max-width:6.1rem}
+.cu-logo-cell.is-razorpay{max-width:8rem}
+.cu-logo-cell.is-z47{max-width:4.3rem}
+.cu-logo-cell.is-storylane{max-width:8rem}
+.cu-logo-cell.is-roommaster{max-width:6.1rem}
+.cu-logo-cell.is-wiz{min-width:7rem}
+
+/* Stats */
+.cu-stats{
+  display:flex;align-items:center;gap:2rem;align-self:stretch;
+  border-top:1px solid var(--primary-green-dark);border-bottom:1px solid var(--primary-green-dark);
+  padding:1.125rem 0;
+}
+.cu-stat{display:flex;align-items:center;gap:1.125rem}
+.cu-stat strong{font-size:clamp(2.5rem,4vw,3.625rem);font-weight:300;color:var(--neutral-2);line-height:1;letter-spacing:-.04em}
+.cu-stat strong:after{content:'%';color:var(--primary-green)}
+.cu-stat span{max-width:7.5rem;color:var(--white-80);line-height:1.4;font-size:1rem}
+.cu-stat-div{width:1px;align-self:stretch;background:var(--primary-green-dark);flex:none}
+
+/* Expect */
+.cu-expect{display:flex;flex-direction:column;gap:1.75rem;align-self:stretch}
+.cu-expect-title{color:var(--white);font-size:1.25rem;font-weight:500}
+.cu-expect-list{display:flex;flex-direction:column;gap:1.25rem}
+.cu-expect-item{display:flex;align-items:flex-start;gap:1.125rem}
+.cu-expect-item img{width:2rem;height:2rem;flex:none;margin-top:4px}
+.cu-expect-item h3{color:var(--white);font-size:1.25rem;font-weight:500;line-height:1.4;margin:0}
+.cu-expect-item p{color:var(--white-80);font-weight:300;margin:.2rem 0 0;line-height:1.45}
+.cu-expect-item + .cu-expect-item{padding-top:1.25rem;border-top:1px solid var(--primary-green-dark)}
+
+/* Form card (sticky) */
+.cu-form-card{
+  position:sticky;top:5.5rem;
+  display:flex;flex-direction:column;gap:1.75rem;
+  background:var(--neutral-3);border:1px solid var(--primary-green-dark);padding:2.5rem 2.25rem;
+}
+.cu-form-hosts{
+  display:flex;align-items:center;gap:1.25rem;
+  background:#171f23;border:1px solid #233238;padding:.75rem;
+}
+.cu-form-avatars{display:flex}
+.cu-form-avatars img{
+  width:3.5rem;height:3.5rem;border-radius:50%;object-fit:cover;border:2px solid #171f23;
+}
+.cu-form-avatars img + img{margin-left:-.75rem}
+.cu-form-hosts p{color:var(--white-80);max-width:15rem;line-height:1.4;font-size:1rem}
+.cu-form{display:flex;flex-direction:column;gap:1rem}
+.cu-form label{display:flex;flex-direction:column;gap:.4rem;font-size:.875rem;color:var(--text-muted)}
+.cu-form input,.cu-form textarea,.cu-form select{
+  width:100%;border:1px solid #2a363b;background:#101619;color:var(--white);
+  border-radius:.2rem;padding:.85rem 1rem;font:inherit;outline:none;
+  transition:border-color .25s ease;
+}
+.cu-form input:focus,.cu-form textarea:focus,.cu-form select:focus{border-color:var(--primary-green)}
+.cu-form textarea{resize:vertical;min-height:6rem}
+.cu-form select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--primary-green) 50%),linear-gradient(135deg,var(--primary-green) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+.cu-form .cu-btn{width:100%;margin-top:.35rem}
+.cu-form-note{color:var(--text-muted);font-size:.8rem;text-align:center}
+.cu-form-success{padding:1.5rem 0;display:flex;flex-direction:column;gap:.75rem}
+.cu-form-success h3{color:var(--primary-green);font-size:1.5rem;font-weight:500}
+.cu-form-success p{color:var(--white-80)}
+
+/* Results / marquee */
+.cu-results{background:#0a0e11;padding:5.5rem 0;position:relative}
+.cu-results .cu-h2{max-width:14ch;margin:0 auto 3rem}
+.cu-marquee-wrap{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem;
+  height:36rem;overflow:hidden;mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent);
+}
+.cu-marquee-col{overflow:hidden;height:100%}
+.cu-marquee-track{
+  display:flex;flex-direction:column;gap:1rem;
+  animation:cuScroll 28s linear infinite;
+}
+.cu-marquee-col.is-reverse .cu-marquee-track{animation-direction:reverse;animation-duration:34s}
+@keyframes cuScroll{
+  from{transform:translateY(0)}
+  to{transform:translateY(calc(-50% - .5rem))}
+}
+.cu-tcard{
+  background:linear-gradient(180deg,#182126,#11171b);
+  border:1px solid #243740;border-radius:.25rem;
+  padding:1.5rem;display:flex;flex-direction:column;gap:1rem;min-height:16rem;
+}
+.cu-tcard-top{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.cu-tcard-logo{object-fit:contain;object-position:left center;width:auto;max-width:5rem;max-height:2rem}
+.cu-tcard-meta{display:flex;align-items:center;gap:.5rem}
+.cu-tcard-flag{width:1.75rem;display:flex}
+.cu-tcard-flag img{width:100%;height:auto}
+.cu-tcard-tag{
+  color:var(--bg-green);background:var(--primary-green);border:.6px solid var(--primary-green);
+  padding:.25rem .5rem;font-weight:700;font-size:.75rem;letter-spacing:.04em;
+}
+.cu-tcard-quote{color:var(--neutral-2);font-weight:300;line-height:1.35;font-size:1.05rem;max-width:30ch;flex:1}
+.cu-tcard-author{display:flex;align-items:center;gap:.75rem;margin-top:auto}
+.cu-tcard-author img{width:2.75rem;height:2.75rem;border-radius:50%;object-fit:cover}
+.cu-tcard-author b{display:block;color:var(--primary-green);font-weight:500;font-size:1rem}
+.cu-tcard-author span{display:block;color:#abe5b1b5;font-size:.875rem;line-height:1.3}
+
+/* Change cards */
+.cu-change{background:var(--bg-green);padding:5.5rem 0 4rem}
+.cu-change .cu-h2{margin:0 auto 3rem;max-width:16ch}
+.cu-change-grid{display:flex;gap:1.5rem;align-items:stretch}
+.cu-change-card{
+  flex:1;display:flex;flex-direction:column;gap:2.5rem;
+  background:linear-gradient(180deg,#151e22,#0f1518);border:1px solid #243740;border-radius:.25rem;padding:2.5rem;
+}
+.cu-change-visual{position:relative}
+.cu-eyebrow{
+  position:absolute;z-index:2;left:0;top:0;
+  border:1px solid var(--primary-green);color:var(--primary-green);
+  letter-spacing:.12em;text-transform:uppercase;padding:.5rem .7rem .45rem;font-size:.75rem;line-height:1;
+  background:rgba(15,21,24,.72);
+}
+.cu-eyebrow.is-red{border-color:var(--orange-red);color:var(--orange-red)}
+.cu-change-visual img{width:100%;height:auto;border-radius:.15rem;margin-top:.5rem}
+.cu-change-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.125rem}
+.cu-change-list li{display:grid;grid-template-columns:1.375rem 1fr;column-gap:.75rem;align-items:flex-start;position:relative}
+.cu-change-list img{width:1.375rem;height:1.375rem;margin-top:2px}
+.cu-change-list span{color:var(--white-80);font-size:1.125rem;line-height:1.5}
+.cu-change-line{grid-column:1 / -1;display:block;height:1px;background:#243740;margin-top:.35rem}
+.cu-change-cta{display:flex;justify-content:center;margin-top:2.5rem}
+
+/* Pipeline */
+.cu-pipeline{background:#0a0e11;padding:5rem 0;overflow:hidden}
+.cu-pipeline .cu-h2{margin:0 auto 2.75rem;max-width:18ch}
+.cu-pipeline-track{overflow:hidden}
+.cu-pipeline-row{
+  display:flex;gap:1.25rem;width:max-content;
+  animation:cuPipe 32s linear infinite;
+}
+@keyframes cuPipe{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+.cu-pipe-card{
+  width:min(88vw,29.375rem);min-height:12rem;
+  background:linear-gradient(180deg,#182126,#11171b);border-radius:.25rem;
+  padding:2rem 1.5rem 2rem 2rem;display:flex;flex-direction:column;justify-content:space-between;gap:1.5rem;
+}
+.cu-pipe-top{display:flex;align-items:flex-end;gap:1.25rem}
+.cu-pipe-top strong{font-size:clamp(3rem,5vw,5rem);font-weight:300;color:var(--primary-green);letter-spacing:-.1rem;line-height:1}
+.cu-pipe-top p{color:var(--white-80);max-width:9rem;line-height:1.4;font-size:1.05rem}
+.cu-pipe-logo{height:2rem;display:flex;align-items:center}
+.cu-pipe-logo img{height:100%;width:auto;object-fit:contain}
+
+/* Decide CTA */
+.cu-decide{background:var(--bg-green);padding:4rem 0 5rem}
+.cu-decide-inner{
+  display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:center;
+  background:linear-gradient(135deg,#151e22,#0f1518);border:1px solid #243740;border-radius:.35rem;
+  padding:clamp(1.5rem,3vw,3rem);overflow:hidden;position:relative;
+}
+.cu-decide-copy{display:flex;flex-direction:column;align-items:flex-start;gap:1.25rem;position:relative;z-index:1}
+.cu-decide-copy .cu-h2{max-width:16ch;color:var(--neutral-2)}
+.cu-decide-copy p{color:var(--white-80);max-width:36ch;font-weight:300;line-height:1.5}
+.cu-decide-visual{position:relative;min-height:14rem}
+.cu-decide-grid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}
+.cu-decide-img{position:relative;z-index:1;width:100%;max-width:22rem;margin-left:auto;object-fit:contain}
+
+/* Landing footer sits outside .cu-page; keep reveal visible on contact. */
+body.cu-active footer[data-reveal="footer"] .footer-col>b,
+body.cu-active footer[data-reveal="footer"] .footer-col>a,
+body.cu-active footer[data-reveal="footer"] .subscribe>*,
+body.cu-active footer[data-reveal="footer"] .footer-bottom>*{
+  opacity:1!important;transform:none!important
+}
+
+/* Responsive */
+@media (max-width:1100px){
+  .cu-hero-grid{flex-direction:column}
+  .cu-hero-left,.cu-hero-right{max-width:100%}
+  .cu-form-card{position:static}
+  .cu-marquee-wrap{grid-template-columns:repeat(2,minmax(0,1fr));height:32rem}
+  .cu-marquee-wrap .cu-marquee-col:last-child{display:none}
+  .cu-decide-inner{grid-template-columns:1fr}
+}
+@media (max-width:767px){
+  .cu-hero{padding:2rem 0 3rem}
+  .cu-hero-left{gap:2rem}
+  .cu-logo-grid{grid-template-columns:repeat(2,1fr)}
+  .cu-stats{flex-direction:column;align-items:flex-start;gap:1rem}
+  .cu-stat-div{width:100%;height:1px}
+  .cu-form-card{padding:1.5rem}
+  .cu-marquee-wrap{grid-template-columns:1fr;height:auto;mask-image:none}
+  .cu-marquee-col{height:auto;overflow:visible}
+  .cu-marquee-track{animation:none;flex-direction:row;overflow-x:auto;padding-bottom:.5rem}
+  .cu-tcard{min-width:18rem;min-height:15rem}
+  .cu-change-grid{flex-direction:column}
+  .cu-change-card{padding:1.5rem}
+  .cu-pipeline-row{animation-duration:24s}
+  .cu-h2{font-size:2rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .cu-marquee-track,.cu-pipeline-row{animation:none}
+}

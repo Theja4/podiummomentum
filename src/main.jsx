@@ -1,25 +1,78 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
+import './contact-us.css'
+import ContactUs from './ContactUs.jsx'
 
 const A = '/assets/'
 const BRAND = 'Podium Momentum'
+const CONTACT_PATH = '/contact-us'
+
+function navigate(path) {
+  if (!path || path === '#') return
+  if (path.startsWith('#')) {
+    const el = document.querySelector(path)
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+    else window.location.hash = path
+    return
+  }
+  window.history.pushState({}, '', path)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+  window.scrollTo(0, 0)
+}
+
+function usePathname() {
+  const [path, setPath] = useState(() => window.location.pathname || '/')
+  useEffect(() => {
+    const onPop = () => setPath(window.location.pathname || '/')
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+  return path
+}
 
 const projects = [
   {
-    sector: 'Career Tech, US', title: 'JobPosted', image: `${A}jobposted-thumb.png`,
+    sector: 'Career Tech, US',
+    title: 'JobPosted',
+    headline: 'JobPosted: job search on autopilot for serious candidates',
+    image: `${A}jobposted-thumb.png`,
+    company: 'JobPosted',
+    location: 'United States',
+    tags: ['#Website Design', '#Brand System', '#Content & SEO'],
+    stack: 'Webflow, Figma, SEO, Content ops',
+    timeline: '4 weeks',
     description: 'JobPosted puts job search on autopilot. It matches live roles, tailors each resume, autofills applications, and queues them for review so candidates skip the busywork and focus on interviews.',
     stats: [['3.3×', 'Conversion increase'], ['65%', 'Organic traffic increase'], ['42', 'Articles created']],
+    results: ['3.3× conversion increase', '65% organic traffic increase', '42 articles created in the system'],
   },
   {
-    sector: 'Career Tech, US', title: 'Rezoomed', image: `${A}rezoomed-thumb.png`,
+    sector: 'Career Tech, US',
+    title: 'Rezoomed',
+    headline: 'Rezoomed: AI resumes that land interviews, not rejections',
+    image: `${A}rezoomed-thumb.png`,
+    company: 'Rezoomed',
+    location: 'United States',
+    tags: ['#Product UX', '#Website Redesign', '#Motion'],
+    stack: 'Figma, React, Motion design',
+    timeline: '5 weeks',
     description: 'Rezoomed is an AI resume platform that builds ATS ready resumes, tailors them to any job description in seconds, and scores keyword match before you apply so candidates land interviews, not rejections.',
     stats: [['1M+', 'Resumes optimized'], ['5×', 'More callbacks on average'], ['98%', 'ATS readability hit rate']],
+    results: ['1M+ resumes optimized', '5× more callbacks on average', '98% ATS readability hit rate'],
   },
   {
-    sector: 'Technology, SE', title: 'Metapic', image: `${A}972304820e19d175.avif`,
+    sector: 'Technology, SE',
+    title: 'Metapic',
+    headline: 'Metapic: influencer platform brand that finally matches scale',
+    image: `${A}972304820e19d175.avif`,
+    company: 'Metapic',
+    location: 'Sweden / Europe',
+    tags: ['#Branding', '#Website Design', '#Growth'],
+    stack: 'Brand system, Webflow, CRO',
+    timeline: '4 weeks',
     description: "Metapic is Europe's leading influencer marketing platform with 100,000+ creators, major brand partnerships, and a product growing faster than its brand could keep up with.",
-    stats: [['50%+', 'Order value growth'], ['100k+', 'Creators on platform'], ['4:1', 'ROAS delivered in 3 months']],
+    stats: [['50%+', 'Order value growth'], ['100k+', 'Creators on platform'], ['4:1', 'ROAS delivered in 3 weeks']],
+    results: ['50%+ order value growth', '100k+ creators on platform', '4:1 ROAS delivered in 3 weeks'],
   },
 ]
 
@@ -42,6 +95,15 @@ const testimonials = [
   ['We needed users to understand what we do just by looking at our website. As a result, we saw stronger interest and an increase in conversion.', 'Lihong Wang', 'CEO', `${A}b6bb0636a8e5a963.avif`],
 ]
 
+const compareRows = [
+  ['Consultative approach', 'A strategy partner that looks through your buyer’s lens and co-owns the result.', 'They build exactly what’s briefed, even when the story doesn’t hold together.'],
+  ['Premium service', 'Senior-led craft and strategy with one owner from kickoff to launch.', 'Packaged “deliverables” with limited senior time.'],
+  ['Mid-market & enterprise focus', 'Built for long buying cycles, stakeholder alignment, and high-stakes credibility.', 'Built for mixed client sizes; enterprise nuance gets missed.'],
+  ['Result-oriented strategy', 'We design for clarity, trust, and action, with outcomes you can track.', '“Looks great” is the finish line.'],
+  ['In-house strategy team', 'Positioning and messaging are set in-house before design begins.', 'Copy and strategy are outsourced or “added later.”'],
+  ['B2B industry expertise', 'B2B-first thinking tailored to evaluation-led buying.', 'Generalist exposure where B2B is one of many.'],
+]
+
 function Logo({ variant = 'header' }) {
   if (variant === 'mark') return <img className="logo-mark" src={`${A}brand-mark.svg`} alt={BRAND} />
   return <span className={`logo-lockup logo-${variant}`} aria-label={BRAND}>
@@ -51,8 +113,14 @@ function Logo({ variant = 'header' }) {
 }
 
 function Button({ children, light = false, href = '#' }) {
+  const onClick = e => {
+    if (href.startsWith('/') || href.startsWith('#')) {
+      e.preventDefault()
+      navigate(href)
+    }
+  }
   return (
-    <a className={`pill ${light ? 'pill-light' : 'pill-dark'}`} href={href}>
+    <a className={`pill ${light ? 'pill-light' : 'pill-dark'}`} href={href} onClick={onClick}>
       {light
         ? <span className="pill-wipe pill-wipe-dark" aria-hidden="true" />
         : <>
@@ -103,11 +171,11 @@ function Header() {
     <a href="#top" className="logo-link" aria-label={BRAND}><Logo /></a>
     <nav className={open ? 'nav open' : 'nav'}>
       <a href="#top">Home</a><a href="#about">About ↓</a><a href="#work">Works ↓</a>
-      <a href="#services">Services ↓</a><a href="#contact">For Startups</a><a href="#faq">Resources ↓</a>
+      <a href="#services">Services ↓</a><a href={CONTACT_PATH} onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }}>For Startups</a><a href="#faq">Resources ↓</a>
     </nav>
     <div className="header-actions">
       <button className="menu" onClick={() => setOpen(!open)} aria-label="Toggle menu">{open ? '×' : '≡'}</button>
-      <Button light href="#contact">Let’s chat</Button>
+      <Button light href={CONTACT_PATH}>Let’s chat</Button>
       <button
         className="theme-toggle"
         type="button"
@@ -132,16 +200,15 @@ function Hero() {
   return <section id="top" className="hero">
     <div className="hero-inner">
       <h1 className="hero-title">
-        <span>Build a <em>10X better website</em> that</span>{' '}
-        <span>makes your company unforgettable</span>
+        <span>Build a <em>10X better website.</em> Become unforgettable.</span>
       </h1>
       <div className="hero-band">
         <div className="hero-media">
           <ShowreelPlayer variant="hero" autoplayOnLoad />
         </div>
         <div className="hero-side">
-          <p>{BRAND} helps scaling tech teams turn an outdated brand and website into <em>a credible growth asset that wins serious buyers</em>. We reposition you to reflect what you’ve become, not what you were when you started.</p>
-          <div className="hero-action"><Button light href="#contact">Let’s go</Button></div>
+          <p>We turn ambitious tech companies into category leaders with <em>sharper positioning, standout design, and websites that win serious buyers.</em></p>
+          <div className="hero-action"><Button light href={CONTACT_PATH}>Start a project</Button></div>
           <div className="hero-rating">
             <span className="hero-rating-badge" aria-hidden="true"><img src={`${A}brand-mark.svg`} alt="" /></span>
             <div className="hero-rating-copy">
@@ -152,7 +219,7 @@ function Hero() {
         </div>
       </div>
       <div className="hero-trust">
-        <p>Trusted by 40+ brands that<br />outpaced their “boring” competitors</p>
+        <p>Trusted by 40+ ambitious<br />technology companies</p>
         <div className="hero-logos">{clientLogos.slice(0, 6).map(id => <img src={`${A}${id}.avif`} alt="Client" key={id} />)}</div>
       </div>
     </div>
@@ -365,23 +432,93 @@ function About() {
   )
 }
 
-function Project({ project, index }) {
-  return <article className={`project ${index % 2 ? 'reverse' : ''}`} data-reveal="project">
-    <div className="project-copy">
-      <div className="eyebrow" data-reveal="up">● &nbsp; {project.sector}</div>
-      <h3 data-reveal="line">{project.title}</h3><p data-reveal="line">{project.description}</p>
-      <div className="stats">{project.stats.map(([n, l]) => <div key={n}><strong>{n}</strong><span>{l}</span></div>)}</div>
-      <a className="explore" href="#contact">Explore &nbsp; →</a>
-    </div>
-    <div className="project-media" data-reveal="scale" data-parallax><img src={project.image} alt={`${project.title} project preview`} /></div>
-  </article>
+function CaseWords({ text }) {
+  return text.split(' ').map((word, i) => (
+    <span className="pm-case-word" style={{ '--wi': i }} key={`${word}-${i}`}>
+      <span>{word}{'\u00A0'}</span>
+    </span>
+  ))
+}
+
+function ProjectCase({ project, index }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.classList.add('is-inview')
+        io.unobserve(el)
+      }
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  return (
+    <article className="pm-case" ref={ref} style={{ '--case-i': index }}>
+      <div className="pm-case-media">
+        <a
+          className="pm-case-media-link"
+          href={CONTACT_PATH}
+          onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }}
+          aria-label={`Explore ${project.title}`}
+        >
+          <img src={project.image} alt={`${project.title} project preview`} loading="lazy" />
+        </a>
+      </div>
+      <div className="pm-case-body">
+        <div className="pm-case-tags">{project.tags.join(' ')}</div>
+        <h3 className="pm-case-title"><CaseWords text={project.headline} /></h3>
+        <div className="pm-case-meta">
+          <div className="pm-case-meta-col">
+            <span className="pm-case-meta-label">Services</span>
+            <p>{project.stack}</p>
+          </div>
+          <div className="pm-case-meta-col">
+            <span className="pm-case-meta-label">Timeline</span>
+            <p>{project.timeline}</p>
+          </div>
+        </div>
+        <div className="pm-case-results">
+          <span className="pm-case-meta-label">Results</span>
+          <ul>
+            {project.results.map(r => <li key={r}>{r}</li>)}
+          </ul>
+        </div>
+        <div className="pm-case-actions">
+          <a
+            className="pm-case-cta"
+            href={CONTACT_PATH}
+            onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }}
+          >
+            Explore
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </article>
+  )
 }
 
 function Work() {
-  return <section id="work" className="work-wrap">
-    <div className="section-lead"><span data-reveal="up">● &nbsp; Selected Work</span><h2 data-reveal="line">Companies that closed the perception gap and what changed.</h2></div>
-    <div className="panel work-panel" data-reveal="panel">{projects.map((p, i) => <Project project={p} index={i} key={p.title} />)}<Button href="#work">All projects</Button></div>
-  </section>
+  return (
+    <section id="work" className="pm-cases">
+      <div className="pm-cases-head">
+        <span className="pm-cases-kicker" data-reveal="up">Featured cases</span>
+        <div className="pm-cases-intro">
+          <h2 data-reveal="line">Companies that closed the perception gap, and what changed.</h2>
+          <p data-reveal="line">Discover how we’re driving change through brand systems, websites, and measurable outcomes for scaling tech teams.</p>
+        </div>
+      </div>
+      <div className="pm-cases-stack">
+        {projects.map((p, i) => <ProjectCase project={p} index={i} key={p.title} />)}
+      </div>
+      <div className="pm-cases-foot" data-reveal="up">
+        <Button href={CONTACT_PATH}>Explore all cases</Button>
+      </div>
+    </section>
+  )
 }
 
 function Clients() {
@@ -390,7 +527,7 @@ function Clients() {
 }
 
 function Services() {
-  return <section id="services" className="panel services" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Our services</div><div className="service-body"><h2 data-reveal="line">Everything your brand needs to grow<br /> under one roof.</h2><div className="service-list">{services.map((s, i) => <a href="#contact" key={s} data-reveal="service"><span>{String(i + 1).padStart(2, '0')}</span><b>{s}</b><i><em>→</em><em>→</em></i></a>)}</div><div data-reveal="up"><Button href="#contact">All Services</Button></div></div></section>
+  return <section id="services" className="panel services" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Our services</div><div className="service-body"><h2 data-reveal="line">Everything your brand needs to grow<br /> under one roof.</h2><div className="service-list">{services.map((s, i) => <a href={CONTACT_PATH} onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }} key={s} data-reveal="service"><span>{String(i + 1).padStart(2, '0')}</span><b>{s}</b><i><em>→</em><em>→</em></i></a>)}</div><div data-reveal="up"><Button href={CONTACT_PATH}>All Services</Button></div></div></section>
 }
 
 function FAQ() {
@@ -404,12 +541,6 @@ function Testimonials() {
   return <section className="testimonials"><div className="testimonial-head"><div className="eyebrow" data-reveal="up">● &nbsp; Testimonials</div><h2 data-reveal="line">What our clients say about working with us.</h2></div><div className="testimonial-track" ref={track}>{testimonials.map(([quote, name, role, img]) => <article key={name} data-reveal="card"><p>{quote}</p><div className="person"><img src={img} alt={name} /><div><b>{name}</b><span>{role}</span></div><i>in</i></div></article>)}</div><div className="track-control"><span></span><button onClick={() => slide(-1)} aria-label="Previous testimonial">←</button><button onClick={() => slide(1)} aria-label="Next testimonial">→</button></div></section>
 }
 
-function Contact() {
-  return <section id="contact" className="contact"><div className="contact-lead"><span data-reveal="up">● &nbsp; Contact us</span><h2 data-reveal="line">The right partner at the right moment<br /> changes everything.</h2></div><div className="panel contact-panel" data-reveal="contact-panel"><div className="contact-copy"><span className="outline-pill">Start a conversation</span><h2>Tell us about your<br /> next stage.</h2><p>Our Testimonials:</p><div className="badges"><span>©</span><span>♞</span></div></div><form className="contact-form" onSubmit={e => e.preventDefault()}><div className="field-grid"><label>Name<input placeholder="Evan" /></label><label>Company<input placeholder="Microsoft" /></label><label>Your Email<input type="email" placeholder="evan@microsoft.com" /></label><label>Your Phone<input placeholder="Your phone number" /></label></div><Choice title="I’m interested in..." options={['Branding','Website Design','UX and UI','Motion Design','Landing page','Content Creation','Webflow Development']} /><Choice title="Project Budget (USD)" options={['Under 10k','10k to 30k','30k to 80k','80k+']} /><label className="message-field">Tell us about your project.<textarea placeholder="Write something concise..." /></label><button className="submit" type="submit"><span>Submit</span></button></form></div></section>
-}
-
-function Choice({ title, options }) { const [selected, setSelected] = useState(''); return <fieldset><legend>{title}</legend><div className="choices">{options.map(o => <button className={selected === o ? 'selected' : ''} type="button" onClick={() => setSelected(o)} key={o}>{o}</button>)}</div></fieldset> }
-
 function SocialIcon({ name }) {
   if (name === 'Behance') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.26 11.47s2.17-.16 2.17-2.7c0-2.54-1.78-3.78-4.04-3.78H0V19h7.39s4.53.14 4.53-4.14c0 0 .2-3.39-2.66-3.39ZM3.25 7.43h4.14s1.01 0 1.01 1.48-.6 1.69-1.28 1.69H3.25V7.43Zm3.94 9.13H3.25v-3.75h4.14s1.51-.02 1.51 1.93c0 1.64-1.12 1.82-1.71 1.82ZM18.31 8.5c-5.47 0-5.46 5.46-5.46 5.46s-.37 5.43 5.46 5.43c0 0 4.87.28 4.87-3.78h-2.5s.08 1.53-2.28 1.53c0 0-2.5.17-2.5-2.47h7.36s.8-6.17-4.95-6.17Zm-2.38 4.28s.31-2.19 2.5-2.19 2.16 2.19 2.16 2.19h-4.66ZM15.79 5.6h5.22v1.56h-5.22V5.6Z" /></svg>
   if (name === 'LinkedIn') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.32 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.1 20.45H3.54V9H7.1v11.45Z" /></svg>
@@ -419,10 +550,198 @@ function SocialIcon({ name }) {
 function Footer() {
   const cols = [['Company:','About','Services','Projects','For startups','Lab','Blog','Resources','Contacts','Careers','Testimonials'],['Services:','Web Design','Branding','UX and UI','Motion','SEO','Content Creation','Landing Page','Webflow Dev'],['Industries:','Healthcare','Fintech','Web3','Technology','Corporate','AI','Real Estate','Ecommerce','FMCG','Hospitality']]
   const socials = ['Behance', 'LinkedIn', 'X']
-  return <footer data-reveal="footer">{cols.map(col => <div className="footer-col" key={col[0]}><b>{col[0]}</b>{col.slice(1).map((x, i) => <a href="#top" style={{ '--footer-i': i }} key={x}>{x}</a>)}</div>)}<div className="subscribe"><b>Subscribe to our news and updates</b><label className="subscribe-row"><input type="email" aria-label="Email address" placeholder="Your email here" /><button className="subscribe-action" type="button" aria-label="Subscribe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></button></label><small>By signing up, you agree to our Privacy Policy. We respect your data.</small><b>Follow us on:</b><div className="socials">{socials.map((name, i) => <a href="#top" aria-label={name} style={{ '--footer-i': i }} key={name}><SocialIcon name={name} /></a>)}</div></div><div className="footer-bottom"><Logo variant="footer" /><span>© 2026 {BRAND}. All rights reserved &nbsp; ● &nbsp; <b>Privacy Policy</b></span><a href="#top" className="to-top">↑</a></div></footer>
+  const goHomeTop = e => {
+    e.preventDefault()
+    if (window.location.pathname === CONTACT_PATH || window.location.pathname === `${CONTACT_PATH}/`) {
+      navigate('/')
+      return
+    }
+    navigate('#top')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+  return <footer data-reveal="footer">{cols.map(col => <div className="footer-col" key={col[0]}><b>{col[0]}</b>{col.slice(1).map((x, i) => <a href="#top" onClick={goHomeTop} style={{ '--footer-i': i }} key={x}>{x}</a>)}</div>)}<div className="subscribe"><b>Subscribe to our news and updates</b><label className="subscribe-row"><input type="email" aria-label="Email address" placeholder="Your email here" /><button className="subscribe-action" type="button" aria-label="Subscribe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></button></label><small>By signing up, you agree to our Privacy Policy. We respect your data.</small><b>Follow us on:</b><div className="socials">{socials.map((name, i) => <a href="#top" onClick={goHomeTop} aria-label={name} style={{ '--footer-i': i }} key={name}><SocialIcon name={name} /></a>)}</div></div><div className="footer-bottom"><a href="#top" onClick={goHomeTop} aria-label={BRAND}><Logo variant="footer" /></a><span>© 2026 {BRAND}. All rights reserved &nbsp; ● &nbsp; <b>Privacy Policy</b></span><a href="#top" className="to-top" onClick={goHomeTop}>↑</a></div></footer>
 }
 
-function App() {
+function TcxArrow() {
+  return <svg viewBox="0 0 18 15" fill="none" aria-hidden="true"><path d="M10.9992 0.311518L17.3608 6.67303C17.4596 6.77153 17.538 6.88858 17.5915 7.01745C17.6451 7.14633 17.6726 7.2845 17.6726 7.42405C17.6726 7.56359 17.6451 7.70176 17.5915 7.83064C17.538 7.95951 17.4596 8.07656 17.3608 8.17506L10.9992 14.5366C10.8001 14.7358 10.5299 14.8477 10.2482 14.8477C9.96654 14.8477 9.6964 14.7358 9.49722 14.5366C9.29804 14.3374 9.18614 14.0672 9.18614 13.7856C9.18614 13.5039 9.29804 13.2337 9.49722 13.0346L14.0484 8.48342L1.06025 8.48342C0.779056 8.48342 0.509377 8.37171 0.310541 8.17288C0.111705 7.97404 0 7.70436 0 7.42316C0 7.14197 0.111705 6.87229 0.310541 6.67345C0.509377 6.47462 0.779056 6.36291 1.06025 6.36291L14.0484 6.36291L9.49633 1.81178C9.29715 1.6126 9.18525 1.34245 9.18525 1.06076C9.18525 0.77908 9.29715 0.508933 9.49633 0.309752C9.69551 0.110571 9.96566 -0.00133025 10.2473 -0.00133027C10.529 -0.00133028 10.7992 0.110571 10.9984 0.309752L10.9992 0.311518Z" fill="currentColor" /></svg>
+}
+
+function TcxButton({ children, href = CONTACT_PATH, white = false }) {
+  const onClick = e => {
+    if (href.startsWith('/') || href.startsWith('#')) {
+      e.preventDefault()
+      navigate(href)
+    }
+  }
+  return (
+    <a className={`tcx-btn ${white ? 'tcx-btn-white' : ''}`} href={href} onClick={onClick}>
+      <span className="tcx-btn-text">{children}</span>
+      <span className="tcx-btn-icon">
+        <span className="tcx-btn-arrows" aria-hidden="true">
+          <span className="tcx-btn-arrow"><TcxArrow /></span>
+          <span className="tcx-btn-arrow tcx-btn-arrow-abs"><TcxArrow /></span>
+        </span>
+      </span>
+    </a>
+  )
+}
+
+// "Challenge" band: sticky viewport, staged browser-window cards popping in on
+// divider lines around a pulsing centerpiece, ported from the reference GSAP flow.
+function Challenge() {
+  const ref = useRef(null)
+  const challengeCards = [
+    // [animation order, position class, corner anchor, image]
+    [3, 'is-1', 'is-bottom-left', `${A}tc-challenge-1.webp`],
+    [1, 'is-2', 'is-top-left', `${A}tc-challenge-2.webp`],
+    [4, 'is-3', 'is-bottom-right', `${A}tc-challenge-3.webp`],
+    [2, 'is-4', 'is-top-right', `${A}tc-challenge-4.webp`],
+  ]
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.classList.add('tcx-static')
+      return
+    }
+    const cards = [...el.querySelectorAll('[data-tcx-card]')]
+      .sort((a, b) => Number(a.dataset.tcxCard) - Number(b.dataset.tcxCard))
+    const center = el.querySelector('.tcx-error-center')
+    if (window.innerWidth < 992) {
+      const io = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('tcx-mobile-live')
+          io.disconnect()
+        }
+      }, { threshold: .3 })
+      io.observe(el)
+      return () => io.disconnect()
+    }
+    const fired = new Set()
+    let frame = 0
+    const check = () => {
+      frame = 0
+      const rect = el.getBoundingClientRect()
+      const vh = window.innerHeight
+      cards.forEach((card, i) => {
+        if (fired.has(i)) return
+        // Same trigger map as the reference: top top / top -30% / top -40% / bottom 105%.
+        const hit = i === 0 ? rect.top <= 0
+          : i === 1 ? rect.top <= -.3 * vh
+          : i === 2 ? rect.top <= -.4 * vh
+          : rect.bottom <= 1.05 * vh
+        if (!hit) return
+        fired.add(i)
+        card.classList.add('is-live')
+        if (center) {
+          center.classList.remove('is-pulse')
+          void center.offsetWidth
+          center.classList.add('is-pulse')
+        }
+      })
+    }
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(check) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    check()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (frame) cancelAnimationFrame(frame)
+    }
+  }, [])
+  return (
+    <section className="tcx tcx-error" ref={ref}>
+      <div className="tcx-error-sticky">
+        <div className="tcx-error-head" data-reveal="up">
+          <div className="tcx-tag tcx-tag-red">Challenge</div>
+          <h2 className="tcx-error-heading">Your product scaled.<br />Your website hasn’t caught up.</h2>
+        </div>
+        <div className="tcx-error-visual">
+          <img className="tcx-error-center" src={`${A}tc-error-computer.webp`} alt="Outdated website throwing errors" />
+        </div>
+        <div className="tcx-error-bg" aria-hidden="true">
+          {[0, 1, 2, 3, 4, 5, 6].map(col => {
+            const card = { 1: challengeCards[0], 2: challengeCards[1], 4: challengeCards[2], 5: challengeCards[3] }[col]
+            return (
+              <div className={`tcx-divider ${col === 3 ? 'is-center' : ''}`} key={col}>
+                {card && (
+                  <div className={`tcx-error-card ${card[1]}`} data-tcx-card={card[0]}>
+                    <span className="tcx-error-dot" />
+                    <div className={`tcx-error-card-visual ${card[2]}`}>
+                      <img src={card[3]} alt="" loading="lazy" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// "Why us" comparison table: label rail, highlighted brand column with check
+// cells, and a muted "traditional agencies" column.
+function Compare() {
+  return (
+    <section className="tcx tcx-cmp">
+      <div className="tcx-cmp-head" data-reveal="up">
+        <div className="tcx-tag">Why us</div>
+        <h2 className="tcx-cmp-heading"><em>Why us</em> (and not the other 500 agencies)?</h2>
+      </div>
+      <div className="tcx-cmp-scroll" data-reveal="up">
+        <div className="tcx-cmp-table">
+          <div className="tcx-cmp-label tcx-cmp-row-head" aria-hidden="true" />
+          <div className="tcx-cmp-us tcx-cmp-row-head tcx-cmp-brand">
+            <span className="logo-wordmark"><b>podium</b><em>momentum</em></span>
+          </div>
+          <div className="tcx-cmp-them tcx-cmp-row-head tcx-cmp-them-title">Traditional agencies</div>
+          {compareRows.map(([label, us, them]) => (
+            <React.Fragment key={label}>
+              <div className="tcx-cmp-label"><span>{label}</span></div>
+              <div className="tcx-cmp-us">
+                <span className="tcx-cmp-check" aria-hidden="true">
+                  <svg viewBox="0 0 15 11" fill="none"><path d="M5.33285 10.6913C5.15919 10.8597 4.91317 11 4.69609 11C4.47902 11 4.233 10.8527 4.0521 10.6843L0 6.75574L1.28799 5.50702L4.70333 8.81824L13.7337 0L15 1.26977L5.33285 10.6913Z" fill="currentColor" /></svg>
+                </span>
+                <span className="tcx-cmp-us-text">{us}</span>
+              </div>
+              <div className="tcx-cmp-them">{them}</div>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+      <div className="tcx-cmp-cta" data-reveal="up"><Button href="#work">View more</Button></div>
+    </section>
+  )
+}
+
+// Checkered CTA banner: mosaic of green tiles framing a dark booking card.
+function CtaBanner() {
+  const oddBlocks = new Set([1, 16, 17, 40, 100, 120, 126, 127])
+  return (
+    <section className="tcx tcx-cta">
+      <div className="tcx-cta-grid" aria-hidden="true">
+        {Array.from({ length: 140 }, (_, i) => (
+          <span className={`tcx-cta-block ${oddBlocks.has(i) ? 'is-odd' : ''}`} key={i} />
+        ))}
+      </div>
+      <div className="tcx-cta-content">
+        <span className="tcx-cta-glow" aria-hidden="true" />
+        <div className="tcx-cta-inner">
+          <div className="tcx-cta-left">
+            <h2 className="tcx-cta-heading">Let’s turn your website into <em>the most unfair advantage</em> in your category.</h2>
+            <TcxButton href={CONTACT_PATH} white>Book a call</TcxButton>
+          </div>
+          <div className="tcx-cta-visual">
+            <img src={`${A}podium-momentum-cta-v2.png`} alt="Three ascending glass forms representing digital momentum" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function HomePage() {
   useEffect(() => {
     document.documentElement.classList.add('motion-ready')
     requestAnimationFrame(() => document.body.classList.add('page-loaded'))
@@ -461,7 +780,16 @@ function App() {
       document.body.classList.remove('page-loaded')
     }
   }, [])
-  return <><Header /><Hero /><main><About /><Work /><Clients /><Services /><FAQ /><Testimonials /><Contact /></main><Footer /></>
+  return <><Header /><Hero /><main><About /><Challenge /><Work /><Clients /><Services /><Compare /><FAQ /><Testimonials /><CtaBanner /></main><Footer /></>
+}
+
+function App() {
+  const path = usePathname()
+  const isContact = path === CONTACT_PATH || path === `${CONTACT_PATH}/`
+  if (isContact) {
+    return <ContactUs onNavigateHome={() => navigate('/')} footer={<Footer />} />
+  }
+  return <HomePage />
 }
 
 createRoot(document.getElementById('root')).render(<App />)
