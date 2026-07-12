@@ -1,23 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 const TC = '/assets/tc-contact/'
+const A = '/assets/'
 const BRAND = 'Podium Momentum'
 
-const logos = [
-  ['logo-amazon-grey.svg', 'is-amazon'],
-  ['logo-razorpay-grey.svg', 'is-razorpay'],
-  ['logo-z47-grey.svg', 'is-z47'],
-  ['logo-factors-grey.svg', 'is-factors'],
-  ['logo-roommaster-grey.svg', 'is-roommaster'],
-  ['logo-storylane-grey.svg', 'is-storylane'],
-  ['logo-zamp.svg', 'is-zamp'],
-  ['logo-wizcom.svg', 'is-wiz'],
-]
+// Same client logos used on the landing page.
+const clientLogos = ['a9cc6fba12268e37', '43201ae504d0ad9f', 'cfecff048b60daa1', 'baa053d3454375d0', 'd2c8ca3a50aba890', 'ab3a9a6cf9778c11', '9a6b3e2b11136ee0', 'c90888271d904160', 'e72cc835698ff331']
+const invertInDark = new Set(['d2c8ca3a50aba890', 'e72cc835698ff331'])
 
 const expectItems = [
-  ['icon-website.svg', 'Website Performance Reality Check', "We'll walk through your current site and identify what's not working"],
-  ['icon-case.svg', 'Case Studies From Your Space', 'See before/after transformations from similar companies'],
-  ['icon-timeline.svg', 'Timeline & Investment Clarity', 'Get realistic timelines and ballpark investment for your project'],
+  ['00–10', 'icon-website.svg', 'Find the friction', "A live teardown of what's helping—and quietly costing you leads.", 'Priority list'],
+  ['10–20', 'icon-case.svg', 'See what good looks like', 'Relevant before-and-after work, chosen for your market and growth stage.', 'Proven patterns'],
+  ['20–30', 'icon-timeline.svg', 'Map the next move', 'A practical route forward with scope, timing, and investment range.', 'Clear roadmap'],
 ]
 
 const testimonialsCol1 = [
@@ -88,11 +82,12 @@ const withPoints = [
   "CRO-optimized pages with clear data on what's working",
 ]
 
+// Randomly picked from the landing-page client logos (accuracy isn't the point here).
 const pipeline = [
-  ['80%', 'Increase in demo requests', 'logo-roommaster.svg'],
-  ['60%', 'Increase in organic traffic', 'logo-z47-grey.svg'],
-  ['35%', 'Increase in clicks and impressions', 'logo-clearly.svg'],
-  ['30%', 'Increase in demo requests', 'logo-storylane-grey.svg'],
+  ['80%', 'Increase in demo requests', 'a9cc6fba12268e37'],
+  ['60%', 'Increase in organic traffic', 'cfecff048b60daa1'],
+  ['35%', 'Increase in clicks and impressions', 'ab3a9a6cf9778c11'],
+  ['30%', 'Increase in demo requests', 'c90888271d904160'],
 ]
 
 function TestimonialCard({ item }) {
@@ -128,20 +123,196 @@ function MarqueeColumn({ items, reverse = false }) {
   )
 }
 
+const budgetOptions = [
+  { value: '$10k to $25k', label: '$10k — $25k', hint: 'Focused engagement' },
+  { value: '$25k to $50k', label: '$25k — $50k', hint: 'Growth project' },
+  { value: '$50k to $100k', label: '$50k — $100k', hint: 'Full transformation' },
+  { value: '$100k+', label: '$100k+', hint: 'Ongoing partnership' },
+]
+
+function BudgetDropdown({ value, onChange, hasError }) {
+  const [open, setOpen] = useState(false)
+  const [openUp, setOpenUp] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const rootRef = useRef(null)
+  const menuRef = useRef(null)
+  const selected = budgetOptions.find(option => option.value === value)
+
+  const updatePlacement = () => {
+    const root = rootRef.current
+    if (!root) return
+    const trigger = root.querySelector('.cu-budget-trigger')
+    if (!trigger) return
+    const rect = trigger.getBoundingClientRect()
+    const menuHeight = menuRef.current?.offsetHeight || 240
+    const gap = 10
+    const spaceBelow = window.innerHeight - rect.bottom - gap
+    const spaceAbove = rect.top - gap
+    // Prefer down when it fits; flip up when bottom space is tight
+    setOpenUp(spaceBelow < menuHeight && spaceAbove > spaceBelow)
+  }
+
+  const openMenu = (next = true) => {
+    if (next) {
+      updatePlacement()
+      setOpen(true)
+      // Re-measure after paint so real menu height is used
+      requestAnimationFrame(() => {
+        updatePlacement()
+      })
+    } else {
+      setOpen(false)
+    }
+  }
+
+  useEffect(() => {
+    const closeOnOutsideClick = event => {
+      if (!rootRef.current?.contains(event.target)) setOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOnOutsideClick)
+    return () => document.removeEventListener('pointerdown', closeOnOutsideClick)
+  }, [])
+
+  useEffect(() => {
+    if (!open) return undefined
+    updatePlacement()
+    const onReposition = () => updatePlacement()
+    window.addEventListener('resize', onReposition)
+    window.addEventListener('scroll', onReposition, true)
+    return () => {
+      window.removeEventListener('resize', onReposition)
+      window.removeEventListener('scroll', onReposition, true)
+    }
+  }, [open])
+
+  const choose = index => {
+    onChange(budgetOptions[index].value)
+    setActiveIndex(index)
+    setOpen(false)
+    rootRef.current?.querySelector('.cu-budget-trigger')?.focus()
+  }
+
+  const onTriggerKeyDown = event => {
+    if (event.key === 'Escape' && open) {
+      event.preventDefault()
+      setOpen(false)
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      const direction = event.key === 'ArrowDown' ? 1 : -1
+      const selectedIndex = budgetOptions.findIndex(option => option.value === value)
+      setActiveIndex(current => open
+        ? (current + direction + budgetOptions.length) % budgetOptions.length
+        : selectedIndex >= 0 ? selectedIndex : direction > 0 ? 0 : budgetOptions.length - 1)
+      openMenu(true)
+    } else if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault()
+      setActiveIndex(event.key === 'Home' ? 0 : budgetOptions.length - 1)
+      openMenu(true)
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      if (open) choose(activeIndex)
+      else {
+        const selectedIndex = budgetOptions.findIndex(option => option.value === value)
+        setActiveIndex(selectedIndex >= 0 ? selectedIndex : 0)
+        openMenu(true)
+      }
+    } else if (event.key === 'Tab') {
+      setOpen(false)
+    }
+  }
+
+  const onOptionKeyDown = (event, index) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      const direction = event.key === 'ArrowDown' ? 1 : -1
+      setActiveIndex((index + direction + budgetOptions.length) % budgetOptions.length)
+    } else if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault()
+      setActiveIndex(event.key === 'Home' ? 0 : budgetOptions.length - 1)
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      choose(index)
+    } else if (event.key === 'Escape' || event.key === 'Tab') {
+      setOpen(false)
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        rootRef.current?.querySelector('.cu-budget-trigger')?.focus()
+      }
+    }
+  }
+
+  return (
+    <div className={`cu-budget ${open ? 'is-open' : ''} ${openUp ? 'opens-up' : 'opens-down'}`} ref={rootRef}>
+      <span className="cu-budget-label" id="budget-label">Budget range</span>
+      <button
+        className="cu-budget-trigger"
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-labelledby="budget-label budget-value"
+        aria-controls="budget-options"
+        aria-activedescendant={open ? `budget-option-${activeIndex}` : undefined}
+        aria-invalid={hasError || undefined}
+        onClick={() => openMenu(!open)}
+        onKeyDown={onTriggerKeyDown}
+      >
+        <span id="budget-value" className={selected ? 'has-value' : ''}>{selected?.label || 'Select a range'}</span>
+        <span className="cu-budget-arrow" aria-hidden="true">↓</span>
+      </button>
+      <div
+        className="cu-budget-menu"
+        id="budget-options"
+        role="listbox"
+        aria-labelledby="budget-label"
+        ref={menuRef}
+      >
+        {budgetOptions.map((option, index) => (
+          <button
+            key={option.value}
+            className={`cu-budget-option ${open && index === activeIndex ? 'is-active' : ''}`}
+            id={`budget-option-${index}`}
+            type="button"
+            role="option"
+            aria-selected={value === option.value}
+            tabIndex={-1}
+            onClick={() => choose(index)}
+            onKeyDown={event => onOptionKeyDown(event, index)}
+          >
+            <span>{option.label}</span>
+            <small>{option.hint}</small>
+            <i aria-hidden="true">→</i>
+          </button>
+        ))}
+      </div>
+      {hasError && <span className="cu-budget-error" role="alert">Choose a budget range</span>}
+    </div>
+  )
+}
+
 function ContactForm() {
   const [sent, setSent] = useState(false)
+  const [budget, setBudget] = useState('')
+  const [budgetError, setBudgetError] = useState(false)
   const onSubmit = e => {
     e.preventDefault()
+    if (!budget) {
+      setBudgetError(true)
+      e.currentTarget.querySelector('.cu-budget-trigger')?.focus()
+      return
+    }
     setSent(true)
   }
   return (
     <div className="cu-form-card" id="form">
-      <div className="cu-form-hosts">
+      <div className="cu-form-intro">
         <div className="cu-form-avatars">
           <img src={`${TC}avatar-ayush.webp`} alt="" />
           <img src={`${TC}avatar-harsh.webp`} alt="" />
         </div>
-        <p>Book a free 30-minute strategy session with our team.</p>
+        <div>
+          <h2>Tell us what you’re building.</h2>
+          <p>We’ll map the clearest next move in a 30-minute strategy session.</p>
+        </div>
       </div>
       {sent ? (
         <div className="cu-form-success">
@@ -166,22 +337,25 @@ function ContactForm() {
             <span>Website</span>
             <input name="website" type="url" placeholder="https://" autoComplete="url" />
           </label>
-          <label>
+          <label className="cu-form-message">
             <span>What are you looking to achieve?*</span>
-            <textarea name="message" required rows={4} placeholder="Rebrand, new website, conversion lift…" />
+            <textarea name="message" required rows={4} placeholder="Share the goal, the friction, and what success should look like." />
           </label>
-          <label>
-            <span>Budget range</span>
-            <select name="budget" defaultValue="">
-              <option value="" disabled>Select a range</option>
-              <option>$10k to $25k</option>
-              <option>$25k to $50k</option>
-              <option>$50k to $100k</option>
-              <option>$100k+</option>
-            </select>
-          </label>
-          <button className="cu-btn" type="submit">Book your strategy session</button>
-          <p className="cu-form-note">No spam. No hard pitch. Just a clear next step.</p>
+          <div className="cu-form-actions">
+            <BudgetDropdown
+              value={budget}
+              hasError={budgetError}
+              onChange={nextValue => {
+                setBudget(nextValue)
+                setBudgetError(false)
+              }}
+            />
+            <input type="hidden" name="budget" value={budget} />
+            <button className="cu-btn cu-form-submit" type="submit">
+              <span>Book the session</span>
+              <span aria-hidden="true">↗</span>
+            </button>
+          </div>
         </form>
       )}
     </div>
@@ -191,13 +365,29 @@ function ContactForm() {
 export default function ContactUs({ onNavigateHome, footer = null }) {
   useEffect(() => {
     document.title = `Book a Demo | ${BRAND}`
-    document.body.classList.add('cu-active')
-    const prevTheme = document.documentElement.dataset.theme
-    document.documentElement.dataset.theme = 'dark'
+    document.body.classList.add('cu-active', 'page-loaded')
+    document.documentElement.classList.add('motion-ready')
     window.scrollTo(0, 0)
+
+    const nodes = [
+      ...document.querySelectorAll('.cu-page [data-reveal], footer[data-reveal]'),
+    ]
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-inview')
+          io.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' })
+    nodes.forEach((n, i) => {
+      n.style.setProperty('--reveal-order', i % 4)
+      io.observe(n)
+    })
+
     return () => {
+      io.disconnect()
       document.body.classList.remove('cu-active')
-      document.documentElement.dataset.theme = prevTheme || 'dark'
       document.title = `${BRAND} | Brand and Web Design Agency for Tech Companies`
     }
   }, [])
@@ -213,13 +403,13 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
         <a className="cu-nav-cta" href="#form">Talk to Us</a>
       </header>
 
-      <section className="cu-hero">
+      <section className="cu-hero" data-reveal="panel">
         <div className="cu-hero-bg" aria-hidden="true">
           <img className="cu-hero-gradient" src={`${TC}gradient-bg.svg`} alt="" />
           <img className="cu-hero-decor" src={`${TC}contact-bg-light.svg`} alt="" />
         </div>
         <div className="cu-container cu-hero-grid">
-          <div className="cu-hero-left">
+          <div className="cu-hero-left" data-reveal="up">
             <h1 className="cu-h2">Get a SaaS website that makes your product impossible to ignore</h1>
 
             <div className="cu-trust">
@@ -241,9 +431,9 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
                 </div>
               </div>
               <div className="cu-logo-grid">
-                {logos.map(([file, mod]) => (
-                  <div className={`cu-logo-cell ${mod}`} key={file}>
-                    <img src={`${TC}${file}`} alt="" />
+                {clientLogos.slice(0, 8).map(id => (
+                  <div className="cu-logo-cell" key={id}>
+                    <img src={`${A}${id}.avif`} alt="" className={invertInDark.has(id) ? 'cu-logo-invert' : undefined} />
                   </div>
                 ))}
               </div>
@@ -261,25 +451,40 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
               </div>
             </div>
 
-            <div className="cu-expect">
-              <h2 className="cu-expect-title">What to expect</h2>
-              <div className="cu-expect-list">
-                {expectItems.map(([icon, title, copy]) => (
-                  <div className="cu-expect-item" key={title}>
-                    <img src={`${TC}${icon}`} alt="" />
-                    <div>
-                      <h3>{title}</h3>
-                      <p>{copy}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
-          <div className="cu-hero-right">
+          <div className="cu-hero-right" data-reveal="card">
             <ContactForm />
           </div>
+        </div>
+
+        <div className="cu-container cu-expect-wrap">
+          <section className="cu-expect" aria-labelledby="expect-title" data-reveal="panel">
+            <div className="cu-expect-intro" data-reveal="up">
+              <span className="cu-expect-kicker">Your 30-minute session</span>
+              <h2 className="cu-expect-title" id="expect-title">Three conversations.<br /><span>One clear next move.</span></h2>
+              <p>No generic pitch deck. We use the time to diagnose, compare, and give you a useful way forward.</p>
+              <div className="cu-expect-leave">
+                <span aria-hidden="true">↗</span>
+                <div><small>You leave with</small><strong>A prioritized website action plan</strong></div>
+              </div>
+            </div>
+
+            <ol className="cu-expect-list">
+              {expectItems.map(([time, icon, title, copy, outcome], index) => (
+                <li className="cu-expect-item" data-reveal="card" key={title}>
+                  <div className="cu-expect-step">
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <small>{time} min</small>
+                  </div>
+                  <div className="cu-expect-icon"><img src={`${TC}${icon}`} alt="" /></div>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                  <strong className="cu-expect-outcome"><span>✓</span>{outcome}</strong>
+                </li>
+              ))}
+            </ol>
+          </section>
         </div>
       </section>
 
@@ -347,7 +552,7 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
                     <p>{label}</p>
                   </div>
                   <div className="cu-pipe-logo">
-                    <img src={`${TC}${logo}`} alt="" />
+                    <img src={`${A}${logo}.avif`} alt="" className={invertInDark.has(logo) ? 'cu-logo-invert' : undefined} />
                   </div>
                 </article>
               ))}

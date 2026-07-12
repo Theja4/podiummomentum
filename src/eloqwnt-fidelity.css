@@ -1,0 +1,917 @@
+/* ============================================================
+   Eloqwnt one-to-one fidelity layer
+   Tokens & geometry measured from https://www.eloqwnt.com/
+   (1440px viewport: body 20px Mazzard, grey #e5e9eb canvas,
+   white 2rem-radius sections, pad 3.75rem, container 82.5rem)
+   ============================================================ */
+
+@font-face {
+  font-family: Mazzard;
+  src: url('/fonts/MazzardM-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: Mazzard;
+  src: url('/fonts/MazzardM-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: Mazzard;
+  src: url('/fonts/MazzardM-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: Mazzard;
+  src: url('/fonts/MazzardM-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: Mazzard;
+  src: url('/fonts/MazzardM-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* Eloqwnt :root */
+  --grey: #e5e9eb;
+  --black: #000;
+  --white: #fff;
+  --standart-section-radius: 2rem;
+  --lightgray: #eff2f3;
+  --grey-light: #787878;
+  --pad-standart: 3.75rem;
+  --container: 82.5rem;
+
+  /* Map existing tokens → Eloqwnt */
+  --ink: var(--black);
+  --paper: var(--white);
+  --ice: var(--grey);
+  --radius: var(--standart-section-radius);
+  --gutter: var(--pad-standart);
+
+  /* Keep a single accent for brand CTAs (Eloqwnt uses black pills) */
+  --emerald: #000;
+  --aquamarine: #222;
+  --celadon: #e5e9eb;
+  --green-line: #d9d9d9;
+  --green-shadow: rgba(0, 0, 0, 0.06);
+  --brand-forest: #000;
+  --brand-forest-hover: #222;
+  --btn-ink: #000;
+  --btn-primary-bg: #000;
+  --btn-primary-text: #fff;
+  --btn-primary-hover-bg: #222;
+  --btn-primary-hover-text: #fff;
+  --btn-primary-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --btn-primary-shadow-hover: 0 14px 32px rgba(0, 0, 0, 0.18);
+  --btn-secondary-bg: #fff;
+  --btn-secondary-text: #000;
+  --btn-secondary-hover-bg: #eff2f3;
+  --btn-secondary-hover-text: #000;
+}
+
+/* Fluid rem — Eloqwnt Webflow-style clamp */
+html {
+  font-size: 1.125rem; /* 18px base; 1.25rem body = 22.5? measured 20px at 1440 */
+}
+@media (max-width: 1920px) {
+  html {
+    font-size: calc(0.625rem + 0.41666666666666674vw);
+  }
+}
+@media (max-width: 1440px) {
+  html {
+    font-size: calc(-0.00222717149220486rem + 1.1135857461024499vw);
+  }
+}
+@media (max-width: 991px) {
+  html {
+    font-size: calc(-0.003766741071428492rem + 1.1160714285714284vw);
+  }
+}
+@media (max-width: 767px) {
+  html {
+    font-size: 1.5rem;
+  }
+}
+
+body {
+  background-color: var(--grey) !important;
+  color: var(--black) !important;
+  font-family: Mazzard, 'Times New Roman', sans-serif !important;
+  font-size: 1.25rem !important; /* ~20px */
+  font-weight: 400 !important;
+  letter-spacing: -0.025rem !important;
+  line-height: 1.2 !important;
+}
+
+#root,
+main {
+  background: transparent !important;
+}
+
+/* —— Header: 5rem / 80px —— */
+.header {
+  height: 5rem !important;
+  padding: 0 var(--pad-standart) !important;
+  background: transparent !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+.header.header-scrolled {
+  background: rgba(229, 233, 235, 0.92) !important;
+  backdrop-filter: blur(12px);
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+.nav {
+  gap: 2rem !important;
+  font-size: 1rem !important; /* ~16–20 */
+  font-weight: 500 !important;
+  letter-spacing: -0.02rem !important;
+  color: #000 !important;
+}
+.nav a,
+.nav-dropdown-trigger {
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.02rem !important;
+  color: #000 !important;
+}
+.nav a:after,
+.nav-dropdown-trigger:after {
+  background: #000 !important;
+  height: 1px !important;
+}
+.logo-lockup-mark {
+  width: 2rem !important;
+  height: 2rem !important;
+}
+.logo-wordmark {
+  font-size: 1.25rem !important;
+  letter-spacing: -0.04em !important;
+  color: #000 !important;
+}
+.menu {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-color: #000 !important;
+  background: #fff !important;
+}
+.theme-toggle {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-color: #000 !important;
+  background: #fff !important;
+  color: #000 !important;
+}
+.theme-toggle:hover {
+  background: #eff2f3 !important;
+  box-shadow: none !important;
+}
+
+/* CTAs: black pills (Eloqwnt) */
+.pill-light {
+  background: #000 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  font-size: 1.125rem !important;
+  font-weight: 500 !important;
+  padding: 0.85rem 1.35rem !important;
+  gap: 0.55rem !important;
+}
+.pill-light .pill-wipe-dark {
+  background: #222 !important;
+}
+.pill-light:hover {
+  color: #fff !important;
+}
+.pill-dark {
+  color: #000 !important;
+}
+.pill-dark .pill-base {
+  background: #fff !important;
+  border: 1px solid #000;
+}
+.pill-dark .pill-wipe {
+  background: #eff2f3 !important;
+}
+.pill-dark:hover {
+  color: #000 !important;
+}
+
+/* —— HERO: fullscreen white, centered (Eloqwnt is-fullscreen) —— */
+.hero {
+  height: 100svh !important;
+  min-height: 100svh !important;
+  background: #fff !important;
+  border-radius: 0 0 var(--standart-section-radius) var(--standart-section-radius) !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+  padding: 5rem var(--pad-standart) 0 !important;
+}
+.hero:before {
+  display: none !important;
+}
+.hero-inner {
+  width: min(var(--container), 100%) !important;
+  max-width: 56rem !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 2rem !important;
+  padding: 0 !important;
+  flex: 1 !important;
+  justify-content: center !important;
+}
+.hero-title {
+  font-size: clamp(2rem, 3.9vw, 3.5rem) !important; /* ~56px */
+  font-weight: 500 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.1rem !important; /* ~-1.6px */
+  max-width: 18ch !important;
+  color: #000 !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+  display: block !important;
+}
+.hero-title .hero-word {
+  display: inline-block !important;
+  overflow: hidden !important;
+  vertical-align: bottom !important;
+  margin-right: 0.28em !important;
+  animation: heroWordIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(0.12s + var(--wi, 0) * 0.04s);
+}
+.hero-title .hero-word:last-child {
+  margin-right: 0 !important;
+}
+@keyframes heroWordIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0.6em, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.page-loaded .hero-title .hero-word {
+  animation-name: heroWordIn;
+}
+.hero-title em {
+  font-style: normal !important;
+  font-weight: 500 !important;
+  background: none !important;
+  padding: 0 !important;
+}
+.hero-band {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 1.5rem !important;
+  border: 0 !important;
+  width: 100% !important;
+  max-width: 42rem !important;
+}
+.hero-media {
+  width: min(100%, 40rem) !important;
+  aspect-ratio: 16 / 10 !important;
+  border-radius: 1.25rem !important;
+  overflow: hidden !important;
+  order: 2 !important;
+}
+.hero-video {
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 1.25rem !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.hero-side {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 1.25rem !important;
+  order: 1 !important;
+  text-align: center !important;
+  max-width: 34ch !important;
+}
+.hero-lead,
+.hero-side p {
+  font-size: 1.125rem !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.02rem !important;
+  color: #000 !important;
+  max-width: 32ch !important;
+  margin: 0 !important;
+}
+.hero-lead em {
+  font-style: normal !important;
+  background: none !important;
+  font-weight: 500 !important;
+}
+.hero-action {
+  display: flex !important;
+  justify-content: center !important;
+}
+.hero-rating {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+.hero-rating-avatars {
+  border: 0 !important;
+  padding: 0 !important;
+}
+.hero-rating-label {
+  color: var(--grey-light) !important;
+  font-size: 0.875rem !important;
+}
+.hero-trust {
+  display: none !important; /* Eloqwnt puts logos in later clients section */
+}
+.hero > .marquee,
+.marquee {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  background: #000 !important;
+  color: #fff !important;
+  height: 3.5rem !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+.marquee-track {
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.02rem !important;
+}
+.marquee-track span:nth-child(3n + 1) {
+  text-decoration: none !important;
+}
+
+/* —— Sections: white cards on grey canvas —— */
+.panel,
+.who-we-are,
+.clients,
+.services,
+.faq,
+.testimonials,
+.work-wrap,
+.tcx,
+.contact,
+.svc-page,
+.ind-main .ind-section-white,
+.ind-cta-band {
+  background: #fff !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: var(--standart-section-radius) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-width: var(--container) !important;
+}
+.who-we-are:before,
+.panel:before {
+  display: none !important;
+}
+
+main {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.25rem !important;
+  padding: 1.25rem var(--pad-standart) 0 !important;
+  background: transparent !important;
+}
+
+.who-we-are,
+.clients,
+.services,
+.faq,
+.testimonials {
+  padding: var(--pad-standart) !important;
+  width: 100% !important;
+}
+
+/* Typography scale */
+h1,
+.hero-title {
+  font-weight: 500 !important;
+  letter-spacing: -0.1rem !important;
+}
+h2,
+.who-headline,
+.clients h2,
+.service-body > h2,
+.faq h2,
+.testimonial-head h2,
+.svc-hub-hero h1,
+.svc-detail-hero h1,
+.ind-h1,
+.ind-h2 {
+  font-weight: 500 !important;
+  letter-spacing: -0.05rem !important;
+  line-height: 1.1 !important;
+}
+.who-headline,
+.clients h2,
+.service-body > h2 {
+  font-size: clamp(1.75rem, 2.8vw, 2.5rem) !important; /* ~40px */
+  max-width: 28ch !important;
+}
+.faq h2 {
+  font-size: clamp(2rem, 3.3vw, 3rem) !important; /* ~48px */
+}
+.eyebrow,
+.section-lead > span,
+.contact-lead > span,
+.svc-dot-label,
+.ind-dot-label {
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+  color: #000 !important;
+}
+.svc-dot,
+.ind-dot {
+  background: #000 !important;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Services list rows — Eloqwnt large type */
+.service-list a,
+.svc-hub-row {
+  border-radius: 0.5rem !important;
+}
+.service-list a:before,
+.svc-hub-row:before {
+  background: var(--lightgray) !important;
+}
+.service-list b,
+.svc-hub-row b {
+  font-size: clamp(1.5rem, 2.2vw, 2rem) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.04rem !important;
+  line-height: 1.125 !important;
+}
+
+/* FAQ */
+.faq {
+  background: #fff !important;
+}
+.faq-item {
+  background: var(--lightgray) !important;
+  border-radius: 1rem !important;
+  box-shadow: none !important;
+}
+.faq-item button i {
+  background: #fff !important;
+}
+.faq-item.active button i,
+.faq-item:not(.active):hover button i {
+  background: #000 !important;
+}
+.faq-item.active button i:before,
+.faq-item.active button i:after,
+.faq-item:not(.active):hover button i:before,
+.faq-item:not(.active):hover button i:after {
+  background: #fff !important;
+}
+
+/* Work / projects */
+.work-wrap {
+  background: transparent !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+.work-panel,
+.project {
+  background: #fff !important;
+  border-radius: 1rem !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 3.5rem var(--pad-standart) var(--pad-standart) !important;
+}
+.project-media {
+  box-shadow: none !important;
+  border-radius: 1.25rem !important;
+}
+.project:nth-child(n) .project-media {
+  box-shadow: none !important;
+}
+
+/* Clients logos marquee on grey */
+.clients {
+  background: #fff !important;
+}
+.logo-marquee {
+  background: transparent !important;
+}
+
+/* Testimonials */
+.testimonials {
+  background: #fff !important;
+  padding: 4.75rem var(--pad-standart) !important;
+}
+.testimonial-track article {
+  background: var(--lightgray) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: none !important;
+}
+
+/* Footer */
+footer {
+  background: #fff !important;
+  border-top: 0 !important;
+  max-width: var(--container) !important;
+  margin: 1.25rem auto 0 !important;
+  border-radius: var(--standart-section-radius) var(--standart-section-radius) 0 0 !important;
+  padding: var(--pad-standart) !important;
+}
+.footer-col a:after {
+  background: #000 !important;
+}
+
+/* Challenge / compare bands */
+.tcx {
+  max-width: var(--container) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  border-radius: var(--standart-section-radius) !important;
+  overflow: hidden !important;
+}
+
+/* —— Services pages —— */
+.svc-page {
+  background: transparent !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.25rem !important;
+  width: 100% !important;
+}
+.svc-main {
+  background: transparent !important;
+  padding: 1.25rem var(--pad-standart) 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.25rem !important;
+}
+.svc-hub-hero,
+.svc-hub-list-wrap,
+.svc-featured,
+.svc-partners,
+.svc-expertise,
+.svc-numbers,
+.svc-testimonials,
+.svc-hub-faq,
+.svc-close,
+.svc-contact-band,
+.svc-detail-hero,
+.svc-detail-intro,
+.svc-stats,
+.svc-caps,
+.svc-process,
+.svc-work-strip,
+.svc-pills-nav,
+.svc-faq,
+.svc-related {
+  background: #fff !important;
+  border-radius: var(--standart-section-radius) !important;
+  max-width: var(--container) !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  padding: var(--pad-standart) !important;
+}
+.svc-featured,
+.svc-process,
+.svc-hub-faq,
+.svc-partners {
+  background: #fff !important;
+}
+.svc-hub-solutions {
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.08rem !important;
+  max-width: 16ch !important;
+}
+.svc-hub-hero h1 {
+  font-size: clamp(2.5rem, 4.5vw, 4rem) !important; /* ~64px */
+  font-weight: 500 !important;
+  letter-spacing: -0.1rem !important;
+  line-height: 1.05 !important;
+  max-width: 12ch !important;
+}
+.svc-detail-lead {
+  font-size: clamp(1.75rem, 3.2vw, 2.65rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.08rem !important;
+}
+.svc-detail-intro h2,
+.svc-expertise-copy h2,
+.svc-numbers-head h2 {
+  font-weight: 500 !important;
+  letter-spacing: -0.06rem !important;
+}
+.svc-hub-card,
+.svc-featured-card,
+.svc-numbers-grid article,
+.svc-stats-grid article,
+.svc-process-grid article,
+.svc-faq-item,
+.svc-related-grid a,
+.svc-detail-hero-card,
+.svc-work-strip-grid article,
+.svc-work-strip-scroll article,
+.svc-detail-chip,
+.svc-pill-link,
+.svc-testimonial-track article {
+  background: var(--lightgray) !important;
+  box-shadow: none !important;
+}
+.svc-pill-link:hover {
+  background: #000 !important;
+  color: #fff !important;
+}
+.svc-partners-track img {
+  filter: grayscale(1) !important;
+  opacity: 0.75 !important;
+}
+.svc-hub-row:hover i,
+.svc-faq-item button i {
+  background: #fff !important;
+}
+.svc-faq-item.is-open button i {
+  background: #000 !important;
+}
+.svc-faq-item.is-open button i:before,
+.svc-faq-item.is-open button i:after {
+  background: #fff !important;
+}
+.svc-close-inner {
+  background: var(--lightgray) !important;
+  box-shadow: none !important;
+}
+.svc-numbers-grid strong,
+.svc-stats-grid strong {
+  text-decoration-color: #000 !important;
+}
+.svc-container {
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+/* —— Industry pages —— */
+.ind-main {
+  background: transparent !important;
+  padding: 0 0 1.25rem !important;
+}
+.ind-hero-fs {
+  background: transparent !important;
+  padding: 0 var(--pad-standart) !important;
+}
+.ind-hero-shell {
+  background: #fff !important;
+  border-radius: var(--standart-section-radius) !important;
+  min-height: 100svh !important;
+}
+.ind-h1 {
+  font-size: clamp(2.5rem, 4.5vw, 4rem) !important; /* 64px */
+  font-weight: 500 !important;
+  letter-spacing: -0.1rem !important;
+  color: #000 !important;
+}
+.ind-hero-head {
+  color: #000 !important;
+}
+.ind-hero-tag {
+  color: rgba(0, 0, 0, 0.65) !important;
+}
+.ind-hero-shell {
+  background: #fff !important;
+}
+.ind-h1,
+.ind-split-word > span {
+  color: #000 !important;
+}
+/* Industry hero: Eloqwnt light canvas + black type */
+.ind-hero-head .ind-h1 {
+  color: #000 !important;
+}
+.ind-hero-shell {
+  color: #000 !important;
+}
+.ind-split-word {
+  margin-right: 0.28em !important;
+}
+.ind-split-word:last-child {
+  margin-right: 0 !important;
+}
+/* Force light surface for first paint (Eloqwnt default) */
+html:not([data-theme='dark']) body {
+  background-color: var(--grey) !important;
+  color: var(--black) !important;
+}
+.ind-video-wrap {
+  border-radius: 1.25rem !important;
+}
+.ind-section,
+.ind-approach,
+.ind-expertise-sec,
+.ind-work,
+.ind-clients-sec,
+.ind-who,
+.ind-more,
+.ind-cta-band {
+  background: #fff !important;
+  border-radius: var(--standart-section-radius) !important;
+  max-width: var(--container) !important;
+  margin: 1.25rem auto 0 !important;
+  width: calc(100% - 0px) !important;
+}
+.ind-section-ice,
+.ind-work,
+.ind-more {
+  background: #fff !important;
+}
+.ind-approach-card,
+.ind-work-grid article,
+.ind-blurb-grid p,
+.ind-who-card {
+  background: var(--lightgray) !important;
+  box-shadow: none !important;
+}
+.ind-approach-card:hover {
+  background: #fff !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06) !important;
+}
+.ind-exp-item {
+  color: #000 !important;
+}
+.ind-who-stats {
+  background: #000 !important;
+}
+.ind-who-stats strong {
+  background: none !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+.ind-container {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.ind-section {
+  padding: var(--pad-standart) !important;
+}
+.ind-cta-band {
+  border-top: 0 !important;
+}
+
+/* Contact page on grey canvas */
+body.cu-active {
+  background: var(--grey) !important;
+}
+.cu-page {
+  background: transparent !important;
+}
+.cu-nav {
+  background: rgba(229, 233, 235, 0.92) !important;
+  border-bottom: 0 !important;
+  backdrop-filter: blur(12px);
+}
+.cu-hero,
+.cu-expect,
+.cu-form-card {
+  background: #fff !important;
+  border-radius: var(--standart-section-radius) !important;
+}
+
+/* Dark theme: keep black/white Eloqwnt spirit inverted */
+html[data-theme='dark'] body {
+  background: #000 !important;
+  color: #fff !important;
+}
+html[data-theme='dark'] .hero,
+html[data-theme='dark'] .panel,
+html[data-theme='dark'] .who-we-are,
+html[data-theme='dark'] .clients,
+html[data-theme='dark'] .services,
+html[data-theme='dark'] .faq,
+html[data-theme='dark'] .testimonials,
+html[data-theme='dark'] footer,
+html[data-theme='dark'] .svc-hub-hero,
+html[data-theme='dark'] .svc-hub-list-wrap,
+html[data-theme='dark'] .svc-featured,
+html[data-theme='dark'] .svc-partners,
+html[data-theme='dark'] .svc-expertise,
+html[data-theme='dark'] .svc-numbers,
+html[data-theme='dark'] .svc-testimonials,
+html[data-theme='dark'] .svc-contact-band,
+html[data-theme='dark'] .svc-hub-faq,
+html[data-theme='dark'] .svc-close,
+html[data-theme='dark'] .svc-detail-hero,
+html[data-theme='dark'] .svc-detail-intro,
+html[data-theme='dark'] .svc-stats,
+html[data-theme='dark'] .svc-caps,
+html[data-theme='dark'] .svc-process,
+html[data-theme='dark'] .svc-work-strip,
+html[data-theme='dark'] .svc-pills-nav,
+html[data-theme='dark'] .svc-faq,
+html[data-theme='dark'] .svc-related,
+html[data-theme='dark'] .ind-hero-shell,
+html[data-theme='dark'] .ind-section,
+html[data-theme='dark'] .ind-approach,
+html[data-theme='dark'] .ind-expertise-sec,
+html[data-theme='dark'] .ind-work,
+html[data-theme='dark'] .ind-clients-sec,
+html[data-theme='dark'] .ind-who,
+html[data-theme='dark'] .ind-more,
+html[data-theme='dark'] .ind-cta-band {
+  background: #0a0a0a !important;
+  color: #fff !important;
+}
+html[data-theme='dark'] .header.header-scrolled {
+  background: rgba(0, 0, 0, 0.9) !important;
+}
+html[data-theme='dark'] .nav a,
+html[data-theme='dark'] .nav-dropdown-trigger,
+html[data-theme='dark'] .hero-title,
+html[data-theme='dark'] .hero-lead,
+html[data-theme='dark'] .ind-h1 {
+  color: #fff !important;
+}
+html[data-theme='dark'] .pill-light {
+  background: #fff !important;
+  color: #000 !important;
+}
+html[data-theme='dark'] .pill-light .pill-wipe-dark {
+  background: #e5e9eb !important;
+}
+html[data-theme='dark'] .marquee {
+  background: #fff !important;
+  color: #000 !important;
+}
+html[data-theme='dark'] .faq-item,
+html[data-theme='dark'] .svc-hub-card,
+html[data-theme='dark'] .svc-featured-card,
+html[data-theme='dark'] .ind-approach-card,
+html[data-theme='dark'] .testimonial-track article {
+  background: #151515 !important;
+}
+
+/* Responsive pad */
+@media (max-width: 991px) {
+  :root {
+    --pad-standart: 1.25rem;
+  }
+  .header {
+    padding: 0 1rem !important;
+    height: 3.5rem !important;
+  }
+  main,
+  .svc-main {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .hero {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    border-radius: 0 0 1rem 1rem !important;
+  }
+  .hero-title,
+  .hero-title span {
+    font-size: 2rem !important;
+    max-width: none !important;
+  }
+  .hero-band {
+    flex-direction: column !important;
+  }
+  .hero-media {
+    order: 2 !important;
+    width: 100% !important;
+  }
+  .ind-hero-fs {
+    padding: 0 1rem !important;
+  }
+}

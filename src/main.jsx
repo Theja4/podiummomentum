@@ -2,7 +2,13 @@ import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import './contact-us.css'
+import './industry.css'
+import './services-pages.css'
 import ContactUs from './ContactUs.jsx'
+import { ServicesHub, ServiceDetail, matchServicesRoute } from './ServicesPages.jsx'
+import { serviceCatalog, getServicePath, getServiceBySlug, SERVICES_PATH } from './servicesData.js'
+import IndustryPage from './IndustryPage.jsx'
+import { industryList, matchIndustryRoute } from './industries.js'
 
 const A = '/assets/'
 const BRAND = 'Podium Momentum'
@@ -76,9 +82,10 @@ const projects = [
   },
 ]
 
-const clientLogos = ['a9cc6fba12268e37','43201ae504d0ad9f','cfecff048b60daa1','baa053d3454375d0','518e03fa4e4f8841','d2c8ca3a50aba890','ab3a9a6cf9778c11','9a6b3e2b11136ee0','c90888271d904160','e72cc835698ff331']
+const clientLogos = ['a9cc6fba12268e37','43201ae504d0ad9f','cfecff048b60daa1','baa053d3454375d0','d2c8ca3a50aba890','ab3a9a6cf9778c11','9a6b3e2b11136ee0','c90888271d904160','e72cc835698ff331']
+const invertInDark = new Set(['d2c8ca3a50aba890','e72cc835698ff331'])
 
-const services = ['Website Design', 'Branding', 'UX and UI', 'Motion Design', 'SEO', 'Content Creation', 'Landing Page', 'Webflow Development']
+const services = serviceCatalog.map(s => s.title)
 const faqs = [
   [`What does ${BRAND} do`, `${BRAND} is a strategic design partner that helps startups, tech companies, and corporate teams strengthen their brand, website, and digital product experience.`],
   [`Can ${BRAND} help startups as well as established companies`, `Yes. ${BRAND} works with both startups and established companies, especially in tech driven sectors.`],
@@ -94,6 +101,21 @@ const testimonials = [
   ['The new website gets lots of trust, and influencers and brand clients get convinced to work with Metapic only by looking at the website :))', 'Jonathan', 'Associate Founder', `${A}ef42fa7cfd41a7e6.avif`],
   ['We needed users to understand what we do just by looking at our website. As a result, we saw stronger interest and an increase in conversion.', 'Lihong Wang', 'CEO', `${A}b6bb0636a8e5a963.avif`],
 ]
+
+const ratingAvatars = ['236e08442c17c9f5.avif', 'c0bb9a494de2f7b0.png', 'ef42fa7cfd41a7e6.avif', 'b6bb0636a8e5a963.avif']
+
+function RatingStars({ value = 4.9, max = 5 }) {
+  const star = 'M12 2.4l2.83 5.94 6.52.86-4.78 4.52 1.21 6.45L12 17.02l-5.78 3.15 1.21-6.45-4.78-4.52 6.52-.86L12 2.4Z'
+  const stars = n => Array.from({ length: n }, (_, i) => (
+    <svg viewBox="0 0 24 24" key={i}><path d={star} /></svg>
+  ))
+  return (
+    <span className="rating-stars" role="img" aria-label={`Rated ${value} out of ${max} stars`}>
+      <span className="rating-stars-base" aria-hidden="true">{stars(max)}</span>
+      <span className="rating-stars-fill" style={{ width: `${(value / max) * 100}%` }} aria-hidden="true">{stars(max)}</span>
+    </span>
+  )
+}
 
 const compareRows = [
   ['Consultative approach', 'A strategy partner that looks through your buyer’s lens and co-owns the result.', 'They build exactly what’s briefed, even when the story doesn’t hold together.'],
@@ -128,11 +150,13 @@ function Button({ children, light = false, href = '#' }) {
             <span className="pill-wipe" aria-hidden="true" />
           </>}
       <span className="pill-label">{children}</span>
-      <img
-        className={`pill-icon ${light ? 'pill-handwave' : 'pill-brand'}`}
-        src={light ? `${A}hand-wave.avif` : `${A}brand-mark.svg`}
-        alt=""
-      />
+      <span className={`pill-icon-shell ${light ? 'is-light' : 'is-dark'}`} aria-hidden="true">
+        <img
+          className={`pill-icon ${light ? 'pill-handwave' : 'pill-brand'}`}
+          src={light ? `${A}hand-wave.avif` : `${A}brand-mark.svg`}
+          alt=""
+        />
+      </span>
     </a>
   )
 }
@@ -141,11 +165,24 @@ function Header() {
   const [open, setOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'dark')
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('pm-theme') || document.documentElement.dataset.theme || 'light'
+    } catch {
+      return 'light'
+    }
+  })
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     try { localStorage.setItem('pm-theme', theme) } catch {}
   }, [theme])
+  // Same header reveal as the landing page — every route needs page-loaded
+  // or logo/nav stay at opacity:0 from the entrance animation CSS.
+  useEffect(() => {
+    document.documentElement.classList.add('motion-ready')
+    const id = requestAnimationFrame(() => document.body.classList.add('page-loaded'))
+    return () => cancelAnimationFrame(id)
+  }, [])
   useEffect(() => {
     let previous = window.scrollY
     let frame = 0
@@ -161,20 +198,205 @@ function Header() {
         frame = 0
       })
     }
+    // Sync initial scroll state (service/industry pages often open mid-scroll history)
+    setScrolled(window.scrollY > 24)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', onScroll)
       if (frame) cancelAnimationFrame(frame)
     }
   }, [])
+  const [svcOpen, setSvcOpen] = useState(false)
+  const [indOpen, setIndOpen] = useState(false)
+  const svcRef = useRef(null)
+  const indRef = useRef(null)
+  const svcLeaveTimer = useRef(null)
+  const indLeaveTimer = useRef(null)
+
+  const clearLeaveTimers = () => {
+    if (svcLeaveTimer.current) {
+      clearTimeout(svcLeaveTimer.current)
+      svcLeaveTimer.current = null
+    }
+    if (indLeaveTimer.current) {
+      clearTimeout(indLeaveTimer.current)
+      indLeaveTimer.current = null
+    }
+  }
+
+  const openServices = () => {
+    if (window.innerWidth <= 900) return
+    clearLeaveTimers()
+    setSvcOpen(true)
+    setIndOpen(false)
+  }
+  const closeServices = () => {
+    if (window.innerWidth <= 900) return
+    clearLeaveTimers()
+    // Small delay so the pointer can cross the trigger→panel bridge
+    svcLeaveTimer.current = setTimeout(() => setSvcOpen(false), 160)
+  }
+  const openIndustries = () => {
+    if (window.innerWidth <= 900) return
+    clearLeaveTimers()
+    setIndOpen(true)
+    setSvcOpen(false)
+  }
+  const closeIndustries = () => {
+    if (window.innerWidth <= 900) return
+    clearLeaveTimers()
+    indLeaveTimer.current = setTimeout(() => setIndOpen(false), 160)
+  }
+
+  useEffect(() => () => clearLeaveTimers(), [])
+
+  useEffect(() => {
+    if (!svcOpen && !indOpen) return undefined
+    const onDoc = e => {
+      if (svcOpen && !svcRef.current?.contains(e.target)) setSvcOpen(false)
+      if (indOpen && !indRef.current?.contains(e.target)) setIndOpen(false)
+    }
+    const onKey = e => {
+      if (e.key === 'Escape') {
+        setSvcOpen(false)
+        setIndOpen(false)
+      }
+    }
+    document.addEventListener('pointerdown', onDoc)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onDoc)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [svcOpen, indOpen])
+
+  const goHomeSection = (e, hash) => {
+    e.preventDefault()
+    setOpen(false)
+    setSvcOpen(false)
+    setIndOpen(false)
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      navigate('/')
+      setTimeout(() => {
+        const el = document.querySelector(hash)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }, 50)
+      return
+    }
+    navigate(hash)
+  }
+
   return <header className={`header ${hidden ? 'header-hidden' : ''} ${scrolled ? 'header-scrolled' : ''}`}>
-    <a href="#top" className="logo-link" aria-label={BRAND}><Logo /></a>
-    <nav className={open ? 'nav open' : 'nav'}>
-      <a href="#top">Home</a><a href="#about">About ↓</a><a href="#work">Works ↓</a>
-      <a href="#services">Services ↓</a><a href={CONTACT_PATH} onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }}>For Startups</a><a href="#faq">Resources ↓</a>
+    <a href="/" className="logo-link" aria-label={BRAND} onClick={e => { e.preventDefault(); navigate('/'); setOpen(false); setSvcOpen(false); setIndOpen(false) }}><Logo /></a>
+    <nav id="primary-navigation" className={open ? 'nav open' : 'nav'}>
+      <a href="/" onClick={e => { e.preventDefault(); navigate('/'); setOpen(false) }}>Home</a>
+      <a href="#about" onClick={e => goHomeSection(e, '#about')}>About ↓</a>
+      <a href="#work" onClick={e => goHomeSection(e, '#work')}>Works ↓</a>
+      <div
+        className={`nav-dropdown nav-dropdown--services ${svcOpen ? 'is-open' : ''}`}
+        ref={svcRef}
+        onMouseEnter={openServices}
+        onMouseLeave={closeServices}
+      >
+        <button
+          type="button"
+          className="nav-dropdown-trigger"
+          aria-expanded={svcOpen}
+          aria-haspopup="true"
+          onClick={() => { clearLeaveTimers(); setSvcOpen(v => !v); setIndOpen(false) }}
+        >
+          <span>Services</span>
+          <span className="nav-dropdown-chevron" aria-hidden="true" />
+        </button>
+        <div className="nav-dropdown-panel nav-dropdown-panel--mega" role="menu">
+          <div className="nav-dropdown-panel-card">
+            <div className="nav-dropdown-head">
+              <span className="nav-dropdown-eyebrow">Offerings</span>
+              <a
+                className="nav-dropdown-all"
+                href={SERVICES_PATH}
+                role="menuitem"
+                onClick={e => { e.preventDefault(); setSvcOpen(false); setOpen(false); navigate(SERVICES_PATH) }}
+              >
+                View all <i aria-hidden="true">→</i>
+              </a>
+            </div>
+            <div className="nav-dropdown-list">
+              {serviceCatalog.map((s, i) => (
+                <a
+                  key={s.slug}
+                  className="nav-dropdown-item"
+                  href={getServicePath(s.slug)}
+                  role="menuitem"
+                  style={{ '--i': i }}
+                  onClick={e => { e.preventDefault(); setSvcOpen(false); setOpen(false); navigate(getServicePath(s.slug)) }}
+                >
+                  <span className="nav-dropdown-item-bg" aria-hidden="true" />
+                  <span className="nav-dropdown-num">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="nav-dropdown-item-copy">
+                    <b>{s.title}</b>
+                    <small>{s.hubBlurb}</small>
+                  </span>
+                  <span className="nav-dropdown-arrow" aria-hidden="true">→</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <a href={CONTACT_PATH} onClick={e => { e.preventDefault(); setOpen(false); navigate(CONTACT_PATH) }}>For Startups</a>
+      <div
+        className={`nav-dropdown nav-dropdown--industries ${indOpen ? 'is-open' : ''}`}
+        ref={indRef}
+        onMouseEnter={openIndustries}
+        onMouseLeave={closeIndustries}
+      >
+        <button
+          type="button"
+          className="nav-dropdown-trigger"
+          aria-expanded={indOpen}
+          aria-haspopup="true"
+          onClick={() => { clearLeaveTimers(); setIndOpen(v => !v); setSvcOpen(false) }}
+        >
+          <span>Industries</span>
+          <span className="nav-dropdown-chevron" aria-hidden="true" />
+        </button>
+        <div className="nav-dropdown-panel nav-dropdown-panel--grid" role="menu">
+          <div className="nav-dropdown-panel-card">
+            <div className="nav-dropdown-head">
+              <span className="nav-dropdown-eyebrow">Markets we know</span>
+            </div>
+            <div className="nav-dropdown-grid">
+              {industryList.map((item, i) => (
+                <a
+                  key={item.slug}
+                  className="nav-dropdown-chip"
+                  href={item.path}
+                  role="menuitem"
+                  style={{ '--i': i }}
+                  onClick={e => { e.preventDefault(); setIndOpen(false); setOpen(false); navigate(item.path) }}
+                >
+                  <span className="nav-dropdown-item-bg" aria-hidden="true" />
+                  <b>{item.label}</b>
+                  <span className="nav-dropdown-arrow" aria-hidden="true">→</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </nav>
     <div className="header-actions">
-      <button className="menu" onClick={() => setOpen(!open)} aria-label="Toggle menu">{open ? '×' : '≡'}</button>
+      <button
+        className="menu"
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-label="Toggle menu"
+        aria-controls="primary-navigation"
+        aria-expanded={open}
+      >
+        {open ? '×' : '≡'}
+      </button>
       <Button light href={CONTACT_PATH}>Let’s chat</Button>
       <button
         className="theme-toggle"
@@ -197,42 +419,45 @@ function Header() {
 }
 
 function Hero() {
+  // Eloqwnt home hero: centered H1 + lead + CTA, showreel, metrics marquee
+  const title = 'Strategy-led creative partner for scaling B2B tech companies'
+  const words = title.split(' ')
   return (
     <section id="top" className="hero">
       <div className="hero-inner">
         <h1 className="hero-title">
-          <span>Build a <em>10X better website.</em> Become unforgettable.</span>
+          {words.map((w, i) => (
+            <span className="hero-word" style={{ '--wi': i }} key={`${w}-${i}`}>
+              {w}
+              {i < words.length - 1 ? '\u00A0' : ''}
+            </span>
+          ))}
         </h1>
         <div className="hero-band">
-          <div className="hero-media">
-            <ShowreelPlayer variant="hero" autoplayOnLoad />
-          </div>
           <div className="hero-side">
             <p className="hero-lead">
-              We turn ambitious tech companies into category leaders with{' '}
-              <em>sharper positioning</em> and websites that win serious buyers.
+              We close the gap between what ambitious companies are and how the market reads them — brand, web, and product under one roof.
             </p>
             <div className="hero-action">
-              <Button light href={CONTACT_PATH}>Start a project</Button>
+              <Button light href={CONTACT_PATH}>Let’s chat</Button>
             </div>
             <div className="hero-rating">
-              <span className="hero-rating-badge" aria-hidden="true">
-                <img src={`${A}brand-mark.svg`} alt="" />
-              </span>
-              <div className="hero-rating-copy">
-                <span className="hero-rating-score"><b>4.9</b> Stars</span>
+              <div className="hero-rating-avatars" aria-hidden="true">
+                {ratingAvatars.map(img => (
+                  <img src={`${A}${img}`} alt="" loading="lazy" key={img} />
+                ))}
+              </div>
+              <div className="hero-rating-meta">
+                <div className="hero-rating-line">
+                  <RatingStars value={4.9} />
+                  <span className="hero-rating-score">4.9<small>/5</small></span>
+                </div>
                 <span className="hero-rating-label">Average client rating</span>
-                <span className="hero-stars" aria-hidden="true">★★★★★</span>
               </div>
             </div>
           </div>
-        </div>
-        <div className="hero-trust">
-          <p>Trusted by 40+ ambitious<br />technology companies</p>
-          <div className="hero-logos">
-            {clientLogos.slice(0, 6).map(id => (
-              <img src={`${A}${id}.avif`} alt="Client" key={id} />
-            ))}
+          <div className="hero-media">
+            <ShowreelPlayer variant="hero" autoplayOnLoad />
           </div>
         </div>
       </div>
@@ -427,22 +652,49 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
   )
 }
 
+const disciplines = [
+  ['Clarity', 'Say what you do in words your buyers repeat.'],
+  ['Position', 'Claim ground your competitors can’t credibly take.'],
+  ['Signal', 'Look like the company you’re becoming, everywhere you show up.'],
+  ['Proof', 'Back every claim with evidence the market can check.'],
+  ['Memory', 'Stay the first name in the room when budgets open.'],
+]
+
 function About() {
   return (
     <section id="about" className="panel who-we-are" data-reveal="panel">
       <div className="who-left">
         <div className="eyebrow" data-reveal="up">● &nbsp; Who we are</div>
         <ShowreelPlayer />
+        <div className="who-proof" data-reveal="up">
+          <div className="who-proof-item">
+            <strong>40+</strong>
+            <span>Technology companies</span>
+          </div>
+          <div className="who-proof-item">
+            <strong>4.9</strong>
+            <span>Average client rating</span>
+          </div>
+        </div>
       </div>
       <div className="who-right">
-        <h2 className="who-headline who-headline-desktop" data-reveal="line">Most of our clients experience the same gap between what they are and how they're perceived.</h2>
-        <h2 className="who-headline who-headline-mobile" data-reveal="line">The gap between what you are and how you're perceived is costing you.</h2>
+        <h2 className="who-headline who-headline-desktop" data-reveal="line">There's a gap between what you've built and how the market sees you. We close it.</h2>
+        <h2 className="who-headline who-headline-mobile" data-reveal="line">The market undersells you. We close that gap.</h2>
         <div className="who-copy">
-          <p className="who-copy-desktop" data-reveal="line">{BRAND} is a design agency for tech and corporate leaders at turning points: pre raise, post acquisition, market expansion, or a full repositioning. We've seen what happens when a company's brand lags behind its ambition. Investors notice. Deals stall. Talent looks elsewhere.</p>
-          <p className="who-copy-desktop" data-reveal="line">We close that gap by turning internal truth into external perception through clarity, position, signal, proof, and memory.</p>
-          <p className="who-copy-mobile" data-reveal="line">We help tech leaders close that gap—turning internal truth into market perception through clarity, position, and proof.</p>
+          <p className="who-copy-desktop" data-reveal="line">{BRAND} is a brand and design agency for technology companies at inflection points — raising, acquiring, expanding, or repositioning. When a brand lags behind its ambition, the cost is real: investors hesitate, deals stall, and top talent signs elsewhere.</p>
+          <p className="who-copy-desktop" data-reveal="line">We turn internal truth into market perception through five disciplines:</p>
+          <p className="who-copy-mobile" data-reveal="line">{BRAND} works with tech leaders at inflection points, turning internal truth into market perception through five disciplines:</p>
         </div>
-        <div data-reveal="up" className="who-cta"><Button href="#work">About us</Button></div>
+        <ol className="who-pillars" data-reveal="up">
+          {disciplines.map(([name, blurb], i) => (
+            <li key={name}>
+              <span className="who-pillar-num">{String(i + 1).padStart(2, '0')}</span>
+              <b>{name}</b>
+              <p>{blurb}</p>
+            </li>
+          ))}
+        </ol>
+        <div data-reveal="up" className="who-cta"><Button href="#work">See the work</Button></div>
       </div>
     </section>
   )
@@ -474,42 +726,41 @@ function ProjectCase({ project, index }) {
   return (
     <article className="pm-case" ref={ref} style={{ '--case-i': index }}>
       <div className="pm-case-media">
-        <a
-          className="pm-case-media-link"
-          href={CONTACT_PATH}
-          onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }}
-          aria-label={`Explore ${project.title}`}
-        >
+        <div className="pm-case-media-link">
           <img src={project.image} alt={`${project.title} project preview`} loading="lazy" />
-        </a>
+        </div>
       </div>
       <div className="pm-case-body">
-        <div className="pm-case-tags">{project.tags.join(' ')}</div>
+        <div className="pm-case-topline">
+          <span className="pm-case-index">{String(index + 1).padStart(2, '0')}</span>
+          <span className="pm-case-topline-rule" aria-hidden="true" />
+          <span className="pm-case-sector">{project.sector}</span>
+        </div>
         <h3 className="pm-case-title"><CaseWords text={project.headline} /></h3>
-        <div className="pm-case-meta">
-          <div className="pm-case-meta-col">
-            <span className="pm-case-meta-label">Services</span>
-            <p>{project.stack}</p>
-          </div>
-          <div className="pm-case-meta-col">
-            <span className="pm-case-meta-label">Timeline</span>
-            <p>{project.timeline}</p>
-          </div>
+        <div className="pm-case-tags">
+          {project.tags.map(t => <span key={t}>{t.replace(/^#/, '')}</span>)}
         </div>
-        <div className="pm-case-results">
-          <span className="pm-case-meta-label">Results</span>
-          <ul>
-            {project.results.map(r => <li key={r}>{r}</li>)}
-          </ul>
+        <p className="pm-case-desc">{project.description}</p>
+        <div className="pm-case-stats">
+          {project.stats.map(([value, label], si) => (
+            <div className="pm-case-stat" style={{ '--si': si }} key={label}>
+              <span className="pm-case-stat-value">{value}</span>
+              <span className="pm-case-stat-label">{label}</span>
+            </div>
+          ))}
         </div>
-        <div className="pm-case-actions">
+        <div className="pm-case-foot">
+          <p className="pm-case-facts">
+            <span>{project.timeline}</span>
+          </p>
           <a
-            className="pm-case-cta"
+            className="pill pill-light pm-case-cta"
             href={CONTACT_PATH}
             onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }}
           >
-            Explore
-            <span aria-hidden="true">→</span>
+            <span className="pill-wipe pill-wipe-dark" aria-hidden="true" />
+            <span className="pill-label">Explore case</span>
+            <span className="pm-case-cta-arrow" aria-hidden="true">→</span>
           </a>
         </div>
       </div>
@@ -521,7 +772,11 @@ function Work() {
   return (
     <section id="work" className="pm-cases">
       <div className="pm-cases-head">
-        <span className="pm-cases-kicker" data-reveal="up">Featured cases</span>
+        <span className="pm-cases-kicker" data-reveal="up">
+          <span className="pm-cases-kicker-rule" aria-hidden="true" />
+          <span className="pm-cases-kicker-index">Index 01</span>
+          <span className="pm-cases-kicker-label">Featured cases</span>
+        </span>
         <div className="pm-cases-intro">
           <h2 data-reveal="line">Companies that closed the perception gap, and what changed.</h2>
           <p data-reveal="line">Discover how we’re driving change through brand systems, websites, and measurable outcomes for scaling tech teams.</p>
@@ -539,11 +794,35 @@ function Work() {
 
 function Clients() {
   const logos = clientLogos
-  return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><h2 data-reveal="line">We work with ambitious B2B tech companies whose ambition is ahead of how the market reads them, and where that gap is becoming commercial.</h2><p className="client-label" data-reveal="up">OUR CLIENTS</p><div className="logo-marquee"><div>{[...logos, ...logos].map((id, i) => <img src={`${A}${id}.avif`} alt="Client" key={i} />)}</div></div></section>
+  return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><div className="clients-copy"><h2 data-reveal="line">We work with ambitious brands across every industry — teams whose ambition is ahead of how the market reads them.</h2><p data-reveal="up">Startup, scale-up, or established business — if your brand needs sharper positioning, design, or growth, we&rsquo;re ready.</p></div><div className="client-label" data-reveal="up"><span>Our clients</span><i aria-hidden="true" /></div><div className="logo-marquee"><div>{[...logos, ...logos].map((id, i) => <img src={`${A}${id}.avif`} alt="Client logo" className={invertInDark.has(id) ? 'logo-invert' : undefined} key={i} />)}</div></div></section>
 }
 
 function Services() {
-  return <section id="services" className="panel services" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Our services</div><div className="service-body"><h2 data-reveal="line">Everything your brand needs to grow<br /> under one roof.</h2><div className="service-list">{services.map((s, i) => <a href={CONTACT_PATH} onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }} key={s} data-reveal="service"><span>{String(i + 1).padStart(2, '0')}</span><b>{s}</b><i><em>→</em><em>→</em></i></a>)}</div><div data-reveal="up"><Button href={CONTACT_PATH}>All Services</Button></div></div></section>
+  return (
+    <section id="services" className="panel services" data-reveal="panel">
+      <div className="services-head">
+        <div className="eyebrow" data-reveal="up">● &nbsp; Our services</div>
+        <h2 data-reveal="line">Everything your brand needs<br /> to grow — under one roof.</h2>
+      </div>
+      <div className="service-list">
+        {serviceCatalog.map((s, i) => (
+          <a
+            href={getServicePath(s.slug)}
+            onClick={e => { e.preventDefault(); navigate(getServicePath(s.slug)) }}
+            key={s.slug}
+            data-reveal="service"
+          >
+            <span>{String(i + 1).padStart(2, '0')}</span>
+            <b>{s.title}</b>
+            <i><em>→</em><em>→</em></i>
+          </a>
+        ))}
+      </div>
+      <div className="services-cta" data-reveal="up">
+        <Button href={SERVICES_PATH}>All Services</Button>
+      </div>
+    </section>
+  )
 }
 
 function FAQ() {
@@ -564,18 +843,82 @@ function SocialIcon({ name }) {
 }
 
 function Footer() {
-  const cols = [['Company:','About','Services','Projects','For startups','Lab','Blog','Resources','Contacts','Careers','Testimonials'],['Services:','Web Design','Branding','UX and UI','Motion','SEO','Content Creation','Landing Page','Webflow Dev'],['Industries:','Healthcare','Fintech','Web3','Technology','Corporate','AI','Real Estate','Ecommerce','FMCG','Hospitality']]
+  const companyLinks = [
+    { label: 'About', path: '/#about' },
+    { label: 'Services', path: SERVICES_PATH },
+    { label: 'Projects', path: '/#work' },
+    { label: 'For startups', path: CONTACT_PATH },
+    { label: 'Contacts', path: CONTACT_PATH },
+    { label: 'Testimonials', path: '/#faq' },
+  ]
+  const serviceLinks = serviceCatalog.map(s => ({ label: s.title, path: getServicePath(s.slug) }))
+  const industryLinks = industryList.map(item => ({ label: item.label, path: item.path }))
   const socials = ['Behance', 'LinkedIn', 'X']
-  const goHomeTop = e => {
+  const onFooterLink = (e, path) => {
     e.preventDefault()
-    if (window.location.pathname === CONTACT_PATH || window.location.pathname === `${CONTACT_PATH}/`) {
-      navigate('/')
+    if (path.startsWith('/#')) {
+      const hash = path.slice(1)
+      if (window.location.pathname !== '/' && window.location.pathname !== '') {
+        navigate('/')
+        setTimeout(() => {
+          const el = document.querySelector(hash)
+          if (el) el.scrollIntoView({ behavior: 'smooth' })
+        }, 50)
+      } else {
+        navigate(hash)
+      }
       return
     }
-    navigate('#top')
+    navigate(path)
+  }
+  const goHomeTop = e => {
+    e.preventDefault()
+    navigate('/')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-  return <footer data-reveal="footer">{cols.map(col => <div className="footer-col" key={col[0]}><b>{col[0]}</b>{col.slice(1).map((x, i) => <a href="#top" onClick={goHomeTop} style={{ '--footer-i': i }} key={x}>{x}</a>)}</div>)}<div className="subscribe"><b>Subscribe to our news and updates</b><label className="subscribe-row"><input type="email" aria-label="Email address" placeholder="Your email here" /><button className="subscribe-action" type="button" aria-label="Subscribe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></button></label><small>By signing up, you agree to our Privacy Policy. We respect your data.</small><b>Follow us on:</b><div className="socials">{socials.map((name, i) => <a href="#top" onClick={goHomeTop} aria-label={name} style={{ '--footer-i': i }} key={name}><SocialIcon name={name} /></a>)}</div></div><div className="footer-bottom"><a href="#top" onClick={goHomeTop} aria-label={BRAND}><Logo variant="footer" /></a><span>© 2026 {BRAND}. All rights reserved &nbsp; ● &nbsp; <b>Privacy Policy</b></span><a href="#top" className="to-top" onClick={goHomeTop}>↑</a></div></footer>
+  return (
+    <footer data-reveal="footer">
+      <div className="footer-col">
+        <b>Company:</b>
+        {companyLinks.map((item, i) => (
+          <a href={item.path} onClick={e => onFooterLink(e, item.path)} style={{ '--footer-i': i }} key={item.label}>{item.label}</a>
+        ))}
+      </div>
+      <div className="footer-col">
+        <b>Services:</b>
+        {serviceLinks.map((item, i) => (
+          <a href={item.path} onClick={e => onFooterLink(e, item.path)} style={{ '--footer-i': i }} key={item.label}>{item.label}</a>
+        ))}
+      </div>
+      <div className="footer-col">
+        <b>Industries:</b>
+        {industryLinks.map((item, i) => (
+          <a href={item.path} onClick={e => onFooterLink(e, item.path)} style={{ '--footer-i': i }} key={item.label}>{item.label}</a>
+        ))}
+      </div>
+      <div className="subscribe">
+        <b>Subscribe to our news and updates</b>
+        <label className="subscribe-row">
+          <input type="email" aria-label="Email address" placeholder="Your email here" />
+          <button className="subscribe-action" type="button" aria-label="Subscribe">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </button>
+        </label>
+        <small>By signing up, you agree to our Privacy Policy. We respect your data.</small>
+        <b>Follow us on:</b>
+        <div className="socials">
+          {socials.map((name, i) => (
+            <a href="#top" onClick={goHomeTop} aria-label={name} style={{ '--footer-i': i }} key={name}><SocialIcon name={name} /></a>
+          ))}
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <a href="/" onClick={goHomeTop} aria-label={BRAND}><Logo variant="footer" /></a>
+        <span>© 2026 {BRAND}. All rights reserved &nbsp; ● &nbsp; <b>Privacy Policy</b></span>
+        <a href="#top" className="to-top" onClick={goHomeTop}>↑</a>
+      </div>
+    </footer>
+  )
 }
 
 function TcxArrow() {
@@ -676,11 +1019,11 @@ function Challenge() {
       <div className="tcx-error-sticky">
         <div className="tcx-error-head" data-reveal="up">
           <div className="tcx-tag tcx-tag-red">Challenge</div>
-          <h2 className="tcx-error-heading">Your product scaled.<br />Your website hasn’t caught up.</h2>
+          <h2 className="tcx-error-heading">Your brand scaled.<br />Your website hasn’t caught up.</h2>
         </div>
         <div className="tcx-error-stage">
           <div className="tcx-error-visual">
-            <img className="tcx-error-center" src={`${A}tc-error-computer.webp`} alt="Outdated website throwing errors" />
+            <img className="tcx-error-center" src={`${A}challenge-growth-visual.svg`} alt="A digital product growing beyond an outdated website" />
           </div>
           <div className="tcx-error-bg" aria-hidden="true">
             {[0, 1, 2, 3, 4, 5, 6].map(col => {
@@ -754,7 +1097,7 @@ function CtaBanner() {
         <span className="tcx-cta-glow" aria-hidden="true" />
         <div className="tcx-cta-inner">
           <div className="tcx-cta-left">
-            <h2 className="tcx-cta-heading">Let’s turn your website into <em>the most unfair advantage</em> in your category.</h2>
+            <h2 className="tcx-cta-heading">Let’s turn your website into <em>the most unfair advantage</em> in your domain.</h2>
             <TcxButton href={CONTACT_PATH} white>Book a call</TcxButton>
           </div>
           <div className="tcx-cta-visual">
@@ -811,8 +1154,53 @@ function HomePage() {
 function App() {
   const path = usePathname()
   const isContact = path === CONTACT_PATH || path === `${CONTACT_PATH}/`
+  const servicesMatch = matchServicesRoute(path)
+  const industryMatch = matchIndustryRoute(path)
+
   if (isContact) {
     return <ContactUs onNavigateHome={() => navigate('/')} footer={<Footer />} />
+  }
+  if (servicesMatch?.type === 'hub') {
+    return (
+      <>
+        <Header />
+        <main className="svc-main svc-main-hub">
+          <ServicesHub navigate={navigate} />
+        </main>
+      </>
+    )
+  }
+  if (servicesMatch?.type === 'detail') {
+    // Unknown slug → hub (graceful fallback)
+    if (!getServiceBySlug(servicesMatch.slug)) {
+      return (
+        <>
+          <Header />
+          <main className="svc-main">
+            <ServicesHub navigate={navigate} />
+          </main>
+          <Footer />
+        </>
+      )
+    }
+    return (
+      <>
+        <Header />
+        <main className="svc-main">
+          <ServiceDetail slug={servicesMatch.slug} navigate={navigate} />
+        </main>
+        <Footer />
+      </>
+    )
+  }
+  if (industryMatch?.type === 'detail') {
+    return (
+      <>
+        <Header />
+        <IndustryPage slug={industryMatch.slug} navigate={navigate} />
+        <Footer />
+      </>
+    )
   }
   return <HomePage />
 }
