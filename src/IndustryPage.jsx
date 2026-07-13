@@ -62,12 +62,120 @@ function DotLabel({ children }) {
   )
 }
 
+const getClientsDataForSlug = (slug, blurbs) => {
+  if (slug === 'healthcare') {
+    return [
+      { name: 'Get Talky', testimonial: blurbs[0], image: '/assets/industry-projects/healthcare-get-talky-0.avif', bgText: 'Get Talky' },
+      { name: 'Frado', testimonial: blurbs[1], image: '/assets/industry-projects/healthcare-frado-1.avif', bgText: 'Frado' },
+      { name: 'ReadyRX', testimonial: blurbs[2], image: '/assets/industry-projects/healthcare-readyrx-2.avif', bgText: 'ReadyRX' },
+      { name: 'Sofia Therapy', testimonial: blurbs[3], image: '/assets/industry-projects/healthcare-sofia-therapy-3.avif', bgText: 'Sofia' },
+      { name: 'Hey.md', testimonial: blurbs[4], image: '/assets/industry-projects/hey-md-7.avif', bgText: 'Hey.md' },
+      { name: 'BeU', testimonial: blurbs[5], image: '/assets/industry-projects/healthcare-beedew-4.avif', bgText: 'BeU' },
+      { name: 'Foothills', testimonial: blurbs[6], image: '/assets/industry-projects/healthcare-serenity-5.avif', bgText: 'Foothills' },
+    ];
+  }
+  if (slug === 'fintech') {
+    return [
+      { name: 'Alpha Ledger', testimonial: blurbs[0], image: '/assets/industry-projects/fintech-alpha-ledger-0.avif', bgText: 'Alpha' },
+      { name: 'Pie Assets', testimonial: blurbs[1], image: '/assets/industry-projects/fintech-pie-assets-1.avif', bgText: 'Pie Assets' },
+      { name: 'Rahmat', testimonial: blurbs[2], image: '/assets/industry-projects/fintech-rahmat-2.avif', bgText: 'Rahmat' },
+      { name: 'Reddex', testimonial: blurbs[3], image: '/assets/industry-projects/fintech-reddex-3.avif', bgText: 'Reddex' },
+      { name: 'Vanquish', testimonial: blurbs[4], image: '/assets/industry-projects/fintech-vantir-7.avif', bgText: 'Vanquish' },
+      { name: 'Planet9', testimonial: blurbs[5], image: '/assets/industry-projects/fintech-planet9-ui-ux-4.avif', bgText: 'Planet9' },
+      { name: 'Multibank', testimonial: blurbs[6], image: '/assets/industry-projects/ft-multibank-8.avif', bgText: 'Multibank' },
+      { name: 'Multikassa', testimonial: blurbs[8], image: '/assets/industry-projects/ft-multikassa-10.avif', bgText: 'Multikassa' },
+      { name: 'UzOman', testimonial: blurbs[9], image: '/assets/industry-projects/corporate-uzoman-3.avif', bgText: 'UzOman' },
+    ];
+  }
+  if (slug === 'web3') {
+    return [
+      { name: 'Taraxa', testimonial: blurbs[0], image: '/assets/industry-projects/web3-taraxa-0.avif', bgText: 'Taraxa' },
+      { name: 'SuperMeme', testimonial: blurbs[1], image: '/assets/industry-projects/web3-supermeme-1.avif', bgText: 'SuperMeme' },
+      { name: 'Pie Assets', testimonial: blurbs[2], image: '/assets/industry-projects/web3-pie-assets-2.avif', bgText: 'Pie Assets' },
+      { name: 'Liquild', testimonial: blurbs[3], image: '/assets/industry-projects/web3-liquild-3.avif', bgText: 'Liquild' },
+      { name: 'Fractalized', testimonial: blurbs[4], image: '/assets/industry-projects/web3-neurofall-4.avif', bgText: 'Fractalized' },
+      { name: 'Sophisticated Traders', testimonial: blurbs[5], image: '/assets/industry-projects/web3-sophisticated-traders-7.avif', bgText: 'Traders' },
+      { name: 'Freeport Markets', testimonial: blurbs[6], image: '/assets/industry-projects/web3-freeport-markets-5.avif', bgText: 'Freeport' },
+    ];
+  }
+  if (slug === 'technology') {
+    return [
+      { name: 'Shaka', testimonial: blurbs[0], image: '/assets/industry-projects/technology-shaka-0.avif', bgText: 'Shaka' },
+      { name: 'Alpha Ledger', testimonial: blurbs[1], image: '/assets/industry-projects/technology-alpha-ledger-1.avif', bgText: 'Alpha' },
+      { name: 'Incipet', testimonial: blurbs[2], image: '/assets/industry-projects/technology-incipet-2.avif', bgText: 'Incipet' },
+      { name: 'Modern Vivo', testimonial: blurbs[3], image: '/assets/industry-projects/technology-modern-vivo-3.avif', bgText: 'Vivo' },
+      { name: 'Hybrid', testimonial: blurbs[4], image: '/assets/industry-projects/hybrid-6.avif', bgText: 'Hybrid' },
+      { name: 'PATtech', testimonial: blurbs[5], image: '/assets/industry-projects/pattech-7.avif', bgText: 'PATtech' },
+      { name: 'Sarwisi', testimonial: blurbs[6], image: '/assets/industry-projects/sarwisi-2.avif', bgText: 'Sarwisi' },
+      { name: 'Scalemont', testimonial: blurbs[7], image: '/assets/industry-projects/technology-titanx-5.avif', bgText: 'Scalemont' },
+      { name: 'QDT', testimonial: blurbs[8], image: '/assets/industry-projects/technology-xim-4.avif', bgText: 'QDT' },
+      { name: 'Vyvo', testimonial: blurbs[9], image: '/assets/industry-projects/innrevai-1.avif', bgText: 'Vyvo' },
+    ];
+  }
+  if (slug === 'corporate') {
+    return [
+      { name: 'Pie Assets', testimonial: blurbs[0], image: '/assets/industry-projects/corporate-pie-assets-0.avif', bgText: 'Pie Assets' },
+      { name: 'Alpha Ledger', testimonial: blurbs[1], image: '/assets/industry-projects/corporate-alpha-ledger-1.avif', bgText: 'Alpha' },
+      { name: 'HCG', testimonial: blurbs[2], image: '/assets/industry-projects/corporate-hcg-2.avif', bgText: 'HCG' },
+      { name: 'UzOman', testimonial: blurbs[3], image: '/assets/industry-projects/corporate-uzoman-3.avif', bgText: 'UzOman' },
+      { name: 'Multibank', testimonial: blurbs[4], image: '/assets/industry-projects/multibank-5.avif', bgText: 'Multibank' },
+      { name: 'PATtech', testimonial: blurbs[5], image: '/assets/industry-projects/pattech-7.avif', bgText: 'PATtech' },
+      { name: 'Builtly', testimonial: blurbs[6], image: '/assets/industry-projects/bultly-7.avif', bgText: 'Builtly' },
+      { name: 'Multikassa', testimonial: blurbs[7], image: '/assets/industry-projects/ft-multikassa-10.avif', bgText: 'Multikassa' },
+      { name: 'Rahmat', testimonial: blurbs[9], image: '/assets/industry-projects/rahmat-2.avif', bgText: 'Rahmat' },
+    ];
+  }
+  if (slug === 'ai') {
+    return [
+      { name: 'ContinuOS', testimonial: blurbs[0], image: '/assets/industry-projects/ai-continuos-0.avif', bgText: 'ContinuOS' },
+      { name: 'InnRev', testimonial: blurbs[1], image: '/assets/industry-projects/ai-innrevai-1.avif', bgText: 'InnRev' },
+      { name: 'Sarwisi', testimonial: blurbs[2], image: '/assets/industry-projects/ai-sarwisi-2.avif', bgText: 'Sarwisi' },
+      { name: 'Incipet', testimonial: blurbs[3], image: '/assets/industry-projects/ai-incipet-3.avif', bgText: 'Incipet' },
+      { name: 'Jogg', testimonial: blurbs[4], image: '/assets/industry-projects/ai-jogg-ai-5.avif', bgText: 'Jogg' },
+      { name: 'Vyvo', testimonial: blurbs[5], image: '/assets/industry-projects/ai-oasira-ui-ux-4.avif', bgText: 'Vyvo' },
+      { name: 'Hybrid', testimonial: blurbs[6], image: '/assets/industry-projects/ai-hybrid-mind-7.avif', bgText: 'Hybrid' },
+      { name: 'Scalemont', testimonial: blurbs[7], image: '/assets/industry-projects/ai-vertus-ai-6.avif', bgText: 'Scalemont' },
+      { name: 'Frado AI', testimonial: blurbs[8], image: '/assets/industry-projects/healthcare-frado-1.avif', bgText: 'Frado' },
+      { name: 'Get Talky', testimonial: blurbs[9], image: '/assets/industry-projects/healthcare-get-talky-0.avif', bgText: 'Get Talky' },
+    ];
+  }
+  if (slug === 'real-estate') {
+    return [
+      { name: 'Pie Assets', testimonial: blurbs[0], image: '/assets/industry-projects/real-estate-pie-assets-0.avif', bgText: 'Pie Assets' },
+      { name: 'Dubai Realty', testimonial: blurbs[1], image: '/assets/industry-projects/real-estate-dubai-realty-1.avif', bgText: 'Dubai Realty' },
+    ];
+  }
+  if (slug === 'e-commerce') {
+    return [
+      { name: 'SAAKINUN', testimonial: blurbs[0], image: '/assets/industry-projects/e-commerce-saakinun-0.avif', bgText: 'SAAKINUN' },
+      { name: 'Glowskin', testimonial: blurbs[1], image: '/assets/industry-projects/e-commerce-glowskin-1.avif', bgText: 'Glowskin' },
+      { name: 'NS Store', testimonial: blurbs[2], image: '/assets/industry-projects/e-commerce-ns-store-2.avif', bgText: 'NS Store' },
+      { name: 'Creatine Gummies', testimonial: blurbs[3], image: '/assets/industry-projects/e-commerce-creatine-gummies-3.avif', bgText: 'Creatine' },
+    ];
+  }
+  if (slug === 'fmcg') {
+    return [
+      { name: 'HFactor', testimonial: blurbs[0], image: '/assets/industry-projects/fmcg-hfactor-0.avif', bgText: 'HFactor' },
+    ];
+  }
+  if (slug === 'hospitality') {
+    return [
+      { name: 'InnRev', testimonial: blurbs[0], image: '/assets/industry-projects/hospitality-innrevai-0.avif', bgText: 'InnRev' },
+    ];
+  }
+  return blurbs.map((b, i) => ({
+    name: `Client ${i + 1}`,
+    testimonial: b,
+    image: '',
+    bgText: `Client ${i + 1}`
+  }));
+}
+
 export default function IndustryPage({ slug, navigate }) {
   const industry = getIndustry(slug)
   const [expOpen, setExpOpen] = useState(0)
-  const [clientIdx, setClientIdx] = useState(0)
+  const [hoveredIdx, setHoveredIdx] = useState(null)
   const [heroIn, setHeroIn] = useState(false)
-  const clientRef = useRef(null)
   const videoRef = useRef(null)
 
   usePageMotion([slug], '.ind-main')
@@ -79,38 +187,39 @@ export default function IndustryPage({ slug, navigate }) {
     requestAnimationFrame(() => setHeroIn(true))
     window.scrollTo(0, 0)
     setExpOpen(0)
-    setClientIdx(0)
+    setHoveredIdx(null)
   }, [industry, slug])
 
-  // Sticky client blurb: advance on scroll through the sticky zone
-  useEffect(() => {
-    if (!industry?.blurbs?.length) return undefined
-    const el = clientRef.current
-    if (!el) return undefined
-    const onScroll = () => {
-      const rect = el.getBoundingClientRect()
-      const view = window.innerHeight
-      const total = Math.max(1, el.offsetHeight - view)
-      const scrolled = Math.min(total, Math.max(0, -rect.top))
-      const progress = scrolled / total
-      const idx = Math.min(
-        industry.blurbs.length - 1,
-        Math.floor(progress * industry.blurbs.length),
-      )
-      setClientIdx(idx)
-    }
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [industry, slug])
-
-  // Ensure muted autoplay
+  // Ensure muted autoplay and custom loop (clip last 4 seconds)
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
     v.muted = true
     const p = v.play()
     if (p?.catch) p.catch(() => {})
+
+    const handleTimeUpdate = () => {
+      if (v.duration && !isNaN(v.duration) && v.duration > 4) {
+        if (v.currentTime >= v.duration - 4) {
+          v.currentTime = 0
+          const pPlay = v.play()
+          if (pPlay?.catch) pPlay.catch(() => {})
+        }
+      }
+    }
+
+    const handleEnded = () => {
+      v.currentTime = 0
+      const pPlay = v.play()
+      if (pPlay?.catch) pPlay.catch(() => {})
+    }
+
+    v.addEventListener('timeupdate', handleTimeUpdate)
+    v.addEventListener('ended', handleEnded)
+    return () => {
+      v.removeEventListener('timeupdate', handleTimeUpdate)
+      v.removeEventListener('ended', handleEnded)
+    }
   }, [slug, industry?.video])
 
   if (!industry) {
@@ -126,6 +235,8 @@ export default function IndustryPage({ slug, navigate }) {
   const blurbs = industry.blurbs?.length
     ? industry.blurbs
     : [`We partner with ambitious ${industry.label.toLowerCase()} teams to close the gap between what they are and how the market reads them.`]
+
+  const clientsData = getClientsDataForSlug(slug, blurbs)
 
   return (
     <div className={`ind-main ${heroIn ? 'is-ready' : ''}`}>
@@ -147,13 +258,29 @@ export default function IndustryPage({ slug, navigate }) {
           <div className="ind-video-wrap" id="video">
             {industry.video ? (
               <video
+                key={industry.video}
                 ref={videoRef}
                 className="ind-video"
                 playsInline
                 muted
-                loop
                 autoPlay
                 poster={industry.cover}
+                onTimeUpdate={e => {
+                  const v = e.currentTarget
+                  if (v.duration && !isNaN(v.duration) && v.duration > 4) {
+                    if (v.currentTime >= v.duration - 4) {
+                      v.currentTime = 0
+                      const pPlay = v.play()
+                      if (pPlay?.catch) pPlay.catch(() => {})
+                    }
+                  }
+                }}
+                onEnded={e => {
+                  const v = e.currentTarget
+                  v.currentTime = 0
+                  const pPlay = v.play()
+                  if (pPlay?.catch) pPlay.catch(() => {})
+                }}
               >
                 <source src={industry.video} type="video/mp4" />
               </video>
@@ -199,27 +326,27 @@ export default function IndustryPage({ slug, navigate }) {
             {industry.expertise.map((item, i) => {
               const open = expOpen === i
               return (
-                <button
-                  type="button"
-                  key={item.title}
-                  className={`ind-exp-item ${open ? 'is-open' : ''}`}
-                  aria-expanded={open}
-                  onClick={() => setExpOpen(open ? -1 : i)}
-                  data-reveal="up"
-                >
-                  <span className="ind-exp-num" aria-hidden="true">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span className="ind-exp-body">
-                    <span className="ind-exp-title">{item.title}</span>
-                    <span className={`ind-exp-desc ${open ? 'is-open' : ''}`}>
-                      <span>{item.body}</span>
+                <div key={item.title} data-reveal="up" style={{ width: '100%' }}>
+                  <button
+                    type="button"
+                    className={`ind-exp-item ${open ? 'is-open' : ''}`}
+                    aria-expanded={open}
+                    onClick={() => setExpOpen(open ? -1 : i)}
+                  >
+                    <span className="ind-exp-num" aria-hidden="true">
+                      {String(i + 1).padStart(2, '0')}
                     </span>
-                  </span>
-                  <span className="ind-exp-num is-right" aria-hidden="true">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </button>
+                    <span className="ind-exp-body">
+                      <span className="ind-exp-title">{item.title}</span>
+                      <span className={`ind-exp-desc ${open ? 'is-open' : ''}`}>
+                        <span>{item.body}</span>
+                      </span>
+                    </span>
+                    <span className="ind-exp-num is-right" aria-hidden="true">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                  </button>
+                </div>
               )
             })}
           </div>
@@ -247,17 +374,8 @@ export default function IndustryPage({ slug, navigate }) {
                   <DotLabel>{project.sector || industry.label}</DotLabel>
                   <h3 className="ind-work-title">
                     <span>{project.name}</span>
-                    <i className="ind-work-line" aria-hidden="true" />
                   </h3>
                   {project.desc ? <p className="ind-work-desc">{project.desc}</p> : null}
-                  <a
-                    className="ind-work-link"
-                    href={CONTACT_PATH}
-                    onClick={e => { e.preventDefault(); navigate?.(CONTACT_PATH) }}
-                  >
-                    Explore project
-                    <img src="/assets/industry-ui/arrow-right-black-round.svg" alt="" />
-                  </a>
                 </div>
                 <div className="ind-work-media">
                   <img src={project.image} alt={project.name} loading="lazy" />
@@ -275,29 +393,63 @@ export default function IndustryPage({ slug, navigate }) {
         </div>
       </section>
 
-      {/* —— OUR CLIENTS: sticky rotating blurbs —— */}
-      <section
-        className="ind-section ind-section-white ind-clients-sec"
-        ref={clientRef}
-        style={{ '--blurb-count': blurbs.length }}
-        data-reveal="panel"
-      >
-        <div className="ind-container ind-clients-sticky">
-          <DotLabel>Our clients</DotLabel>
-          <div className="ind-clients-stage">
-            {blurbs.map((b, i) => (
-              <p
-                key={i}
-                className={`ind-client-blurb ${i === clientIdx ? 'is-active' : ''}`}
-              >
-                {b}
-              </p>
-            ))}
+      {/* —— OUR CLIENTS: interactive hover/tap —— */}
+      <section className="ind-section ind-section-white ind-clients-sec" data-reveal="panel">
+        <div className="ind-container ind-clients-container">
+          
+          {/* Watermark/Background Text */}
+          <div className={`ind-clients-bg-text ${hoveredIdx !== null ? 'is-visible' : ''}`}>
+            {hoveredIdx !== null ? clientsData[hoveredIdx].bgText : ''}
           </div>
-          <div className="ind-clients-progress" aria-hidden="true">
-            {blurbs.map((_, i) => (
-              <span key={i} className={i === clientIdx ? 'is-active' : ''} />
-            ))}
+
+          <div className="ind-clients-grid">
+            {/* Left Column: Testimonial & label */}
+            <div className="ind-clients-left">
+              <DotLabel>Our clients</DotLabel>
+              <div className={`ind-clients-testimonial-wrap ${hoveredIdx !== null ? 'is-visible' : ''}`}>
+                {hoveredIdx !== null ? (
+                  <p className="ind-clients-testimonial">
+                    {clientsData[hoveredIdx].testimonial}
+                  </p>
+                ) : (
+                  <p className="ind-clients-testimonial-placeholder" aria-hidden="true"></p>
+                )}
+              </div>
+            </div>
+
+            {/* Center Column: List of client names */}
+            <div className="ind-clients-center">
+              <ul className="ind-clients-list">
+                {clientsData.map((client, idx) => (
+                  <li
+                    key={client.name}
+                    className={`ind-clients-item ${hoveredIdx === idx ? 'is-active' : ''}`}
+                    onMouseEnter={() => setHoveredIdx(idx)}
+                    onMouseLeave={() => setHoveredIdx(null)}
+                    onClick={() => setHoveredIdx(hoveredIdx === idx ? null : idx)}
+                  >
+                    {client.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right Column: Thumbnail image */}
+            <div className="ind-clients-right">
+              <div className={`ind-clients-thumbnail-wrap ${hoveredIdx !== null && clientsData[hoveredIdx].image ? 'is-visible' : ''}`}>
+                {hoveredIdx !== null && clientsData[hoveredIdx].image ? (
+                  <img
+                    src={clientsData[hoveredIdx].image}
+                    alt={clientsData[hoveredIdx].name}
+                    className="ind-clients-thumbnail"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="ind-clients-thumbnail-placeholder" aria-hidden="true"></div>
+                )}
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
@@ -306,41 +458,49 @@ export default function IndustryPage({ slug, navigate }) {
       <section className="ind-section ind-section-white ind-who" data-reveal="panel">
         <div className="ind-container">
           <DotLabel>Who we are</DotLabel>
-          <div className="ind-who-grid">
-            {(industry.who || []).map((src, i) => (
-              <div className="ind-who-card" data-reveal="scale" key={src + i}>
-                <img src={src} alt="" loading="lazy" />
-              </div>
-            ))}
-            <div className="ind-who-stats" data-reveal="card">
-              <div><strong>60+</strong><span>Successful projects</span></div>
-              <div><strong>5+</strong><span>Years of experience</span></div>
-              <div><strong>4.9</strong><span>Average client rating</span></div>
+          <div className="ind-who-grid-new">
+            <div className="ind-who-new-card" data-reveal="scale">
+              <span className="ind-who-new-card-num">01</span>
+              <div className="ind-who-new-card-stat">25+</div>
+              <div className="ind-who-new-card-body">Successful {industry.label} Projects</div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* —— MORE INDUSTRIES —— */}
-      <section className="ind-section ind-section-ice" data-reveal="panel">
-        <div className="ind-container">
-          <div className="ind-section-head">
-            <DotLabel>Industries</DotLabel>
-            <h2 className="ind-h2" data-reveal="line">Explore other industries we serve.</h2>
-          </div>
-          <div className="ind-more-rail">
-            {industryList.filter(x => x.slug !== slug).map(item => (
-              <a
-                key={item.slug}
-                href={item.path}
-                className="ind-more-tile"
-                onClick={e => { e.preventDefault(); navigate?.(item.path) }}
-                data-reveal="card"
-              >
-                <img src={`/assets/industries/${item.slug}.avif`} alt="" loading="lazy" />
-                <span>{item.label}</span>
-              </a>
-            ))}
+            <div className="ind-who-new-card" data-reveal="scale">
+              <span className="ind-who-new-card-num">02</span>
+              <div className="ind-who-new-card-title">Ongoing Support and Maintenance</div>
+              <div className="ind-who-new-card-body">We provide continued assistance post-launch to ensure your solutions remain effective and up-to-date.</div>
+            </div>
+            <div className="ind-who-new-card" data-reveal="scale">
+              <span className="ind-who-new-card-num">03</span>
+              <div className="ind-who-new-card-stat">5+</div>
+              <div className="ind-who-new-card-title">Years of Experience</div>
+              <div className="ind-who-new-card-body">Expertise in helping brands and companies.</div>
+            </div>
+            <div className="ind-who-new-card" data-reveal="scale">
+              <span className="ind-who-new-card-num">04</span>
+              <div className="ind-who-new-card-title">Flexible Engagement Models</div>
+              <div className="ind-who-new-card-body">We offer flexible partnerships, ranging from project-based work to long-term retainers.</div>
+            </div>
+            <div className="ind-who-new-card" data-reveal="scale">
+              <span className="ind-who-new-card-num">05</span>
+              <div className="ind-who-new-card-title">Fast Turnaround</div>
+              <div className="ind-who-new-card-body">Delivering projects efficiently without compromising quality.</div>
+            </div>
+            <div className="ind-who-new-card" data-reveal="scale">
+              <span className="ind-who-new-card-num">06</span>
+              <div className="ind-who-new-card-title">User-Centric Design Philosophy</div>
+              <div className="ind-who-new-card-body">We prioritize user experience to enhance {industry.slug === 'healthcare' ? 'patient' : 'user'} engagement and satisfaction.</div>
+            </div>
+            <div className="ind-who-new-card" data-reveal="scale">
+              <span className="ind-who-new-card-num">07</span>
+              <div className="ind-who-new-card-title">Regulatory Compliance</div>
+              <div className="ind-who-new-card-body">We design with a focus on industry standards, ensuring both innovation and reliability.</div>
+            </div>
+            <div className="ind-who-new-card" data-reveal="scale">
+              <span className="ind-who-new-card-num">08</span>
+              <div className="ind-who-new-card-stat">99%</div>
+              <div className="ind-who-new-card-title">Client Satisfaction</div>
+              <div className="ind-who-new-card-body">Almost all our clients return, showing our partnerships go beyond single projects.</div>
+            </div>
           </div>
         </div>
       </section>

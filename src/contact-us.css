@@ -102,7 +102,7 @@ html[data-theme="dark"] .cu-page{
 .cu-center{text-align:center}
 
 /* Hero */
-.cu-hero{position:relative;z-index:2;padding:3.5rem 0 5rem;overflow:hidden}
+.cu-hero{position:relative;z-index:2;padding:3.5rem 0 5rem;overflow:visible}
 .cu-hero-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
 .cu-page .cu-hero-gradient,.cu-page .cu-hero-decor{display:none}
 .cu-hero-bg::after{

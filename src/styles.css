@@ -1323,33 +1323,14 @@ html[data-theme="dark"] .pm-case-media-link{border-color:rgba(255,255,255,.12);b
   .who-cta{margin-top:.15rem}
 }
 
-/* Who-we-are revamp: video fills the left column, method pillars + proof stats. */
-.who-vid-wrap{width:100%;height:auto;flex:1;min-height:22rem;margin-top:1.75rem}
-.who-proof{display:flex;gap:2.75rem;width:100%;margin-top:1.6rem;padding-top:1.35rem;border-top:1px solid var(--green-line)}
-.who-proof-item{display:flex;flex-direction:column;gap:.45rem}
-.who-proof-item strong{font-size:2.1rem;font-weight:500;line-height:1;letter-spacing:-.05rem;text-decoration:underline;text-decoration-color:var(--aquamarine);text-decoration-thickness:4px;text-underline-offset:7px}
-.who-proof-item span{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:#54615a}
-.who-pillars{list-style:none;margin:.25rem 0 0;padding:0;display:flex;flex-direction:column}
-.who-pillars li{position:relative;display:grid;grid-template-columns:2.6rem 8.5rem 1fr;align-items:baseline;gap:1.1rem;padding:.8rem 0;border-top:1px solid var(--green-line)}
-.who-pillars li:last-child{border-bottom:1px solid var(--green-line)}
-.who-pillars li:before{content:"";position:absolute;left:0;top:-1px;width:0;height:2px;background:var(--emerald);transition:width .5s cubic-bezier(.16,1,.3,1)}
-.who-pillars li:nth-child(3n+2):before{background:var(--aquamarine)}
-.who-pillars li:nth-child(3n):before{background:var(--celadon)}
-.who-pillars li:hover:before{width:100%}
-.who-pillar-num{font-size:.78rem;font-weight:500;color:#54615a;font-variant-numeric:tabular-nums}
-.who-pillars b{font-size:1.15rem;font-weight:500;letter-spacing:-.02em}
-.who-pillars p{margin:0;font-size:.95rem;line-height:1.4;color:#54615a;max-width:34ch}
-html[data-theme="dark"] .who-proof,html[data-theme="dark"] .who-pillars li,html[data-theme="dark"] .who-pillars li:last-child{border-color:#202a24}
-html[data-theme="dark"] .who-proof-item span,html[data-theme="dark"] .who-pillar-num,html[data-theme="dark"] .who-pillars p{color:#9ba59f}
-html[data-theme="dark"] .who-proof-item strong{text-decoration-color:rgba(124,240,189,.58)}
+/* Align See the Work button to the left directly under the paragraph */
+.who-cta {
+  justify-content: flex-start !important;
+  margin-top: 1.5rem !important;
+}
+
 @media(max-width:900px){
-  .who-vid-wrap{flex:none;height:15rem;min-height:0;margin-top:10px}
-  .who-proof{gap:1.9rem;margin-top:1.1rem;padding-top:1rem}
-  .who-proof-item strong{font-size:1.55rem}
-  .who-pillars li{grid-template-columns:2rem 1fr;gap:.2rem .8rem;padding:.68rem 0}
-  .who-pillars li p{grid-column:2}
-  .who-pillars b{font-size:1rem}
-  .who-pillars p{font-size:.88rem;max-width:none}
+  .who-vid-wrap{flex:none !important;height:15rem !important;min-height:0 !important;margin-top:10px !important}
 }
 
 /* ===== Services card: shared column tracks keep head / rows / CTA aligned ===== */
@@ -2291,17 +2272,11 @@ html[data-theme="dark"] .service-list a:first-child{
 html[data-theme="dark"] .testimonials .person{
   border-top-color:rgba(255,255,255,.06)!important;
 }
-.who-proof,
-.who-pillars li,
-.who-pillars li:last-child,
 .pm-case-stats,
 .pm-case-foot,
 .pm-case-stat+.pm-case-stat{
   border-color:rgba(8,13,16,.07)!important;
 }
-html[data-theme="dark"] .who-proof,
-html[data-theme="dark"] .who-pillars li,
-html[data-theme="dark"] .who-pillars li:last-child,
 html[data-theme="dark"] .pm-case-stats,
 html[data-theme="dark"] .pm-case-foot,
 html[data-theme="dark"] .pm-case-stat+.pm-case-stat{

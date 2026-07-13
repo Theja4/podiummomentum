@@ -938,12 +938,21 @@ html[data-theme='dark'] .ind-work-title span,
 html[data-theme='dark'] .ind-client-blurb.is-active {
   color: #f2f5f3 !important;
 }
+html[data-theme='dark'] .svc-dot,
+html[data-theme='dark'] .ind-dot {
+  background: #fff !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08) !important;
+}
 html[data-theme='dark'] .ind-exp-item {
   border-bottom-color: rgba(255, 255, 255, 0.14) !important;
 }
 
 /* Contact hero card: contact-us.css already themes the page dark via
    --cu-card; the only breakage is eloqwnt forcing these surfaces white. */
+html[data-theme='dark'] .cu-nav {
+  background: #000000 !important;
+  border-bottom: 0 !important;
+}
 html[data-theme='dark'] .cu-hero {
   background: transparent !important;
 }

@@ -480,7 +480,7 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
   opacity: 0.5;
-  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1), color 0.35s ease;
 }
 
 .svc-hub-title-stack {
@@ -546,7 +546,7 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
 }
 
 .svc-hub-row:hover .svc-hub-num {
-  transform: translateX(4px);
+  transform: translateX(6px);
 }
 
 .svc-hub-row:hover .svc-hub-title-stack {
@@ -554,7 +554,7 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
 }
 
 .svc-hub-title-stack {
-  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1), color 0.35s ease;
 }
 
 .svc-hub-row:hover i {
@@ -1606,7 +1606,7 @@ html[data-theme="dark"] .svc-related-grid a:hover {
 }
 
 html[data-theme="dark"] .svc-hub-row:hover i {
-  background: #151a17;
+  background: var(--pm-btn-forest);
 }
 
 html[data-theme="dark"] .svc-cap-list li {

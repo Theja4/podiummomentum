@@ -354,7 +354,6 @@ function Header() {
           </div>
         </div>
       </div>
-      <a href={CONTACT_PATH} onClick={e => { e.preventDefault(); setOpen(false); navigate(CONTACT_PATH) }}>Start here</a>
       <div
         className={`nav-dropdown nav-dropdown--industries ${indOpen ? 'is-open' : ''}`}
         ref={indRef}
@@ -628,10 +627,11 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
       <video
         ref={videoRef}
         className={variant === 'hero' ? 'hero-vid' : 'who-vid'}
-        src={`${A}showreel.mp4`}
+        src={variant === 'hero' ? `${A}showreel.mp4` : `${A}who-we-are-trimmed.mp4`}
         poster={`${A}showreel-brand-bg.png`}
         playsInline
         muted={muted}
+        loop={variant !== 'hero'}
         preload={autoplayOnLoad ? 'auto' : 'metadata'}
         onClick={togglePlay}
         onPlay={() => {
@@ -755,48 +755,20 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
   )
 }
 
-const disciplines = [
-  ['Clarity', 'Say what you do in words your buyers repeat.'],
-  ['Position', 'Claim ground your competitors can’t credibly take.'],
-  ['Signal', 'Look like the company you’re becoming, everywhere you show up.'],
-  ['Proof', 'Back every claim with evidence the market can check.'],
-  ['Memory', 'Stay the first name in the room when budgets open.'],
-]
-
 function About() {
   return (
     <section id="about" className="panel who-we-are" data-reveal="panel">
       <div className="who-left">
         <div className="eyebrow" data-reveal="up">● &nbsp; Who we are</div>
         <ShowreelPlayer />
-        <div className="who-proof" data-reveal="up">
-          <div className="who-proof-item">
-            <strong>40+</strong>
-            <span>Technology companies</span>
-          </div>
-          <div className="who-proof-item">
-            <strong>4.9</strong>
-            <span>Average client rating</span>
-          </div>
-        </div>
       </div>
       <div className="who-right">
         <h2 className="who-headline who-headline-desktop" data-reveal="line">There's a gap between what you've built and how the market sees you. We close it.</h2>
         <h2 className="who-headline who-headline-mobile" data-reveal="line">The market undersells you. We close that gap.</h2>
         <div className="who-copy">
           <p className="who-copy-desktop" data-reveal="line">{BRAND} is a brand and design agency for technology companies at inflection points: raising, acquiring, expanding, or repositioning. When a brand lags behind its ambition, the cost is real: investors hesitate, deals stall, and top talent signs elsewhere.</p>
-          <p className="who-copy-desktop" data-reveal="line">We turn internal truth into market perception through five disciplines:</p>
-          <p className="who-copy-mobile" data-reveal="line">{BRAND} works with tech leaders at inflection points, turning internal truth into market perception through five disciplines:</p>
+          <p className="who-copy-mobile" data-reveal="line">{BRAND} works with tech leaders at inflection points, turning internal truth into market perception.</p>
         </div>
-        <ol className="who-pillars" data-reveal="up">
-          {disciplines.map(([name, blurb], i) => (
-            <li key={name}>
-              <span className="who-pillar-num">{String(i + 1).padStart(2, '0')}</span>
-              <b>{name}</b>
-              <p>{blurb}</p>
-            </li>
-          ))}
-        </ol>
         <div data-reveal="up" className="who-cta"><Button href="#work">See the work</Button></div>
       </div>
     </section>
