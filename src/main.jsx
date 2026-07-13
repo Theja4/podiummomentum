@@ -87,12 +87,12 @@ const invertInDark = new Set(['d2c8ca3a50aba890','e72cc835698ff331'])
 
 const services = serviceCatalog.map(s => s.title)
 const faqs = [
-  [`What does ${BRAND} do`, `${BRAND} is a strategic design partner that helps startups, tech companies, and corporate teams strengthen their brand, website, and digital product experience.`],
-  [`Can ${BRAND} help startups as well as established companies`, `Yes. ${BRAND} works with both startups and established companies, especially in tech driven sectors.`],
-  [`Who is ${BRAND} best suited for`, 'Founders, CEOs, CMOs, and product leaders at companies going through fundraising, repositioning, expansion, or acquisition.'],
-  [`What makes ${BRAND} different from a typical creative agency`, `${BRAND} is built around business outcomes, not just deliverables. Brand, web, and UX are treated as connected systems.`],
-  [`When is the right time to hire ${BRAND}`, 'When the business has outgrown its current brand, website, or product experience and needs to present itself at the next level.'],
-  [`What does ${BRAND} actually help companies with`, 'Strategy, branding, websites, UX and UI, and design systems that support trust, fundraising, conversion, and growth.'],
+  [`What does ${BRAND} do?`, `${BRAND} is a strategic design partner that helps startups, tech companies, and corporate teams strengthen their brand, website, and digital product experience.`],
+  [`Can ${BRAND} help startups as well as established companies?`, `Yes. ${BRAND} works with both startups and established companies, especially in tech driven sectors.`],
+  [`Who is ${BRAND} best suited for?`, 'Founders, CEOs, CMOs, and product leaders at companies going through fundraising, repositioning, expansion, or acquisition.'],
+  [`What makes ${BRAND} different from a typical creative agency?`, `${BRAND} is built around business outcomes, not just deliverables. Brand, web, and UX are treated as connected systems.`],
+  [`When is the right time to hire ${BRAND}?`, 'When the business has outgrown its current brand, website, or product experience and needs to present itself at the next level.'],
+  [`What does ${BRAND} actually help companies with?`, 'Strategy, branding, websites, UX and UI, and design systems that support trust, fundraising, conversion, and growth.'],
 ]
 
 const testimonials = [
@@ -290,8 +290,8 @@ function Header() {
     <a href="/" className="logo-link" aria-label={BRAND} onClick={e => { e.preventDefault(); navigate('/'); setOpen(false); setSvcOpen(false); setIndOpen(false) }}><Logo /></a>
     <nav id="primary-navigation" className={open ? 'nav open' : 'nav'}>
       <a href="/" onClick={e => { e.preventDefault(); navigate('/'); setOpen(false) }}>Home</a>
-      <a href="#about" onClick={e => goHomeSection(e, '#about')}>About ↓</a>
-      <a href="#work" onClick={e => goHomeSection(e, '#work')}>Works ↓</a>
+      <a href="#about" onClick={e => goHomeSection(e, '#about')}>About</a>
+      <a href="#work" onClick={e => goHomeSection(e, '#work')}>Works</a>
       <div
         className={`nav-dropdown nav-dropdown--services ${svcOpen ? 'is-open' : ''}`}
         ref={svcRef}
@@ -344,7 +344,7 @@ function Header() {
           </div>
         </div>
       </div>
-      <a href={CONTACT_PATH} onClick={e => { e.preventDefault(); setOpen(false); navigate(CONTACT_PATH) }}>For Startups</a>
+      <a href={CONTACT_PATH} onClick={e => { e.preventDefault(); setOpen(false); navigate(CONTACT_PATH) }}>Start here</a>
       <div
         className={`nav-dropdown nav-dropdown--industries ${indOpen ? 'is-open' : ''}`}
         ref={indRef}
@@ -420,23 +420,23 @@ function Header() {
 
 function Hero() {
   // Eloqwnt home hero: centered H1 + lead + CTA, showreel, metrics marquee
-  const title = 'Strategy-led creative partner for scaling B2B tech companies'
+  const title = 'The strategy first creative partner for scaling B2B tech companies'
   const words = title.split(' ')
   return (
     <section id="top" className="hero">
       <div className="hero-inner">
         <h1 className="hero-title">
           {words.map((w, i) => (
-            <span className="hero-word" style={{ '--wi': i }} key={`${w}-${i}`}>
-              {w}
-              {i < words.length - 1 ? '\u00A0' : ''}
-            </span>
+            <React.Fragment key={`${w}-${i}`}>
+              <span className="hero-word" style={{ '--wi': i }}>{w}</span>
+              {i < words.length - 1 ? ' ' : ''}
+            </React.Fragment>
           ))}
         </h1>
         <div className="hero-band">
           <div className="hero-side">
             <p className="hero-lead">
-              We close the gap between what ambitious companies are and how the market reads them — brand, web, and product under one roof.
+              Ambitious companies are often read as smaller than they are. We fix that with brand, web, and product design under one roof.
             </p>
             <div className="hero-action">
               <Button light href={CONTACT_PATH}>Let’s chat</Button>
@@ -681,7 +681,7 @@ function About() {
         <h2 className="who-headline who-headline-desktop" data-reveal="line">There's a gap between what you've built and how the market sees you. We close it.</h2>
         <h2 className="who-headline who-headline-mobile" data-reveal="line">The market undersells you. We close that gap.</h2>
         <div className="who-copy">
-          <p className="who-copy-desktop" data-reveal="line">{BRAND} is a brand and design agency for technology companies at inflection points — raising, acquiring, expanding, or repositioning. When a brand lags behind its ambition, the cost is real: investors hesitate, deals stall, and top talent signs elsewhere.</p>
+          <p className="who-copy-desktop" data-reveal="line">{BRAND} is a brand and design agency for technology companies at inflection points: raising, acquiring, expanding, or repositioning. When a brand lags behind its ambition, the cost is real: investors hesitate, deals stall, and top talent signs elsewhere.</p>
           <p className="who-copy-desktop" data-reveal="line">We turn internal truth into market perception through five disciplines:</p>
           <p className="who-copy-mobile" data-reveal="line">{BRAND} works with tech leaders at inflection points, turning internal truth into market perception through five disciplines:</p>
         </div>
@@ -726,7 +726,7 @@ function ProjectCase({ project, index }) {
   return (
     <article className="pm-case" ref={ref} style={{ '--case-i': index }}>
       <div className="pm-case-media">
-        <div className="pm-case-media-link">
+        <div className="pm-case-media-link" data-project={project.title}>
           <img src={project.image} alt={`${project.title} project preview`} loading="lazy" />
         </div>
       </div>
@@ -759,7 +759,7 @@ function ProjectCase({ project, index }) {
             onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }}
           >
             <span className="pill-wipe pill-wipe-dark" aria-hidden="true" />
-            <span className="pill-label">Explore case</span>
+            <span className="pill-label">Start a project</span>
             <span className="pm-case-cta-arrow" aria-hidden="true">→</span>
           </a>
         </div>
@@ -779,14 +779,14 @@ function Work() {
         </span>
         <div className="pm-cases-intro">
           <h2 data-reveal="line">Companies that closed the perception gap, and what changed.</h2>
-          <p data-reveal="line">Discover how we’re driving change through brand systems, websites, and measurable outcomes for scaling tech teams.</p>
+          <p data-reveal="line">Brand systems, websites, and measurable outcomes for scaling tech teams.</p>
         </div>
       </div>
       <div className="pm-cases-stack">
         {projects.map((p, i) => <ProjectCase project={p} index={i} key={p.title} />)}
       </div>
       <div className="pm-cases-foot" data-reveal="up">
-        <Button href={CONTACT_PATH}>Explore all cases</Button>
+        <Button href={CONTACT_PATH}>Start a project</Button>
       </div>
     </section>
   )
@@ -794,7 +794,7 @@ function Work() {
 
 function Clients() {
   const logos = clientLogos
-  return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><div className="clients-copy"><h2 data-reveal="line">We work with ambitious brands across every industry — teams whose ambition is ahead of how the market reads them.</h2><p data-reveal="up">Startup, scale-up, or established business — if your brand needs sharper positioning, design, or growth, we&rsquo;re ready.</p></div><div className="client-label" data-reveal="up"><span>Our clients</span><i aria-hidden="true" /></div><div className="logo-marquee"><div>{[...logos, ...logos].map((id, i) => <img src={`${A}${id}.avif`} alt="Client logo" className={invertInDark.has(id) ? 'logo-invert' : undefined} key={i} />)}</div></div></section>
+  return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><div className="clients-copy"><h2 data-reveal="line">We work with ambitious brands across every industry, teams whose ambition is ahead of how the market sees them.</h2><p data-reveal="up">Startup or established business, if your brand needs sharper positioning, design, or growth, we are ready.</p></div><div className="client-label" data-reveal="up"><span>Our clients</span><i aria-hidden="true" /></div><div className="logo-marquee"><div>{[...logos, ...logos].map((id, i) => <img src={`${A}${id}.avif`} alt="Client logo" className={invertInDark.has(id) ? 'logo-invert' : undefined} key={i} />)}</div></div></section>
 }
 
 function Services() {
@@ -802,7 +802,7 @@ function Services() {
     <section id="services" className="panel services" data-reveal="panel">
       <div className="services-head">
         <div className="eyebrow" data-reveal="up">● &nbsp; Our services</div>
-        <h2 data-reveal="line">Everything your brand needs<br /> to grow — under one roof.</h2>
+        <h2 data-reveal="line">Everything your brand needs to grow, in one team.</h2>
       </div>
       <div className="service-list">
         {serviceCatalog.map((s, i) => (
@@ -833,13 +833,7 @@ function FAQ() {
 function Testimonials() {
   const track = useRef(null)
   const slide = direction => track.current?.scrollBy({ left: direction * Math.min(460, track.current.clientWidth * .82), behavior: 'smooth' })
-  return <section className="testimonials"><div className="testimonial-head"><div className="eyebrow" data-reveal="up">● &nbsp; Testimonials</div><h2 data-reveal="line">What our clients say about working with us.</h2></div><div className="testimonial-track" ref={track}>{testimonials.map(([quote, name, role, img]) => <article key={name} data-reveal="card"><p>{quote}</p><div className="person"><img src={img} alt={name} /><div><b>{name}</b><span>{role}</span></div><i>in</i></div></article>)}</div><div className="track-control"><span></span><button onClick={() => slide(-1)} aria-label="Previous testimonial">←</button><button onClick={() => slide(1)} aria-label="Next testimonial">→</button></div></section>
-}
-
-function SocialIcon({ name }) {
-  if (name === 'Behance') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.26 11.47s2.17-.16 2.17-2.7c0-2.54-1.78-3.78-4.04-3.78H0V19h7.39s4.53.14 4.53-4.14c0 0 .2-3.39-2.66-3.39ZM3.25 7.43h4.14s1.01 0 1.01 1.48-.6 1.69-1.28 1.69H3.25V7.43Zm3.94 9.13H3.25v-3.75h4.14s1.51-.02 1.51 1.93c0 1.64-1.12 1.82-1.71 1.82ZM18.31 8.5c-5.47 0-5.46 5.46-5.46 5.46s-.37 5.43 5.46 5.43c0 0 4.87.28 4.87-3.78h-2.5s.08 1.53-2.28 1.53c0 0-2.5.17-2.5-2.47h7.36s.8-6.17-4.95-6.17Zm-2.38 4.28s.31-2.19 2.5-2.19 2.16 2.19 2.16 2.19h-4.66ZM15.79 5.6h5.22v1.56h-5.22V5.6Z" /></svg>
-  if (name === 'LinkedIn') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.32 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.1 20.45H3.54V9H7.1v11.45Z" /></svg>
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.24 2.25h3.31l-7.23 8.26 8.51 11.24h-6.66l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.08 4.13H5.12l11.96 15.64Z" /></svg>
+  return <section id="testimonials" className="testimonials"><div className="testimonial-head"><div className="eyebrow" data-reveal="up">● &nbsp; Testimonials</div><h2 data-reveal="line">What our clients say about working with us.</h2></div><div className="testimonial-track" ref={track}>{testimonials.map(([quote, name, role, img]) => <article key={name} data-reveal="card"><p>{quote}</p><div className="person"><img src={img} alt={name} /><div><b>{name}</b><span>{role}</span></div><i>in</i></div></article>)}</div><div className="track-control"><span></span><button onClick={() => slide(-1)} aria-label="Previous testimonial">←</button><button onClick={() => slide(1)} aria-label="Next testimonial">→</button></div></section>
 }
 
 function Footer() {
@@ -849,11 +843,10 @@ function Footer() {
     { label: 'Projects', path: '/#work' },
     { label: 'For startups', path: CONTACT_PATH },
     { label: 'Contacts', path: CONTACT_PATH },
-    { label: 'Testimonials', path: '/#faq' },
+    { label: 'Testimonials', path: '/#testimonials' },
   ]
   const serviceLinks = serviceCatalog.map(s => ({ label: s.title, path: getServicePath(s.slug) }))
   const industryLinks = industryList.map(item => ({ label: item.label, path: item.path }))
-  const socials = ['Behance', 'LinkedIn', 'X']
   const onFooterLink = (e, path) => {
     e.preventDefault()
     if (path.startsWith('/#')) {
@@ -905,12 +898,6 @@ function Footer() {
           </button>
         </label>
         <small>By signing up, you agree to our Privacy Policy. We respect your data.</small>
-        <b>Follow us on:</b>
-        <div className="socials">
-          {socials.map((name, i) => (
-            <a href="#top" onClick={goHomeTop} aria-label={name} style={{ '--footer-i': i }} key={name}><SocialIcon name={name} /></a>
-          ))}
-        </div>
       </div>
       <div className="footer-bottom">
         <a href="/" onClick={goHomeTop} aria-label={BRAND}><Logo variant="footer" /></a>
@@ -1085,14 +1072,8 @@ function Compare() {
 
 // Checkered CTA banner: mosaic of green tiles framing a dark booking card.
 function CtaBanner() {
-  const oddBlocks = new Set([1, 16, 17, 40, 100, 120, 126, 127])
   return (
     <section className="tcx tcx-cta">
-      <div className="tcx-cta-grid" aria-hidden="true">
-        {Array.from({ length: 140 }, (_, i) => (
-          <span className={`tcx-cta-block ${oddBlocks.has(i) ? 'is-odd' : ''}`} key={i} />
-        ))}
-      </div>
       <div className="tcx-cta-content">
         <span className="tcx-cta-glow" aria-hidden="true" />
         <div className="tcx-cta-inner">

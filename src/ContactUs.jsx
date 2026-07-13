@@ -414,7 +414,7 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
 
             <div className="cu-trust">
               <div className="cu-trust-top">
-                <p className="cu-trust-title">Trusted by <span>88+</span> B2B Marketing Leaders</p>
+                <p className="cu-trust-title">Trusted by <span>40+</span> B2B Technology Companies</p>
                 <div className="cu-clutch">
                   <img className="cu-clutch-icon" src={`${TC}clutch-icon.webp`} alt="Clutch" />
                   <div>

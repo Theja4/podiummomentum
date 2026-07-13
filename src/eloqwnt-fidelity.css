@@ -125,10 +125,9 @@ main {
   box-shadow: none !important;
 }
 .header.header-scrolled {
-  background: rgba(229, 233, 235, 0.92) !important;
-  backdrop-filter: blur(12px);
+  background: var(--paper) !important;
   border-bottom: 0 !important;
-  box-shadow: none !important;
+  box-shadow: 0 8px 28px rgba(8, 20, 13, 0.12) !important;
 }
 .nav {
   gap: 2rem !important;
@@ -369,11 +368,10 @@ main {
 }
 
 /* —— Sections: white cards on grey canvas —— */
-.panel,
+.panel:not(.faq),
 .who-we-are,
 .clients,
 .services,
-.faq,
 .testimonials,
 .work-wrap,
 .tcx,
@@ -405,7 +403,6 @@ main {
 .who-we-are,
 .clients,
 .services,
-.faq,
 .testimonials {
   padding: var(--pad-standart) !important;
   width: 100% !important;
@@ -421,7 +418,6 @@ h2,
 .who-headline,
 .clients h2,
 .service-body > h2,
-.faq h2,
 .testimonial-head h2,
 .svc-hub-hero h1,
 .svc-detail-hero h1,
@@ -436,9 +432,6 @@ h2,
 .service-body > h2 {
   font-size: clamp(1.75rem, 2.8vw, 2.5rem) !important; /* ~40px */
   max-width: 28ch !important;
-}
-.faq h2 {
-  font-size: clamp(2rem, 3.3vw, 3rem) !important; /* ~48px */
 }
 .eyebrow,
 .section-lead > span,
@@ -471,29 +464,6 @@ h2,
   font-weight: 400 !important;
   letter-spacing: -0.04rem !important;
   line-height: 1.125 !important;
-}
-
-/* FAQ */
-.faq {
-  background: #fff !important;
-}
-.faq-item {
-  background: var(--lightgray) !important;
-  border-radius: 1rem !important;
-  box-shadow: none !important;
-}
-.faq-item button i {
-  background: #fff !important;
-}
-.faq-item.active button i,
-.faq-item:not(.active):hover button i {
-  background: #000 !important;
-}
-.faq-item.active button i:before,
-.faq-item.active button i:after,
-.faq-item:not(.active):hover button i:before,
-.faq-item:not(.active):hover button i:after {
-  background: #fff !important;
 }
 
 /* Work / projects */
@@ -813,11 +783,10 @@ html[data-theme='dark'] body {
   color: #fff !important;
 }
 html[data-theme='dark'] .hero,
-html[data-theme='dark'] .panel,
+html[data-theme='dark'] .panel:not(.faq),
 html[data-theme='dark'] .who-we-are,
 html[data-theme='dark'] .clients,
 html[data-theme='dark'] .services,
-html[data-theme='dark'] .faq,
 html[data-theme='dark'] .testimonials,
 html[data-theme='dark'] footer,
 html[data-theme='dark'] .svc-hub-hero,
@@ -852,7 +821,8 @@ html[data-theme='dark'] .ind-cta-band {
   color: #fff !important;
 }
 html[data-theme='dark'] .header.header-scrolled {
-  background: rgba(0, 0, 0, 0.9) !important;
+  background: var(--paper) !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6) !important;
 }
 html[data-theme='dark'] .nav a,
 html[data-theme='dark'] .nav-dropdown-trigger,
@@ -872,7 +842,6 @@ html[data-theme='dark'] .marquee {
   background: #fff !important;
   color: #000 !important;
 }
-html[data-theme='dark'] .faq-item,
 html[data-theme='dark'] .svc-hub-card,
 html[data-theme='dark'] .svc-featured-card,
 html[data-theme='dark'] .ind-approach-card,
