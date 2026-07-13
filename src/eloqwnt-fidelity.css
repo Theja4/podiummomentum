@@ -544,7 +544,9 @@ footer {
 }
 .svc-main {
   background: transparent !important;
-  padding: 1.25rem var(--pad-standart) 0 !important;
+  /* Clear the fixed site header (~92px desktop / 74px mobile) so the hero
+     card isn't tucked underneath it. */
+  padding: clamp(88px, 8vw, 108px) var(--pad-standart) 0 !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 1.25rem !important;
@@ -640,8 +642,13 @@ footer {
 .svc-faq-item.is-open button i:after {
   background: #fff !important;
 }
+/* The .svc-close section is itself the padded card (see group rule above),
+   so the inner is only a content wrapper. Keeping a background here produced a
+   redundant nested card, and .svc-container's `padding:0 !important` zeroed the
+   inner padding, clipping the text against the rounded corners. Match the hub
+   (.is-hub .svc-close-inner) by keeping the inner transparent. */
 .svc-close-inner {
-  background: var(--lightgray) !important;
+  background: transparent !important;
   box-shadow: none !important;
 }
 .svc-numbers-grid strong,
@@ -844,11 +851,104 @@ html[data-theme='dark'] .marquee {
   background: #fff !important;
   color: #000 !important;
 }
+/* Inner cards — the fidelity layer pins these to a light grey (--lightgray);
+   in dark mode that leaves pale cards floating on dark sections with unreadable
+   text (this is what made the FAQ answers look "blank" on expand). Give every
+   card a dark surface with light text. */
 html[data-theme='dark'] .svc-hub-card,
 html[data-theme='dark'] .svc-featured-card,
 html[data-theme='dark'] .ind-approach-card,
-html[data-theme='dark'] .testimonial-track article {
-  background: #151515 !important;
+html[data-theme='dark'] .testimonial-track article,
+html[data-theme='dark'] .svc-numbers-grid article,
+html[data-theme='dark'] .svc-stats-grid article,
+html[data-theme='dark'] .svc-process-grid article,
+html[data-theme='dark'] .svc-faq-item,
+html[data-theme='dark'] .svc-related-grid a,
+html[data-theme='dark'] .svc-work-strip-grid article,
+html[data-theme='dark'] .svc-work-strip-scroll article,
+html[data-theme='dark'] .svc-detail-hero-card,
+html[data-theme='dark'] .svc-detail-chip,
+html[data-theme='dark'] .svc-pill-link,
+html[data-theme='dark'] .svc-testimonial-track article {
+  background: #15191b !important;
+  color: #eef2f0 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Text inside dark cards stays legible. */
+html[data-theme='dark'] .svc-faq-item button b,
+html[data-theme='dark'] .svc-faq-answer > p,
+html[data-theme='dark'] .svc-numbers-grid article strong,
+html[data-theme='dark'] .svc-numbers-grid article span,
+html[data-theme='dark'] .svc-stats-grid article strong,
+html[data-theme='dark'] .svc-stats-grid article b,
+html[data-theme='dark'] .svc-stats-grid article p,
+html[data-theme='dark'] .svc-process-grid article h3,
+html[data-theme='dark'] .svc-process-grid article p,
+html[data-theme='dark'] .svc-process-grid article span,
+html[data-theme='dark'] .svc-related-grid a b,
+html[data-theme='dark'] .svc-related-grid a span,
+html[data-theme='dark'] .svc-testimonial-track article p,
+html[data-theme='dark'] .svc-testimonial-person b {
+  color: #eef2f0 !important;
+}
+html[data-theme='dark'] .svc-faq-answer > p,
+html[data-theme='dark'] .svc-process-grid article p,
+html[data-theme='dark'] .svc-stats-grid article p {
+  opacity: 0.72 !important;
+}
+
+/* Green pill toggle keeps its emerald face; symbol stays dark for contrast. */
+html[data-theme='dark'] .svc-faq-item button i {
+  background: var(--emerald, #67e0a3) !important;
+}
+html[data-theme='dark'] .svc-faq-item button i:before,
+html[data-theme='dark'] .svc-faq-item button i:after {
+  background: #06110b !important;
+}
+
+/* ============================================================
+   Dark-mode contrast repairs
+   The light-forcing !important rules above (industry hero + contact
+   cards) have no dark counterpart, so in dark mode they leave black
+   text on dark surfaces (invisible hero words/tagline) and a white
+   contact card holding white text. IndustryPage renders a `.ind-main`
+   DIV, so button-system's `main`-scoped dark fixes never reach it.
+   These rules restore legible foregrounds without touching light mode.
+   ============================================================ */
+
+/* Industry hero: type sits on the dark video shell, so it must be light. */
+html[data-theme='dark'] .ind-hero-head,
+html[data-theme='dark'] .ind-hero-head .ind-h1,
+html[data-theme='dark'] .ind-h1,
+html[data-theme='dark'] .ind-h1 .ind-split-word > span,
+html[data-theme='dark'] .ind-split-word > span {
+  color: #fff !important;
+}
+html[data-theme='dark'] .ind-hero-tag {
+  color: rgba(255, 255, 255, 0.74) !important;
+}
+
+/* Industry section labels + list copy the `main`-scoped fixes miss. */
+html[data-theme='dark'] .ind-dot-label,
+html[data-theme='dark'] .ind-exp-item,
+html[data-theme='dark'] .ind-exp-body,
+html[data-theme='dark'] .ind-work-title,
+html[data-theme='dark'] .ind-work-title span,
+html[data-theme='dark'] .ind-client-blurb.is-active {
+  color: #f2f5f3 !important;
+}
+html[data-theme='dark'] .ind-exp-item {
+  border-bottom-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Contact hero card: contact-us.css already themes the page dark via
+   --cu-card; the only breakage is eloqwnt forcing these surfaces white. */
+html[data-theme='dark'] .cu-hero {
+  background: transparent !important;
+}
+html[data-theme='dark'] .cu-form-card {
+  background: var(--cu-card, #050706) !important;
 }
 
 /* Responsive pad */

@@ -1273,6 +1273,7 @@ function App() {
         <main className="svc-main svc-main-hub">
           <ServicesHub navigate={navigate} />
         </main>
+        <Footer />
       </>
     )
   }

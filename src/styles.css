@@ -686,7 +686,7 @@ html[data-theme="dark"] .header-scrolled{box-shadow:0 10px 32px rgba(0,0,0,.6)}
 .testimonials .person{margin-top:38px;padding-top:24px;border-top:1px solid #deebe3;gap:16px}
 .testimonials .person img{width:54px;height:54px}
 .testimonials .person b{font-size:20px}
-.testimonials .person span{font-size:15px;color:#6d7871;margin-top:3px}
+.testimonials .person span{font-size:15px;color:#5c665f;margin-top:3px}
 .testimonials .person i{width:46px;height:46px;border-color:#bdccc3;font-size:15px;background:transparent}
 .testimonials .testimonial-track article:hover{transform:none;border-color:#9fdbba;box-shadow:0 24px 55px rgba(22,70,45,.13)!important}
 .testimonials .track-control{margin:34px clamp(28px,4vw,60px) 0}
@@ -1441,7 +1441,7 @@ html[data-theme="dark"] .who-proof-item strong{text-decoration-color:rgba(124,24
   font-weight:400;
   font-variant-numeric:tabular-nums;
   letter-spacing:.02em;
-  color:rgba(8,8,8,.5);
+  color:rgba(8,8,8,.62);
   transition:transform .72s cubic-bezier(.22,1,.36,1),color .35s ease;
 }
 .service-list a>b{
@@ -2616,6 +2616,9 @@ html[data-theme="dark"] .tcx-btn-white:hover .tcx-btn-arrows{
 }
 .tcx-tag-red{
   background:rgba(246,84,67,.12);
+}
+html:not([data-theme='dark']) .tcx-tag-red{
+  color:#b3271a;
 }
 .tcx-cta-content{
   border:0!important;

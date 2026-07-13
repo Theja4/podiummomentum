@@ -1,8 +1,8 @@
-/** Pure service catalog — Eloqwnt reference copy for hub + detail clone. */
+/** Pure service catalog — Podium Momentum services hub + detail content. */
 
 export const SERVICES_PATH = '/services'
-export const ELOQWNT_BRAND = 'Eloqwnt'
-const E = '/assets/eloqwnt/'
+export const BRAND = 'Podium Momentum'
+const IP = '/assets/industry-projects/'
 
 export const serviceCatalog = [
   {
@@ -17,7 +17,7 @@ export const serviceCatalog = [
     heroHeadline: 'Your Website Is More Than Just a Digital Presence',
     heroBody:
       'Your website is your digital storefront, and often the first impression your audience has of your brand. A well-designed site goes beyond mere aesthetics—it builds trust, captures attention, and turns casual visitors into loyal customers.',
-    heroImage: `${E}hero-web-design.avif`,
+    heroImage: `${IP}technology-modern-vivo-3.avif`,
     stats: [
       { value: '500+', label: 'Websites Designed', note: 'We’ve crafted over 500 websites, blending aesthetics with strategy to create seamless digital experiences.' },
       { value: '98%', label: 'Client Satisfaction Rate', note: 'Nearly all of our clients walk away with a website that exceeds their expectations.' },
@@ -51,7 +51,7 @@ export const serviceCatalog = [
       { name: 'Vanquish', year: '2024', image: '/assets/industry-projects/pattech-7.avif' },
       { name: 'ContinuOS', year: '2024', image: '/assets/industry-projects/ai-continuos-0.avif' },
       { name: 'Alpha Ledger', year: '2024', image: '/assets/industry-projects/alpha-ledger-0.avif' },
-      { name: 'Incipet', year: '2024', image: `${E}work-incipet.avif` },
+      { name: 'Incipet', year: '2024', image: `${IP}incipet-2.avif` },
     ],
   },
   {
@@ -64,7 +64,7 @@ export const serviceCatalog = [
     heroHeadline: 'Build a brand the market remembers',
     heroBody:
       'A strong brand is more than a logo — it’s how people recognize, trust, and choose you. We craft visual identities and messaging systems that create lasting equity.',
-    heroImage: `${E}work-taraxa.avif`,
+    heroImage: `${IP}taraxa-0.avif`,
     stats: [
       { value: '40+', label: 'Tech brands shaped', note: 'From seed-stage to scale-up category leaders.' },
       { value: '4.9', label: 'Average client rating', note: 'Founders rate clarity of process as highly as craft.' },
@@ -93,9 +93,9 @@ export const serviceCatalog = [
     ],
     related: ['website-design', 'content-creation', 'ux-ui'],
     works: [
-      { name: 'Taraxa', year: '2024', image: `${E}work-taraxa.avif` },
-      { name: 'Fractal', year: '2024', image: `${E}work-fractal.avif` },
-      { name: 'InnrevAI', year: '2024', image: `${E}work-innrevai.avif` },
+      { name: 'Taraxa', year: '2024', image: `${IP}taraxa-0.avif` },
+      { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
+      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
     ],
   },
   {
@@ -110,7 +110,7 @@ export const serviceCatalog = [
     heroHeadline: 'Design that puts the user first',
     heroBody:
       'Great design isn’t just about aesthetics — it’s about how users interact, navigate, and connect with your product. A well-crafted UX / UI enhances usability, builds trust, and keeps users engaged.',
-    heroImage: `${E}hero-ux-ui.avif`,
+    heroImage: `${IP}fintech-planet9-ui-ux-4.avif`,
     stats: [
       { value: '3M+', label: 'Impacted Users', note: 'Our designs have reached over 3 million people, enhancing digital experiences across multiple platforms.' },
       { value: '40%', label: 'Increasing Conversion Rates', note: 'Optimized UX / UI that turns visitors into loyal customers.' },
@@ -158,7 +158,7 @@ export const serviceCatalog = [
     heroHeadline: 'Why Is Motion Design Important',
     heroBody:
       'Motion design brings visuals to life, making content more engaging, memorable, and impactful. It enhances storytelling, improves user experience, and increases audience retention.',
-    heroImage: `${E}hero-motion.avif`,
+    heroImage: `${IP}ai-innrevai-1.avif`,
     stats: [
       { value: '90%', label: 'Of Our Clients Come Back', note: 'Once brands experience the power of well-crafted motion, they want more.' },
       { value: '4.9/5', label: 'Average Motion Project Approval Rating', note: 'High standards, seamless execution—our motion work speaks for itself.' },
@@ -189,9 +189,9 @@ export const serviceCatalog = [
     related: ['ux-ui', 'branding', 'content-creation'],
     works: [
       { name: 'Alpha Ledger', year: '2024', image: '/assets/industry-projects/alpha-ledger-0.avif' },
-      { name: 'Fractal', year: '2024', image: `${E}work-fractal.avif` },
+      { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
       { name: 'ContinuOS', year: '2024', image: '/assets/industry-projects/ai-continuos-0.avif' },
-      { name: 'InnrevAI', year: '2024', image: `${E}work-innrevai.avif` },
+      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
     ],
   },
   {
@@ -206,7 +206,7 @@ export const serviceCatalog = [
     heroHeadline: 'Organic growth built on structure and story',
     heroBody:
       'We pair technical excellence with content that compounds — so your site earns attention for the queries that matter to revenue, not vanity volume.',
-    heroImage: `${E}work-fractal.avif`,
+    heroImage: `${IP}vertus-ai-6.avif`,
     stats: [
       { value: '65%', label: 'Organic traffic lifts', note: 'Typical gains after technical + content systems.' },
       { value: '3.3×', label: 'Conversion gains', note: 'When SEO pages are designed for action, not just rank.' },
@@ -235,9 +235,9 @@ export const serviceCatalog = [
     ],
     related: ['content-creation', 'website-design', 'landing-page'],
     works: [
-      { name: 'InnrevAI', year: '2024', image: `${E}work-innrevai.avif` },
-      { name: 'Taraxa', year: '2024', image: `${E}work-taraxa.avif` },
-      { name: 'Incipet', year: '2024', image: `${E}work-incipet.avif` },
+      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
+      { name: 'Taraxa', year: '2024', image: `${IP}taraxa-0.avif` },
+      { name: 'Incipet', year: '2024', image: `${IP}incipet-2.avif` },
     ],
   },
   {
@@ -250,7 +250,7 @@ export const serviceCatalog = [
     heroHeadline: 'Content with a commercial backbone',
     heroBody:
       'We build content that carries your positioning: site pages, thought leadership, and assets sales can use without diluting the brand.',
-    heroImage: `${E}work-innrevai.avif`,
+    heroImage: `${IP}innrevai-1.avif`,
     stats: [
       { value: '42+', label: 'Articles in engines', note: 'Structured publishing that compounds SEO and trust.' },
       { value: '3×', label: 'Qualified engagement', note: 'When narrative and CTA design work together.' },
@@ -279,9 +279,9 @@ export const serviceCatalog = [
     ],
     related: ['seo', 'branding', 'motion-design'],
     works: [
-      { name: 'Fractal', year: '2024', image: `${E}work-fractal.avif` },
-      { name: 'Taraxa', year: '2024', image: `${E}work-taraxa.avif` },
-      { name: 'InnrevAI', year: '2024', image: `${E}work-innrevai.avif` },
+      { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
+      { name: 'Taraxa', year: '2024', image: `${IP}taraxa-0.avif` },
+      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
     ],
   },
   {
@@ -294,7 +294,7 @@ export const serviceCatalog = [
     heroHeadline: 'One page. One job. Maximum conversion.',
     heroBody:
       'We design landing experiences for campaigns, launches, and product moments — focused narrative, proof, and frictionless next steps.',
-    heroImage: `${E}work-incipet.avif`,
+    heroImage: `${IP}incipet-2.avif`,
     stats: [
       { value: '3.3×', label: 'Conversion lifts', note: 'When message-match and proof hierarchy are rebuilt.' },
       { value: '2 wks', label: 'Fast-track builds', note: 'Scoped pages can move quickly when assets are ready.' },
@@ -323,9 +323,9 @@ export const serviceCatalog = [
     ],
     related: ['website-design', 'seo', 'webflow-development'],
     works: [
-      { name: 'InnrevAI', year: '2024', image: `${E}work-innrevai.avif` },
+      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
       { name: 'Alpha Ledger', year: '2024', image: '/assets/industry-projects/alpha-ledger-0.avif' },
-      { name: 'Incipet', year: '2024', image: `${E}work-incipet.avif` },
+      { name: 'Incipet', year: '2024', image: `${IP}incipet-2.avif` },
     ],
   },
   {
@@ -340,7 +340,7 @@ export const serviceCatalog = [
     heroHeadline: 'Design systems that marketing can run',
     heroBody:
       'We build Webflow sites that protect craft in production — clean structure, CMS power, and performance so your team ships updates without breaking the brand.',
-    heroImage: `${E}work-incipet.avif`,
+    heroImage: `${IP}incipet-2.avif`,
     stats: [
       { value: '100+', label: 'Webflow launches', note: 'Marketing sites and multi-template systems.' },
       { value: 'Core', label: 'Web Vitals focus', note: 'Speed and stability treated as product requirements.' },
@@ -369,9 +369,9 @@ export const serviceCatalog = [
     ],
     related: ['website-design', 'landing-page', 'seo'],
     works: [
-      { name: 'InnrevAI', year: '2024', image: `${E}work-innrevai.avif` },
-      { name: 'Incipet', year: '2024', image: `${E}work-incipet.avif` },
-      { name: 'Fractal', year: '2024', image: `${E}work-fractal.avif` },
+      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
+      { name: 'Incipet', year: '2024', image: `${IP}incipet-2.avif` },
+      { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
     ],
   },
 ]
@@ -384,74 +384,74 @@ export const hubIntro = {
   offeringsLabel: 'Our Services',
 }
 
-/** Featured work strip — Eloqwnt hub projects. */
+/** Featured work strip — Podium Momentum projects. */
 export const hubFeatured = [
   {
-    name: 'InnrevAI',
-    year: '2024',
-    sector: 'AI',
+    name: 'JobPosted',
+    year: '2025',
+    sector: 'Career Tech',
     blurb: '',
-    image: `${E}work-innrevai.avif`,
-    tags: ['Branding', 'Web Design', 'Webflow Dev'],
+    image: '/assets/jobposted-thumb.png',
+    tags: ['Website Design', 'Brand System', 'Content & SEO'],
   },
   {
-    name: 'Taraxa',
-    year: '2024',
-    sector: 'Web3',
+    name: 'Rezoomed',
+    year: '2025',
+    sector: 'Career Tech',
     blurb: '',
-    image: `${E}work-taraxa.avif`,
-    tags: ['Branding', 'Web Design'],
+    image: '/assets/rezoomed-thumb.png',
+    tags: ['Product UX', 'Website Redesign', 'Motion'],
   },
   {
-    name: 'Fractal',
-    year: '2024',
+    name: 'Metapic',
+    year: '2025',
     sector: 'Technology',
     blurb: '',
-    image: `${E}work-fractal.avif`,
-    tags: ['Branding', 'Web Design', 'Webflow Dev'],
+    image: '/assets/972304820e19d175.avif',
+    tags: ['Branding', 'Website Design', 'Growth'],
   },
   {
-    name: 'Incipet',
+    name: 'Planet9',
     year: '2024',
-    sector: 'AI',
+    sector: 'Fintech',
     blurb: '',
-    image: `${E}work-incipet.avif`,
-    tags: ['Web Design', 'Webflow Dev'],
+    image: `${IP}fintech-planet9-ui-ux-4.avif`,
+    tags: ['UX/UI', 'Web Design'],
   },
 ]
 
-/** Partner logos (local Eloqwnt CDN mirrors). */
+/** Partner logos — Podium Momentum clients (local /assets mirrors). */
 export const hubPartners = [
-  `${E}logo-pattech.avif`,
-  `${E}logo-xh.avif`,
-  `${E}logo-taraxa.avif`,
-  `${E}logo-modernvivo.avif`,
-  `${E}logo-vanquish.avif`,
-  `${E}logo-hcg.avif`,
-  `${E}logo-planet9.avif`,
-  `${E}logo-hfactor.avif`,
+  '/assets/a9cc6fba12268e37.avif',
+  '/assets/43201ae504d0ad9f.avif',
+  '/assets/cfecff048b60daa1.avif',
+  '/assets/baa053d3454375d0.avif',
+  '/assets/d2c8ca3a50aba890.avif',
+  '/assets/ab3a9a6cf9778c11.avif',
+  '/assets/9a6b3e2b11136ee0.avif',
+  '/assets/c90888271d904160.avif',
 ]
 
 export const hubExpertise = {
   label: 'Expertise',
   title: 'We solve real problems',
-  body: 'We combine years of expertise in UX/UI, Motion design, Webflow development, and Web design to build high-performance digital experiences that not only look great but drive engagement and results for our clients.',
-  image: `${E}expertise-media.avif`,
-  imageAlt: 'Design craft workspace',
+  body: 'We combine strategy, branding, UX and UI, and web design to build high-performance digital experiences that not only look great but move the metrics that matter for scaling technology companies.',
+  image: '/assets/972304820e19d175.avif',
+  imageAlt: 'Podium Momentum brand and web design work',
 }
 
 export const hubNumbers = [
-  { index: '01', value: '100+', label: 'Projects Completed' },
-  { index: '02', value: '98%', label: 'Client Satisfaction Rate' },
-  { index: '03', value: '25+', label: 'Experts In Our Team' },
-  { index: '04', value: '8/10', label: 'Clients Return For More' },
+  { index: '01', value: '40+', label: 'Technology Companies' },
+  { index: '02', value: '4.9', label: 'Average Client Rating' },
+  { index: '03', value: '2.3×', label: 'Conversion Lift Post-Rebrand' },
+  { index: '04', value: '$10M+', label: 'Raised By Clients' },
 ]
 
 export const hubNumbersHead = {
   label: 'What makes us different?',
-  title: 'Eloqwnt\nIn Numbers',
-  titleLines: ['Eloqwnt', 'In Numbers'],
-  body: 'Design is more than aesthetics—it’s about measurable impact. Here’s how we make a difference.',
+  title: 'Momentum\nin numbers',
+  titleLines: ['Momentum', 'in numbers'],
+  body: 'Design is more than aesthetics — it’s about measurable impact. Here’s how we make a difference.',
 }
 
 export const hubClose = {
@@ -475,35 +475,35 @@ export const hubFaqs = [
   { q: 'Why is website design important?', a: 'It’s often the first impression of your brand. Strong design builds trust, captures attention, and turns visitors into customers.' },
 ]
 
-/** Hub testimonials (Eloqwnt reference copy). */
+/** Hub testimonials — Podium Momentum clients. */
 export const hubTestimonials = [
   {
     quote:
-      'Eloqwnt crushed it with the UX/UI for our planet9 app. Super sleek, intuitive, and on-point—exactly what we needed. If youre all about next-level design and perfection, theyre the ones to call!',
-    name: 'Ganjina Oripova',
-    role: 'Co-Founder at Planet9',
-    image: `${E}avatar-ganjina.avif`,
+      'Podium Momentum rebuilt our brand into one that finally matches the operation behind it. They gave us a system — strategic pillars and a defined voice that the whole team now uses.',
+    name: 'Qadir Hussain',
+    role: 'CEO, The Virtual Slimming Clinic',
+    image: '/assets/236e08442c17c9f5.avif',
   },
   {
     quote:
-      'The work was great, it was done in a timely basis, and Eloqwnt was very easy & flexible to work with. We had hugely positively responses from the community after the rebrand.',
-    name: 'Steven Pu',
-    role: 'CEO, Taraxa',
-    image: `${E}avatar-steven.avif`,
+      'Our previous website failed to reflect our standard of high end storytelling and technology. After the redesign, it shifted the caliber of partners reaching out.',
+    name: 'Halie Graham',
+    role: 'Executive Producer',
+    image: '/assets/c0bb9a494de2f7b0.png',
   },
   {
     quote:
-      'All deliverables were completed on time, and positive feedback was received during focus group sessions. Eloqwnt was thorough — they went through each task in detail to ensure everything aligned with the client\'s vision.',
-    name: 'Juan Paolo Legaspi',
-    role: 'Managing Director, Fractal',
-    image: `${E}avatar-juan.avif`,
+      'The new website gets lots of trust — influencers and brand clients get convinced to work with us just by looking at the site.',
+    name: 'Jonathan',
+    role: 'Associate Founder, Metapic',
+    image: '/assets/ef42fa7cfd41a7e6.avif',
   },
   {
     quote:
-      'Have been working with Eloqwnt for a while now, 3rd project to be exact. Always a great experience, very talented and responsive!',
-    name: 'Serhan Gülfidan',
-    role: 'Co-Founder & CEO, Fractalized',
-    image: `${E}avatar-serhan.avif`,
+      'We needed users to understand what we do just by looking at our website. As a result, we saw stronger interest and an increase in conversion.',
+    name: 'Lihong Wang',
+    role: 'CEO',
+    image: '/assets/b6bb0636a8e5a963.avif',
   },
 ]
 
@@ -565,9 +565,17 @@ export function validateServiceCatalog() {
     if (!Array.isArray(s.process) || s.process.length < 3) errors.push(`process <3 for ${s.slug}`)
     if (!Array.isArray(s.faqs) || s.faqs.length < 2) errors.push(`faqs <2 for ${s.slug}`)
   }
-  // Objective requires Eloqwnt reference brand copy on hub surfaces
-  if (!/Eloqwnt/i.test(hubNumbersHead.title)) errors.push('hubNumbersHead missing Eloqwnt brand')
-  if (!hubTestimonials.some(t => /Eloqwnt/i.test(t.quote))) errors.push('hubTestimonials missing Eloqwnt brand copy')
+  // Hub surfaces must not leak competitor (Eloqwnt) brand or assets.
+  const hubText = [hubNumbersHead.title, ...hubTestimonials.map(t => t.quote), hubExpertise.body].join(' ')
+  if (/Eloqwnt/i.test(hubText)) errors.push('hub copy still references Eloqwnt')
+  const hubImages = [
+    ...hubFeatured.map(f => f.image),
+    ...hubPartners,
+    hubExpertise.image,
+    ...hubTestimonials.map(t => t.image),
+    ...serviceCatalog.flatMap(s => [s.heroImage, ...(s.works || []).map(w => w.image)]),
+  ]
+  if (hubImages.some(src => /\/assets\/eloqwnt\//.test(src || ''))) errors.push('assets still point to /assets/eloqwnt')
   if (hubFeatured.length < 3) errors.push('hubFeatured too small')
   if (hubPartners.length < 6) errors.push('hubPartners too small')
   if (hubFaqs.length < 6) errors.push('hubFaqs incomplete')

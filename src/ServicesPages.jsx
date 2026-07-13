@@ -21,19 +21,19 @@ import { usePageMotion } from './usePageMotion.js'
 export { matchServicesRoute }
 import './services-pages.css'
 import './eloqwnt-fidelity.css'
+import './split-reveal.css'
 
 const CONTACT_PATH = '/contact-us'
 const A = '/assets/'
-const E = '/assets/eloqwnt/'
 
 function go(path, navigate) {
   if (typeof navigate === 'function') navigate(path)
 }
 
 function Pill({ children, href, navigate, dark = false, icon = 'wave' }) {
-  let src = `${E}hand-wave-ref.avif`
-  if (icon === 'pricing' || icon === 'brand') src = `${E}pricing-icon.avif`
-  if (dark && icon === 'wave') src = `${E}pricing-icon.avif`
+  let src = `${A}hand-wave.avif`
+  if (icon === 'pricing' || icon === 'brand') src = `${A}brand-mark.svg`
+  if (dark && icon === 'wave') src = `${A}brand-mark.svg`
   return (
     <a
       className={`pill ${dark ? 'pill-dark' : 'pill-light'}`}
@@ -78,8 +78,12 @@ function ServiceFaq({ faqs }) {
     <div className="svc-faq-list">
       {faqs.map((item, i) => {
         const open = active === i
+        // NOTE: no data-reveal here. The reveal observer adds `is-inview`
+        // imperatively, but React rewrites className on open/close and would
+        // wipe it — dropping the toggled item to opacity:0. The FAQ section
+        // (data-reveal="panel") already handles the entrance.
         return (
-          <div className={`svc-faq-item ${open ? 'is-open' : ''}`} key={item.q} data-reveal="card">
+          <div className={`svc-faq-item ${open ? 'is-open' : ''}`} key={item.q}>
             <button type="button" aria-expanded={open} onClick={() => setActive(open ? null : i)}>
               <span>{String(i + 1).padStart(2, '0')}</span>
               <b>{item.q}</b>
@@ -100,8 +104,8 @@ function DualClose({ navigate, label = hubClose.label, title = hubClose.title, b
     <section className="svc-close" data-reveal="panel">
       <div className="svc-container svc-close-inner">
         {label ? <DotLabel>{label}</DotLabel> : null}
-        <h2 data-reveal="line">{title}</h2>
-        <p data-reveal="up">{body}</p>
+        <h2 data-split="words">{title}</h2>
+        <p data-split="letters">{body}</p>
         <div className="svc-close-actions" data-reveal="up">
           <Pill href={CONTACT_PATH} navigate={navigate} icon="wave">
             {hubClose.primary}
@@ -146,11 +150,11 @@ export function ServicesHub({ navigate }) {
     <div className="svc-page">
       <section className="svc-hub-hero" data-reveal="panel">
         <div className="svc-container">
-          <p className="svc-hub-solutions" data-reveal="line">
+          <p className="svc-hub-solutions" data-split="letters">
             {hubIntro.heroLine}
           </p>
           <DotLabel>{hubIntro.offeringsLabel}</DotLabel>
-          <h1 data-reveal="line">{hubIntro.title}</h1>
+          <h1 data-split="words">{hubIntro.title}</h1>
         </div>
       </section>
 
@@ -190,7 +194,7 @@ export function ServicesHub({ navigate }) {
         <div className="svc-container">
           <div className="svc-section-head svc-section-head-row">
             <DotLabel>Our Works</DotLabel>
-            <h2 data-reveal="line">Check Our Featured Projects</h2>
+            <h2 data-split="words">Check Our Featured Projects</h2>
           </div>
           <div className="svc-featured-grid">
             {hubFeatured.map(p => (
@@ -217,7 +221,7 @@ export function ServicesHub({ navigate }) {
         <div className="svc-container svc-expertise-grid">
           <div className="svc-expertise-copy">
             <DotLabel>{hubExpertise.label}</DotLabel>
-            <h2 data-reveal="line">{hubExpertise.title}</h2>
+            <h2 data-split="words">{hubExpertise.title}</h2>
             <p data-reveal="up">{hubExpertise.body}</p>
             <div data-reveal="up">
               <Pill href={CONTACT_PATH} navigate={navigate}>
@@ -305,7 +309,7 @@ export function ServicesHub({ navigate }) {
       <section className="svc-contact-band" data-reveal="panel">
         <div className="svc-container">
           <DotLabel>Contact us</DotLabel>
-          <h2 data-reveal="line">The right partner at the right moment changes everything.</h2>
+          <h2 data-split="words">The right partner at the right moment changes everything.</h2>
           <div data-reveal="up">
             <Pill href={CONTACT_PATH} navigate={navigate}>
               Start a conversation
@@ -347,7 +351,7 @@ export function ServiceDetail({ slug, navigate }) {
       <section className="svc-detail-hero" data-reveal="panel">
         <div className="svc-container svc-detail-hero-grid">
           <div className="svc-detail-hero-copy">
-            <p className="svc-detail-lead" data-reveal="line">
+            <p className="svc-detail-lead" data-split="letters">
               {service.heroLead}
             </p>
             <div className="svc-detail-chip" data-reveal="up">
@@ -363,7 +367,7 @@ export function ServiceDetail({ slug, navigate }) {
       <section className="svc-detail-intro" data-reveal="panel">
         <div className="svc-container svc-detail-intro-grid">
           <div>
-            <h2 data-reveal="line">{service.heroHeadline}</h2>
+            <h2 data-split="words">{service.heroHeadline}</h2>
             <p data-reveal="up">{service.heroBody}</p>
             <div className="svc-detail-hero-actions" data-reveal="up">
               <Pill href={CONTACT_PATH} navigate={navigate}>
@@ -398,7 +402,7 @@ export function ServiceDetail({ slug, navigate }) {
                 Services
               </span>
             </div>
-            <h2 data-reveal="line">
+            <h2 data-split="words">
               {service.title} Services — Seamless, Results-Driven Experiences
             </h2>
           </div>
@@ -420,7 +424,7 @@ export function ServiceDetail({ slug, navigate }) {
         <div className="svc-container">
           <div className="svc-section-head svc-section-head-row">
             <DotLabel>Works</DotLabel>
-            <h2 data-reveal="line">Selected projects</h2>
+            <h2 data-split="words">Selected projects</h2>
           </div>
           <div className="svc-work-strip-scroll">
             {works.map(p => (
@@ -464,7 +468,7 @@ export function ServiceDetail({ slug, navigate }) {
         <div className="svc-container">
           <div className="svc-section-head">
             <DotLabel>Our process</DotLabel>
-            <h2 data-reveal="line">How we work</h2>
+            <h2 data-split="words">How we work</h2>
           </div>
           <div className="svc-process-grid">
             {service.process.map((step, i) => (
@@ -496,7 +500,7 @@ export function ServiceDetail({ slug, navigate }) {
         <div className="svc-container">
           <div className="svc-section-head">
             <DotLabel>Related</DotLabel>
-            <h2 data-reveal="line">Keep exploring</h2>
+            <h2 data-split="words">Keep exploring</h2>
           </div>
           <div className="svc-related-grid">
             {related.map(s => (

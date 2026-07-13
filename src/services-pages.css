@@ -24,7 +24,8 @@
 
 .svc-main.svc-main-hub {
   display: block !important;
-  padding: 0 !important;
+  /* Clear the fixed site header so the hero isn't tucked under the logo/nav. */
+  padding: clamp(88px, 8vw, 108px) 0 0 !important;
   gap: 0 !important;
 }
 

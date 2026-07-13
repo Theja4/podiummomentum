@@ -1,0 +1,67 @@
+/*
+ * Split-text scroll reveals — dependency-free port of Eloqwnt's two signature
+ * GSAP SplitText utilities:
+ *   data-split="words"   → words-slide-from-right (headings)
+ *   data-split="letters" → letters-fade-in       (lead paragraphs)
+ *
+ * The splitter (usePageMotion.js) wraps each word/char in a span with an
+ * incrementing --si index; the IntersectionObserver adds .is-inview when the
+ * element crosses ~top 80% of the viewport, and the per-index transition delay
+ * produces the staggered slide/fade. Progressive enhancement: if the JS never
+ * runs, no spans exist and the raw text renders normally.
+ */
+
+.split-word,
+.split-char {
+  display: inline-block;
+}
+
+.split-cword {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* words-slide-from-right: each word starts pushed right + transparent */
+.motion-ready [data-split='words'] .split-word {
+  will-change: transform, opacity;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--si, 0) * 46ms),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--si, 0) * 46ms);
+}
+
+.motion-ready [data-split='words']:not(.is-inview) .split-word {
+  opacity: 0;
+  transform: translate3d(0.72em, 0, 0);
+}
+
+.motion-ready [data-split='words'].is-inview .split-word {
+  opacity: 1;
+  transform: none;
+}
+
+/* letters-fade-in: each character fades up on a tight stagger */
+.motion-ready [data-split='letters'] .split-char {
+  will-change: transform, opacity;
+  transition:
+    opacity 0.5s ease calc(var(--si, 0) * 15ms),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--si, 0) * 15ms);
+}
+
+.motion-ready [data-split='letters']:not(.is-inview) .split-char {
+  opacity: 0;
+  transform: translate3d(0, 0.12em, 0);
+}
+
+.motion-ready [data-split='letters'].is-inview .split-char {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready [data-split] .split-word,
+  .motion-ready [data-split] .split-char {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
