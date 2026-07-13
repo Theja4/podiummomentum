@@ -1,0 +1,1526 @@
+/*
+ * Site-wide interaction system.
+ *
+ * This file is intentionally loaded after every route stylesheet. It is the
+ * single final authority for button geometry, centering, brand-color states,
+ * and motion so page-specific fidelity rules cannot reintroduce jumps or
+ * low-contrast hover combinations.
+ */
+
+:root {
+  --pm-btn-mint: #67e0a3;
+  --pm-btn-aqua: #7cf0bd;
+  --pm-btn-celadon: #aff9c9;
+  --pm-btn-forest: #146b48;
+  --pm-btn-ink: #06120b;
+  --pm-btn-white: #fff;
+  --pm-btn-ease: cubic-bezier(.16, 1, .3, 1);
+  --pm-btn-shadow: 0 8px 24px rgba(103, 224, 163, .2);
+  --pm-btn-shadow-hover: 0 12px 30px rgba(20, 107, 72, .24);
+}
+
+/* Shared focus treatment for every button-shaped control. */
+:where(
+  .pill,
+  .cu-btn,
+  .cu-nav-cta,
+  .submit,
+  .choices button,
+  .menu,
+  .theme-toggle,
+  .who-play,
+  .who-mute,
+  .subscribe-action,
+  .track-control button,
+  .svc-slider-controls button,
+  .svc-pill-link,
+  .svc-all-projects a,
+  .elo-contact-form button,
+  .elo-footer-bottom > a,
+  .to-top,
+  .down,
+  .tcx-btn,
+  .cu-budget-trigger,
+  .cu-budget-option,
+  .faq-item button,
+  .svc-faq-item button,
+  .ind-exp-item
+):focus-visible {
+  outline: 3px solid var(--pm-btn-aqua) !important;
+  outline-offset: 3px !important;
+}
+
+/* Primary and secondary pill CTAs. */
+.pill {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .55rem !important;
+  min-height: 3.15rem !important;
+  padding: .65rem .75rem .65rem 1.35rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  line-height: 1.2 !important;
+  text-align: center;
+  vertical-align: middle;
+  transform: none !important;
+  transition:
+    color .32s ease,
+    background-color .32s ease,
+    box-shadow .4s var(--pm-btn-ease) !important;
+}
+
+.pill:hover,
+.hero-action .pill:hover,
+.hero-cta .pill:hover,
+.pm-case.is-inview .pm-case-cta:hover {
+  transform: none !important;
+}
+
+.pill-label,
+.pill-icon-shell,
+.pm-case-cta-arrow {
+  position: relative;
+  z-index: 2;
+}
+
+.pill-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.pill-icon-shell {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto;
+  width: 1.8rem !important;
+  height: 1.8rem !important;
+  margin: -.15rem 0;
+  border-radius: 50%;
+  line-height: 0;
+  transform: none !important;
+  transition: background-color .32s ease, box-shadow .32s ease !important;
+}
+
+.pill-icon-shell .pill-icon {
+  position: static !important;
+  display: block !important;
+  width: 1.08rem !important;
+  height: 1.08rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  object-fit: contain;
+  object-position: center;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.pill-wipe {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: scaleX(0) !important;
+  transform-origin: right center !important;
+  transition: transform .55s var(--pm-btn-ease) !important;
+  will-change: transform;
+}
+
+.pill:hover .pill-wipe {
+  height: 100% !important;
+  transform: scaleX(1) !important;
+  transform-origin: left center !important;
+}
+
+.pill-light,
+html[data-theme='dark'] .pill-light {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  box-shadow: var(--pm-btn-shadow) !important;
+}
+
+.pill-light .pill-wipe,
+.pill-light .pill-wipe-dark,
+html[data-theme='dark'] .pill-light .pill-wipe,
+html[data-theme='dark'] .pill-light .pill-wipe-dark {
+  background: var(--pm-btn-forest) !important;
+}
+
+.pill-light:hover,
+html[data-theme='dark'] .pill-light:hover {
+  color: var(--pm-btn-white) !important;
+  box-shadow: var(--pm-btn-shadow-hover) !important;
+}
+
+.pill-light .pill-icon-shell {
+  background: rgba(6, 18, 11, .09) !important;
+}
+
+.pill-light:hover .pill-icon-shell,
+html[data-theme='dark'] .pill-light:hover .pill-icon-shell {
+  background: var(--pm-btn-white) !important;
+}
+
+.pill-dark,
+html[data-theme='dark'] .pill-dark {
+  background: transparent !important;
+  color: var(--pm-btn-white) !important;
+  box-shadow: 0 8px 22px rgba(6, 18, 11, .14) !important;
+}
+
+.pill-dark .pill-base,
+html[data-theme='dark'] .pill-dark .pill-base {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border: 0 !important;
+  border-radius: inherit;
+  background: var(--pm-btn-ink) !important;
+}
+
+.pill-dark .pill-wipe,
+html[data-theme='dark'] .pill-dark .pill-wipe {
+  background: var(--pm-btn-mint) !important;
+}
+
+.pill-dark:hover,
+html[data-theme='dark'] .pill-dark:hover {
+  color: var(--pm-btn-ink) !important;
+  box-shadow: var(--pm-btn-shadow) !important;
+}
+
+.pill-dark .pill-icon-shell,
+html[data-theme='dark'] .pill-dark .pill-icon-shell {
+  background: var(--pm-btn-white) !important;
+}
+
+/* Button-shaped form CTAs use the same left-to-right brand wipe. */
+.cu-nav-cta,
+.cu-btn,
+.submit {
+  position: relative !important;
+  z-index: 0;
+  isolation: isolate;
+  overflow: hidden !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .6rem;
+  min-height: 3.15rem;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  line-height: 1.2 !important;
+  text-align: center;
+  transform: none !important;
+  box-shadow: var(--pm-btn-shadow) !important;
+  transition: color .32s ease, box-shadow .4s var(--pm-btn-ease) !important;
+}
+
+.cu-nav-cta::before,
+.cu-btn::before,
+.submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--pm-btn-forest) !important;
+  transform: scaleX(0) !important;
+  transform-origin: right center !important;
+  transition: transform .55s var(--pm-btn-ease) !important;
+}
+
+.cu-nav-cta:hover,
+.cu-btn:hover,
+.submit:hover,
+.cu-form .cu-form-submit:hover,
+.cu-decide-copy .cu-btn:hover {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-white) !important;
+  transform: none !important;
+  box-shadow: var(--pm-btn-shadow-hover) !important;
+}
+
+.cu-nav-cta:hover::before,
+.cu-btn:hover::before,
+.submit:hover::before {
+  transform: scaleX(1) !important;
+  transform-origin: left center !important;
+}
+
+.cu-form .cu-form-submit {
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-height: 3.25rem;
+  height: 3.25rem;
+  border-radius: .88rem !important;
+}
+
+.cu-form-submit > span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.cu-form-submit:hover span:last-child {
+  transform: none !important;
+}
+
+/* Choice controls and service pills: no lift, only brand-color feedback. */
+.choices button,
+.svc-pill-link,
+.svc-all-projects a,
+.elo-choice-row label span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 2.75rem;
+  border-radius: 999px !important;
+  line-height: 1.2 !important;
+  text-align: center;
+  vertical-align: middle;
+  transform: none !important;
+  transition: background-color .3s ease, color .3s ease, box-shadow .3s ease !important;
+}
+
+.choices button:hover,
+.svc-pill-link:hover,
+.svc-all-projects a:hover,
+.elo-choice-row label span:hover {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  border-color: var(--pm-btn-mint) !important;
+  transform: none !important;
+  box-shadow: 0 7px 18px rgba(103, 224, 163, .18);
+}
+
+.choices button.selected,
+.elo-choice-row label input:checked + span {
+  background: var(--pm-btn-forest) !important;
+  border-color: var(--pm-btn-forest) !important;
+  color: var(--pm-btn-white) !important;
+}
+
+html[data-theme='dark'] .choices button.selected,
+html[data-theme='dark'] .elo-choice-row label input:checked + span {
+  background: var(--pm-btn-mint) !important;
+  border-color: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+}
+
+/* Circular utility controls: fixed geometry and true center alignment. */
+:where(
+  .menu,
+  .theme-toggle,
+  .who-play,
+  .who-mute,
+  .subscribe-action,
+  .track-control button,
+  .svc-slider-controls button,
+  .elo-footer-bottom > a,
+  .to-top
+) {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  line-height: 1 !important;
+  text-align: center;
+  transform: none !important;
+  transition: background-color .3s ease, color .3s ease, box-shadow .35s ease !important;
+}
+
+:where(
+  .menu,
+  .theme-toggle,
+  .subscribe-action,
+  .track-control button,
+  .svc-slider-controls button,
+  .elo-footer-bottom > a,
+  .to-top
+):hover {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  border-color: var(--pm-btn-mint) !important;
+  transform: none !important;
+  box-shadow: 0 8px 22px rgba(103, 224, 163, .2) !important;
+}
+
+.menu,
+.theme-toggle {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  min-width: 2.5rem;
+}
+
+.menu {
+  padding-bottom: .08em !important;
+}
+
+.theme-toggle svg,
+.subscribe-action svg,
+.who-mute svg {
+  display: block;
+  margin: 0 !important;
+  transform-origin: center;
+}
+
+.who-play,
+.hero-video .who-play {
+  width: 3rem !important;
+  height: 3rem !important;
+  background: rgba(0, 0, 0, .48) !important;
+  color: var(--pm-btn-white) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.who-play:hover,
+.hero-video .who-play:hover,
+.who-mute:hover {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  transform: none !important;
+  box-shadow: 0 8px 22px rgba(103, 224, 163, .24) !important;
+}
+
+.who-play img,
+.hero-video .who-play img {
+  width: 2.65rem !important;
+  height: 2.65rem !important;
+  margin: 0 !important;
+  object-fit: contain;
+  object-position: center;
+}
+
+.who-play:hover img,
+.hero-video .who-play:hover img {
+  filter: brightness(0) saturate(100%);
+}
+
+.who-play:hover .who-play-pause {
+  border-color: var(--pm-btn-ink);
+}
+
+.who-mute {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  background: rgba(0, 0, 0, .48) !important;
+  color: var(--pm-btn-white) !important;
+}
+
+.who-mute-icon {
+  width: 1.35rem !important;
+  height: 1.35rem !important;
+  margin: 0 !important;
+}
+
+.track-control button,
+.svc-slider-controls button {
+  width: 3.25rem !important;
+  height: 3.25rem !important;
+  min-width: 3.25rem;
+}
+
+.subscribe-action,
+.elo-footer-bottom > a,
+.to-top {
+  width: 3rem !important;
+  height: 3rem !important;
+  min-width: 3rem;
+}
+
+.subscribe-action:hover svg,
+.to-top:hover,
+.socials a:hover {
+  transform: none !important;
+}
+
+/* Keep the fixed horizontal centering of scroll controls; remove only bobbing. */
+.down,
+.svc-scroll-cue {
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border-radius: 50%;
+  background: var(--pm-btn-ink) !important;
+  color: var(--pm-btn-white) !important;
+  line-height: 1;
+}
+
+.down {
+  animation: none !important;
+}
+
+.down:hover,
+.svc-scroll-cue:hover {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+}
+
+/* FAQ and accordion buttons retain state motion, but never move their shell. */
+.faq-item button,
+.svc-faq-item button,
+.ind-exp-item {
+  transform: none !important;
+}
+
+.faq-item button {
+  align-items: start !important;
+}
+
+.svc-faq-item button {
+  align-items: center !important;
+}
+
+.faq-item button > *,
+.svc-faq-item button > * {
+  min-width: 0;
+}
+
+.faq-item button i,
+.svc-faq-item button i {
+  display: grid !important;
+  place-items: center !important;
+  align-self: center;
+  justify-self: end;
+  flex: 0 0 auto;
+}
+
+.faq-item button i {
+  align-self: start;
+}
+
+@media (max-width: 900px) {
+  .faq {
+    border-radius: 0 0 20px 20px !important;
+  }
+}
+
+.faq-item button:hover i,
+.svc-faq-item button:hover i,
+.faq-item.active button i,
+.svc-faq-item.is-open button i {
+  background: var(--pm-btn-mint) !important;
+}
+
+.faq-item button:hover i::before,
+.faq-item button:hover i::after,
+.svc-faq-item button:hover i::before,
+.svc-faq-item button:hover i::after,
+.faq-item.active button i::before,
+.faq-item.active button i::after,
+.svc-faq-item.is-open button i::before,
+.svc-faq-item.is-open button i::after {
+  background: var(--pm-btn-ink) !important;
+}
+
+.svc-faq-item:hover {
+  transform: none !important;
+}
+
+/*
+ * Service rows previously moved two copies of their title/arrow vertically
+ * through overflow-hidden boxes. The geometry is now fixed; the brand panel
+ * and a simple opacity swap carry the interaction without clipped glyphs.
+ */
+.service-list a,
+.svc-hub-row {
+  transform: none !important;
+}
+
+.service-list a::before,
+.svc-hub-row::before {
+  background: var(--pm-btn-celadon) !important;
+}
+
+.service-list a:hover,
+.svc-hub-row:hover,
+.is-hub .svc-hub-row:hover {
+  color: var(--pm-btn-ink) !important;
+  transform: none !important;
+}
+
+.service-list a > span,
+.service-list a > b,
+.svc-hub-num,
+.svc-hub-title-stack,
+.svc-hub-title-main,
+.svc-hub-title-ghost {
+  transform: none !important;
+}
+
+.service-list a:hover > span,
+.service-list a:hover > b,
+.svc-hub-row:hover .svc-hub-num,
+.svc-hub-row:hover .svc-hub-title-stack,
+.svc-hub-row:hover .svc-hub-title-main {
+  transform: none !important;
+}
+
+.svc-hub-title-main {
+  opacity: 1 !important;
+}
+
+.svc-hub-title-ghost,
+.svc-hub-row:hover .svc-hub-title-ghost {
+  opacity: 0 !important;
+  transform: none !important;
+}
+
+.service-list a > i,
+.svc-hub-row > i {
+  position: relative;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  transform: none !important;
+}
+
+.service-list a > i em,
+.svc-hub-row > i em {
+  grid-area: 1 / 1;
+  display: grid !important;
+  place-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  transform: none !important;
+  transition: opacity .28s ease !important;
+}
+
+.service-list a > i em:first-child,
+.svc-hub-row > i em:first-child {
+  opacity: 1;
+}
+
+.service-list a > i em:last-child,
+.svc-hub-row > i em:last-child {
+  opacity: 0;
+}
+
+.service-list a:hover > i,
+.svc-hub-row:hover > i {
+  background: var(--pm-btn-white) !important;
+  color: var(--pm-btn-ink) !important;
+  transform: none !important;
+}
+
+.service-list a:hover > i em:first-child,
+.svc-hub-row:hover > i em:first-child {
+  opacity: 0;
+  transform: none !important;
+}
+
+.service-list a:hover > i em:last-child,
+.svc-hub-row:hover > i em:last-child {
+  opacity: 1;
+  transform: none !important;
+}
+
+html[data-theme='dark'] .service-list a:hover > i,
+html[data-theme='dark'] .svc-hub-row:hover > i {
+  background: var(--pm-btn-ink) !important;
+  color: var(--pm-btn-white) !important;
+}
+
+.ind-exp-item:hover .ind-exp-title,
+.ind-exp-item.is-open .ind-exp-title {
+  color: var(--pm-btn-forest);
+}
+
+html[data-theme='dark'] .ind-exp-item:hover .ind-exp-title,
+html[data-theme='dark'] .ind-exp-item.is-open .ind-exp-title {
+  color: var(--pm-btn-mint);
+}
+
+/* Contact budget control: preserve dropdown motion, remove control/label drift. */
+.cu-budget-trigger {
+  align-items: center !important;
+  min-height: 3.25rem;
+  transform: none !important;
+}
+
+.cu-budget-trigger:hover,
+.cu-budget-trigger:focus-visible,
+.cu-budget.is-open .cu-budget-trigger {
+  border-color: var(--pm-btn-mint) !important;
+  background: #fff !important;
+  transform: none !important;
+}
+
+.cu-budget-arrow {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto;
+  line-height: 1 !important;
+}
+
+.cu-budget-option {
+  align-items: center !important;
+  transform: none !important;
+}
+
+.cu-budget-option:hover span,
+.cu-budget-option:focus-visible span,
+.cu-budget-option.is-active span,
+.cu-budget-option:hover i,
+.cu-budget-option:focus-visible i,
+.cu-budget-option.is-active i {
+  transform: none !important;
+}
+
+/* Legacy and case-study submit controls. */
+.elo-contact-form button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 3.25rem;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--pm-btn-ink) !important;
+  color: var(--pm-btn-white) !important;
+  line-height: 1.2 !important;
+  transform: none !important;
+  transition: background-color .3s ease, color .3s ease, box-shadow .3s ease !important;
+}
+
+.elo-contact-form button:hover {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  transform: none !important;
+  box-shadow: var(--pm-btn-shadow) !important;
+}
+
+.tcx-btn {
+  align-items: center !important;
+  transform: none !important;
+}
+
+.tcx-btn-icon,
+.tcx-btn-arrows,
+.tcx-btn-arrow {
+  align-self: center;
+}
+
+.tcx-btn:hover {
+  background: var(--pm-btn-mint) !important;
+  border-color: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  transform: none !important;
+}
+
+/* Social circles are button-like controls too. */
+.socials a,
+.socials span,
+.elo-socials a {
+  display: inline-grid !important;
+  place-items: center !important;
+  line-height: 1 !important;
+}
+
+.socials a:hover,
+.socials span:hover,
+.elo-socials a:hover {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  border-color: var(--pm-btn-mint) !important;
+  transform: none !important;
+}
+
+@media (max-width: 900px) {
+  .pill {
+    min-height: 2.9rem !important;
+    padding: .55rem .65rem .55rem 1.1rem !important;
+  }
+
+  .pill-icon-shell {
+    width: 1.7rem !important;
+    height: 1.7rem !important;
+  }
+
+  .cu-btn,
+  .cu-nav-cta {
+    min-height: 2.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-wipe,
+  .cu-nav-cta::before,
+  .cu-btn::before,
+  .submit::before {
+    transition: none !important;
+  }
+}
+
+/* ========================================================================
+ * FINAL CONTRAST CONTRACT
+ *
+ * Keep foreground and surface changes atomic. The older theme files contain
+ * high-specificity `!important` rules, so these app-root selectors are the
+ * deliberate final word in both modes. Decorative wipes/bases are disabled:
+ * they were able to change label color without painting the visible surface.
+ * ======================================================================== */
+
+html[data-theme] body #root {
+  --pm-control-primary-bg: var(--pm-btn-mint);
+  --pm-control-primary-fg: var(--pm-btn-ink);
+  --pm-control-primary-hover-bg: var(--pm-btn-forest);
+  --pm-control-primary-hover-fg: var(--pm-btn-white);
+  --pm-control-secondary-bg: var(--pm-btn-forest);
+  --pm-control-secondary-fg: var(--pm-btn-white);
+  --pm-control-secondary-hover-bg: var(--pm-btn-mint);
+  --pm-control-secondary-hover-fg: var(--pm-btn-ink);
+  --pm-control-soft-bg: var(--pm-btn-celadon);
+  --pm-control-soft-fg: var(--pm-btn-ink);
+}
+
+html[data-theme] body #root .pill .pill-wipe,
+html[data-theme] body #root .pill .pill-base {
+  display: none !important;
+}
+
+html[data-theme] body #root .pill-light,
+html[data-theme] body #root .pm-case-cta,
+html[data-theme] body #root .pm-landing-hero .hero-action .pill-light,
+html[data-theme] body #root .svc-page .pill-light,
+html[data-theme] body #root .ind-main .pill-light,
+html[data-theme] body #root .header .pill-light {
+  background: var(--pm-control-primary-bg) !important;
+  color: var(--pm-control-primary-fg) !important;
+  box-shadow:
+    0 0 0 1px rgba(20, 107, 72, .2),
+    var(--pm-btn-shadow) !important;
+}
+
+html[data-theme] body #root .pill-light:hover,
+html[data-theme] body #root .pm-case-cta:hover,
+html[data-theme] body #root .pm-case.is-inview .pm-case-cta:hover,
+html[data-theme] body #root .pm-landing-hero .hero-action .pill-light:hover,
+html[data-theme] body #root .svc-page .pill-light:hover,
+html[data-theme] body #root .ind-main .pill-light:hover,
+html[data-theme] body #root .header .pill-light:hover {
+  background: var(--pm-control-primary-hover-bg) !important;
+  color: var(--pm-control-primary-hover-fg) !important;
+  box-shadow:
+    0 0 0 1px rgba(124, 240, 189, .28),
+    var(--pm-btn-shadow-hover) !important;
+}
+
+html[data-theme] body #root .pill-dark,
+html[data-theme] body #root .svc-page .pill-dark,
+html[data-theme] body #root .ind-main .pill-dark {
+  background: var(--pm-control-secondary-bg) !important;
+  color: var(--pm-control-secondary-fg) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .12),
+    0 8px 24px rgba(5, 31, 19, .24) !important;
+}
+
+html[data-theme] body #root .pill-dark:hover,
+html[data-theme] body #root .svc-page .pill-dark:hover,
+html[data-theme] body #root .ind-main .pill-dark:hover {
+  background: var(--pm-control-secondary-hover-bg) !important;
+  color: var(--pm-control-secondary-hover-fg) !important;
+  box-shadow:
+    0 0 0 1px rgba(20, 107, 72, .2),
+    var(--pm-btn-shadow) !important;
+}
+
+html[data-theme] body #root .pill-light .pill-icon-shell {
+  background: rgba(6, 18, 11, .1) !important;
+}
+
+html[data-theme] body #root .pill-light:hover .pill-icon-shell {
+  background: var(--pm-btn-white) !important;
+}
+
+html[data-theme] body #root .pill-dark .pill-icon-shell,
+html[data-theme] body #root .pill-dark:hover .pill-icon-shell {
+  background: var(--pm-btn-white) !important;
+  box-shadow: 0 0 0 1px rgba(6, 18, 11, .08) !important;
+}
+
+/* Form and contact CTAs use the same guaranteed pair, without pseudo layers. */
+html[data-theme] body #root .cu-nav-cta::before,
+html[data-theme] body #root .cu-btn::before,
+html[data-theme] body #root .submit::before {
+  display: none !important;
+}
+
+html[data-theme] body #root .cu-nav-cta,
+html[data-theme] body #root .cu-btn,
+html[data-theme] body #root .submit,
+html[data-theme] body #root .elo-contact-form button {
+  background: var(--pm-control-primary-bg) !important;
+  color: var(--pm-control-primary-fg) !important;
+  box-shadow:
+    0 0 0 1px rgba(20, 107, 72, .2),
+    var(--pm-btn-shadow) !important;
+}
+
+html[data-theme] body #root .cu-nav-cta:hover,
+html[data-theme] body #root .cu-btn:hover,
+html[data-theme] body #root .submit:hover,
+html[data-theme] body #root .cu-form .cu-form-submit:hover,
+html[data-theme] body #root .cu-decide-copy .cu-btn:hover,
+html[data-theme] body #root .elo-contact-form button:hover {
+  background: var(--pm-control-primary-hover-bg) !important;
+  color: var(--pm-control-primary-hover-fg) !important;
+  box-shadow: var(--pm-btn-shadow-hover) !important;
+}
+
+/* Case-study / booking CTA: mint surface, ink label, visible arrow circle. */
+html[data-theme] body #root .tcx-btn,
+html[data-theme] body #root .tcx-btn-white,
+html[data-theme] body #root .tcx-cta .tcx-btn,
+html[data-theme] body #root .tcx-cta .tcx-btn-white {
+  background: var(--pm-control-primary-bg) !important;
+  border-color: var(--pm-control-primary-bg) !important;
+  color: var(--pm-control-primary-fg) !important;
+  box-shadow:
+    0 0 0 1px rgba(20, 107, 72, .22),
+    0 12px 30px -14px rgba(20, 107, 72, .42) !important;
+}
+
+html[data-theme] body #root .tcx-btn .tcx-btn-icon,
+html[data-theme] body #root .tcx-btn-white .tcx-btn-icon,
+html[data-theme] body #root .tcx-cta .tcx-btn .tcx-btn-icon {
+  display: inline-grid !important;
+  place-items: center !important;
+  background: var(--pm-btn-ink) !important;
+}
+
+html[data-theme] body #root .tcx-btn .tcx-btn-arrows,
+html[data-theme] body #root .tcx-btn-white .tcx-btn-arrows,
+html[data-theme] body #root .tcx-cta .tcx-btn .tcx-btn-arrows {
+  color: var(--pm-btn-mint) !important;
+}
+
+html[data-theme] body #root .tcx-btn:hover,
+html[data-theme] body #root .tcx-btn-white:hover,
+html[data-theme] body #root .tcx-cta .tcx-btn:hover,
+html[data-theme] body #root .tcx-cta .tcx-btn-white:hover {
+  background: var(--pm-control-primary-hover-bg) !important;
+  border-color: var(--pm-control-primary-hover-bg) !important;
+  color: var(--pm-control-primary-hover-fg) !important;
+}
+
+html[data-theme] body #root .tcx-btn:hover .tcx-btn-icon,
+html[data-theme] body #root .tcx-btn-white:hover .tcx-btn-icon,
+html[data-theme] body #root .tcx-cta .tcx-btn:hover .tcx-btn-icon {
+  background: var(--pm-btn-white) !important;
+}
+
+html[data-theme] body #root .tcx-btn:hover .tcx-btn-arrows,
+html[data-theme] body #root .tcx-btn-white:hover .tcx-btn-arrows,
+html[data-theme] body #root .tcx-cta .tcx-btn:hover .tcx-btn-arrows {
+  color: var(--pm-btn-forest) !important;
+}
+
+/* Footer and round controls must never inherit the surrounding black fill. */
+html[data-theme] body #root .subscribe-action,
+html[data-theme] body #root footer .subscribe-action,
+html[data-theme] body #root .to-top,
+html[data-theme] body #root .footer-bottom .to-top,
+html[data-theme] body #root .elo-footer-bottom > a,
+html[data-theme] body #root .track-control button,
+html[data-theme] body #root .svc-slider-controls button {
+  background: var(--pm-control-primary-bg) !important;
+  color: var(--pm-control-primary-fg) !important;
+  border-color: var(--pm-btn-forest) !important;
+  box-shadow:
+    0 0 0 1px rgba(20, 107, 72, .34),
+    0 8px 22px rgba(20, 107, 72, .18) !important;
+}
+
+html[data-theme] body #root .subscribe-action:hover,
+html[data-theme] body #root footer .subscribe-action:hover,
+html[data-theme] body #root .to-top:hover,
+html[data-theme] body #root .footer-bottom .to-top:hover,
+html[data-theme] body #root .elo-footer-bottom > a:hover,
+html[data-theme] body #root .track-control button:hover,
+html[data-theme] body #root .svc-slider-controls button:hover {
+  background: var(--pm-control-primary-hover-bg) !important;
+  color: var(--pm-control-primary-hover-fg) !important;
+  border-color: var(--pm-control-primary-hover-bg) !important;
+  box-shadow: var(--pm-btn-shadow-hover) !important;
+}
+
+html[data-theme] body #root .subscribe-action svg {
+  display: block !important;
+  stroke: currentColor !important;
+  fill: none !important;
+  opacity: 1 !important;
+}
+
+/* Remaining button-shaped controls use explicit, contrast-safe soft states. */
+html[data-theme] body #root .menu,
+html[data-theme] body #root .theme-toggle,
+html[data-theme] body #root .who-mute,
+html[data-theme] body #root .faq-item button i,
+html[data-theme] body #root .svc-faq-item button i {
+  background: var(--pm-control-soft-bg) !important;
+  color: var(--pm-control-soft-fg) !important;
+}
+
+html[data-theme] body #root .menu:hover,
+html[data-theme] body #root .theme-toggle:hover,
+html[data-theme] body #root .who-mute:hover,
+html[data-theme] body #root .faq-item button:hover i,
+html[data-theme] body #root .svc-faq-item button:hover i,
+html[data-theme] body #root .faq-item.active button i,
+html[data-theme] body #root .svc-faq-item.is-open button i {
+  background: var(--pm-control-primary-bg) !important;
+  color: var(--pm-control-primary-fg) !important;
+}
+
+html[data-theme] body #root .svc-pill-link,
+html[data-theme] body #root .svc-all-projects a,
+html[data-theme] body #root .choices button {
+  background: var(--pm-control-soft-bg) !important;
+  color: var(--pm-control-soft-fg) !important;
+}
+
+html[data-theme] body #root .svc-pill-link:hover,
+html[data-theme] body #root .svc-all-projects a:hover,
+html[data-theme] body #root .choices button:hover {
+  background: var(--pm-control-secondary-bg) !important;
+  color: var(--pm-control-secondary-fg) !important;
+}
+
+/* Section title contrast contract. The fidelity stylesheet uses explicit black
+ * labels for its light design; these selectors are the final dark-mode layer
+ * so labels and titles never disappear against the black section surfaces. */
+html[data-theme="dark"] body #root main .eyebrow,
+html[data-theme="dark"] body #root main .section-lead > span,
+html[data-theme="dark"] body #root main .contact-lead > span,
+html[data-theme="dark"] body #root main .svc-dot-label,
+html[data-theme="dark"] body #root main .ind-dot-label,
+html[data-theme="dark"] body #root main .who-headline,
+html[data-theme="dark"] body #root main .clients h2,
+html[data-theme="dark"] body #root main .services-head h2,
+html[data-theme="dark"] body #root main .pm-cases-head h2,
+html[data-theme="dark"] body #root main .testimonial-head h2,
+html[data-theme="dark"] body #root main .faq h2,
+html[data-theme="dark"] body #root main .tcx-error-heading,
+html[data-theme="dark"] body #root main .tcx-cmp-heading,
+html[data-theme="dark"] body #root main .tcx-cta-heading,
+html[data-theme="dark"] body #root .ind-main .ind-h1,
+html[data-theme="dark"] body #root .ind-main .ind-h2 {
+  color: #fff !important;
+}
+
+/* Text shown alongside the footer controls in the supplied dark-mode example. */
+html[data-theme='light'] body #root footer .subscribe input::placeholder {
+  color: #55615b !important;
+  opacity: 1;
+}
+
+html[data-theme='light'] body #root footer .subscribe small,
+html[data-theme='light'] body #root footer .footer-bottom > span {
+  color: #4b5751 !important;
+}
+
+html[data-theme='dark'] body #root footer .subscribe input::placeholder {
+  color: #aeb9b2 !important;
+  opacity: 1;
+}
+
+html[data-theme='dark'] body #root footer .subscribe small,
+html[data-theme='dark'] body #root footer .footer-bottom > span {
+  color: #b8c2bc !important;
+}
+
+/* Service-row hover correction: restrained tint and one centered arrow. */
+html[data-theme] body #root .service-list a::before,
+html[data-theme] body #root .svc-hub-row::before {
+  background: linear-gradient(
+    90deg,
+    rgba(103, 224, 163, .18),
+    rgba(175, 249, 201, .1)
+  ) !important;
+}
+
+html[data-theme='light'] body #root .service-list a:hover,
+html[data-theme='light'] body #root .svc-hub-row:hover,
+html[data-theme='light'] body #root .is-hub .svc-hub-row:hover {
+  background: rgba(103, 224, 163, .08) !important;
+  color: var(--pm-btn-ink) !important;
+}
+
+html[data-theme='dark'] body #root .service-list a::before,
+html[data-theme='dark'] body #root .svc-hub-row::before {
+  background: linear-gradient(
+    90deg,
+    rgba(20, 107, 72, .3),
+    rgba(103, 224, 163, .08)
+  ) !important;
+}
+
+html[data-theme='dark'] body #root .service-list a:hover,
+html[data-theme='dark'] body #root .svc-hub-row:hover,
+html[data-theme='dark'] body #root .is-hub .svc-hub-row:hover {
+  background: rgba(20, 107, 72, .12) !important;
+  color: var(--pm-btn-white) !important;
+}
+
+html[data-theme='dark'] body #root .service-list a:hover > span,
+html[data-theme='dark'] body #root .service-list a:hover > b,
+html[data-theme='dark'] body #root .svc-hub-row:hover .svc-hub-num,
+html[data-theme='dark'] body #root .svc-hub-row:hover b,
+html[data-theme='dark'] body #root .svc-hub-row:hover p {
+  color: var(--pm-btn-white) !important;
+}
+
+html[data-theme] body #root .service-list a > i,
+html[data-theme] body #root .svc-hub-row > i {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 auto;
+  overflow: hidden !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(103, 224, 163, .16) !important;
+  color: var(--pm-btn-ink) !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  transform: none !important;
+  transition: background-color .28s ease, color .28s ease !important;
+}
+
+html[data-theme] body #root .service-list a > i em,
+html[data-theme] body #root .svc-hub-row > i em {
+  display: none !important;
+}
+
+html[data-theme] body #root .service-list a > i::after,
+html[data-theme] body #root .svc-hub-row > i::after {
+  content: '→';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0 0 .06em;
+  color: currentColor;
+  font-family: Arial, sans-serif;
+  font-size: 1.05rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+}
+
+html[data-theme] body #root .service-list a:hover > i,
+html[data-theme] body #root .svc-hub-row:hover > i {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  transform: none !important;
+}
+
+/* Testimonial hover correction: quote and LinkedIn badge stay legible. */
+html[data-theme='light'] body #root .testimonials .testimonial-track article::before,
+html[data-theme='light'] body #root .testimonials .testimonial-track article:hover::before {
+  color: var(--pm-btn-forest) !important;
+  opacity: 1 !important;
+  transform: none !important;
+  text-shadow: none !important;
+}
+
+html[data-theme='dark'] body #root .testimonials .testimonial-track article::before,
+html[data-theme='dark'] body #root .testimonials .testimonial-track article:hover::before {
+  color: var(--pm-btn-mint) !important;
+  opacity: 1 !important;
+  transform: none !important;
+  text-shadow: 0 0 18px rgba(103, 224, 163, .14) !important;
+}
+
+html[data-theme] body #root .testimonials .person i,
+html[data-theme] body #root .svc-testimonial-person i {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  font-family: Arial, sans-serif !important;
+  font-size: .78rem !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  letter-spacing: -.04em;
+  line-height: 1 !important;
+  text-align: center !important;
+  transform: none !important;
+  transition: background-color .28s ease, color .28s ease, box-shadow .28s ease !important;
+}
+
+html[data-theme='light'] body #root .testimonials .person i,
+html[data-theme='light'] body #root .svc-testimonial-person i {
+  background: var(--pm-btn-celadon) !important;
+  color: var(--pm-btn-ink) !important;
+  box-shadow: 0 0 0 1px rgba(20, 107, 72, .18) !important;
+}
+
+html[data-theme='light'] body #root .testimonials .testimonial-track article:hover .person i,
+html[data-theme='light'] body #root .svc-testimonial-track article:hover .svc-testimonial-person i {
+  background: var(--pm-btn-forest) !important;
+  color: var(--pm-btn-white) !important;
+  box-shadow: 0 8px 20px rgba(20, 107, 72, .2) !important;
+  transform: none !important;
+}
+
+html[data-theme='dark'] body #root .testimonials .person i,
+html[data-theme='dark'] body #root .svc-testimonial-person i {
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  box-shadow: 0 0 0 1px rgba(124, 240, 189, .22) !important;
+}
+
+html[data-theme='dark'] body #root .testimonials .testimonial-track article:hover .person i,
+html[data-theme='dark'] body #root .svc-testimonial-track article:hover .svc-testimonial-person i {
+  background: var(--pm-btn-aqua) !important;
+  color: var(--pm-btn-ink) !important;
+  box-shadow: 0 8px 22px rgba(103, 224, 163, .18) !important;
+  transform: none !important;
+}
+
+/* ========================================================================
+   SOFT ELEVATION AUDIT
+
+   Keep depth close to the surface. The previous unspread 8px/24px shadows
+   created a visible rectangular halo around pills and pale cards, especially
+   where they sat on white. Menus and popovers are intentionally excluded:
+   those floating layers still need stronger separation from page content.
+   ======================================================================== */
+
+html[data-theme] body #root {
+  --pm-elevation-control: 0 5px 14px -10px rgba(8, 13, 16, .18);
+  --pm-elevation-control-hover: 0 10px 24px -14px rgba(8, 13, 16, .24);
+  --pm-elevation-card: 0 12px 30px -24px rgba(16, 50, 31, .16);
+  --pm-elevation-card-hover: 0 18px 38px -26px rgba(16, 50, 31, .22);
+}
+
+html[data-theme='dark'] body #root {
+  --pm-elevation-control: 0 6px 16px -11px rgba(0, 0, 0, .48);
+  --pm-elevation-control-hover: 0 11px 26px -15px rgba(0, 0, 0, .58);
+  --pm-elevation-card: 0 14px 32px -24px rgba(0, 0, 0, .48);
+  --pm-elevation-card-hover: 0 20px 42px -26px rgba(0, 0, 0, .6);
+}
+
+/* Button-shaped controls: no outer ring and no broad gray halo. */
+html[data-theme] body #root :is(
+  .pill-light,
+  .pill-dark,
+  .pm-case-cta,
+  .cu-nav-cta,
+  .cu-btn,
+  .submit,
+  .elo-contact-form button,
+  .tcx-btn,
+  .tcx-btn-white,
+  .subscribe-action,
+  .to-top,
+  .elo-footer-bottom > a,
+  .track-control button,
+  .svc-slider-controls button
+) {
+  box-shadow: var(--pm-elevation-control) !important;
+}
+
+html[data-theme] body #root :is(
+  .pill-light,
+  .pill-dark,
+  .pm-case-cta,
+  .cu-nav-cta,
+  .cu-btn,
+  .submit,
+  .elo-contact-form button,
+  .tcx-btn,
+  .tcx-btn-white,
+  .subscribe-action,
+  .to-top,
+  .elo-footer-bottom > a,
+  .track-control button,
+  .svc-slider-controls button
+):hover {
+  box-shadow: var(--pm-elevation-control-hover) !important;
+}
+
+/* Match the higher-specificity route rules that style these same controls. */
+html[data-theme] body #root :is(
+  .header .pill,
+  .pm-landing-hero .hero-action .pill,
+  .svc-page .pill,
+  .ind-main .pill,
+  .pm-case.is-inview .pm-case-cta,
+  .tcx-cta .tcx-btn,
+  .cu-decide-copy .cu-btn,
+  .cu-form .cu-form-submit
+) {
+  box-shadow: var(--pm-elevation-control) !important;
+}
+
+html[data-theme] body #root :is(
+  .header .pill,
+  .pm-landing-hero .hero-action .pill,
+  .svc-page .pill,
+  .ind-main .pill,
+  .pm-case.is-inview .pm-case-cta,
+  .tcx-cta .tcx-btn,
+  .cu-decide-copy .cu-btn,
+  .cu-form .cu-form-submit
+):hover {
+  box-shadow: var(--pm-elevation-control-hover) !important;
+}
+
+html[data-theme] body #root :is(.menu, .theme-toggle) {
+  border: 1px solid rgba(20, 107, 72, .2) !important;
+  box-shadow: var(--pm-elevation-control) !important;
+}
+
+html[data-theme='dark'] body #root :is(.menu, .theme-toggle) {
+  border-color: rgba(103, 224, 163, .22) !important;
+}
+
+html[data-theme] body #root :is(.menu, .theme-toggle):hover {
+  box-shadow: var(--pm-elevation-control-hover) !important;
+}
+
+/* Header actions share one primary CTA treatment. */
+html[data-theme] body #root .header .theme-toggle {
+  background: var(--pm-control-primary-bg) !important;
+  color: var(--pm-control-primary-fg) !important;
+  border-color: rgba(20, 107, 72, .2) !important;
+  box-shadow: var(--pm-elevation-control) !important;
+}
+
+html[data-theme] body #root .header .theme-toggle:hover {
+  background: var(--pm-control-primary-hover-bg) !important;
+  color: var(--pm-control-primary-hover-fg) !important;
+  border-color: var(--pm-control-primary-hover-bg) !important;
+  box-shadow: var(--pm-elevation-control-hover) !important;
+}
+
+@media (max-width: 900px) {
+  html[data-theme] body #root .pm-landing-hero .hero-action .pill {
+    min-height: 50px !important;
+    padding: 12px 14px 12px 18px !important;
+    gap: 8px !important;
+    font-size: 16px !important;
+  }
+
+  html[data-theme] body #root .pm-landing-hero .hero-action .pill-icon-shell {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  html[data-theme] body #root .pm-landing-hero .hero-action .pill-icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
+
+/* Repeated card families use one restrained elevation scale. */
+html[data-theme] body #root :is(
+  .testimonials .testimonial-track article,
+  .svc-testimonial-track article,
+  .faq-item,
+  .svc-faq-item,
+  .svc-featured-card,
+  .svc-numbers-grid article,
+  .svc-stats-grid article,
+  .svc-process-grid article,
+  .svc-related-grid a,
+  .cu-form-card,
+  .cu-expect,
+  .cu-expect-item,
+  .cu-tcard,
+  .cu-change-card,
+  .cu-pipe-card,
+  .cu-decide-inner,
+  .ind-approach-card,
+  .ind-work-media,
+  .ind-more-tile,
+  .pm-case
+) {
+  box-shadow: var(--pm-elevation-card) !important;
+}
+
+html[data-theme] body #root :is(
+  .testimonials .testimonial-track article,
+  .svc-testimonial-track article,
+  .faq-item,
+  .svc-faq-item,
+  .svc-featured-card,
+  .svc-numbers-grid article,
+  .svc-stats-grid article,
+  .svc-process-grid article,
+  .svc-related-grid a,
+  .cu-expect-item,
+  .ind-approach-card,
+  .ind-more-tile,
+  .pm-case
+):hover {
+  box-shadow: var(--pm-elevation-card-hover) !important;
+}
+
+/* Small badges should read as flat controls, not floating bubbles. */
+html[data-theme] body #root :is(
+  .testimonials .person i,
+  .svc-testimonial-person i,
+  .pill-icon-shell
+) {
+  box-shadow: none !important;
+}
+
+/* Dark service-list arrows use the same primary CTA colors as other buttons. */
+html[data-theme='dark'] body #root .service-list a > i {
+  background: var(--pm-control-primary-bg) !important;
+  color: var(--pm-control-primary-fg) !important;
+}
+
+html[data-theme='dark'] body #root .service-list a:hover > i {
+  background: var(--pm-control-primary-hover-bg) !important;
+  color: var(--pm-control-primary-hover-fg) !important;
+}
+
+/* Desktop booking CTA: use the full panel and let its artwork fill the right half. */
+@media (min-width: 992px) {
+  html[data-theme] body #root .tcx.tcx-cta {
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: var(--soft-card) !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  html[data-theme] body #root .tcx-cta-content {
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: inherit !important;
+  }
+
+  html[data-theme] body #root .tcx-cta-inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  }
+
+  html[data-theme] body #root .tcx-cta-left {
+    max-width: none !important;
+    padding: clamp(2.5rem, 5vw, 5rem) !important;
+  }
+
+  html[data-theme] body #root .tcx-cta-visual {
+    width: 100% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+
+html[data-theme] body #root .tcx-cta-visual img {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* Keep the footer wordmark legible on dark surfaces. */
+html[data-theme='dark'] body #root footer .logo-wordmark,
+html[data-theme='dark'] body #root footer .logo-wordmark b,
+html[data-theme='dark'] body #root footer .logo-wordmark em {
+  color: var(--pm-btn-white) !important;
+}
+
+/*
+ * Homepage service rows — reference hover geometry.
+ * Desktop tracks: 35rem number | flexible title | 13.04rem arrow.
+ * Hover pulls every control 1.5rem inward while the tint rises from below.
+ */
+@media (min-width: 1101px) {
+  html[data-theme] body #root .services {
+    --svc-num: 35rem;
+    --svc-title: minmax(0, 1fr);
+    --svc-arrow: 13.04rem;
+  }
+
+  html[data-theme] body #root .service-list a {
+    grid-template-columns: var(--svc-cols) !important;
+    padding: 1rem 0 !important;
+    border-radius: .25rem !important;
+    background: transparent !important;
+  }
+
+  html[data-theme] body #root .service-list a::before {
+    inset: 0 !important;
+    border-radius: .25rem !important;
+    transform: scaleY(.01) !important;
+    transform-origin: center bottom !important;
+    transition: transform .6s ease !important;
+  }
+
+  html[data-theme] body #root .service-list a:hover,
+  html[data-theme='light'] body #root .service-list a:hover,
+  html[data-theme='dark'] body #root .service-list a:hover {
+    background: transparent !important;
+    border-radius: .25rem !important;
+  }
+
+  html[data-theme] body #root .service-list a:hover::before {
+    transform: scaleY(1) !important;
+  }
+
+  html[data-theme] body #root .service-list a > span,
+  html[data-theme] body #root .service-list a > b {
+    transform: translate3d(0, 0, 0) !important;
+    transition: transform .4s ease, color .35s ease !important;
+  }
+
+  html[data-theme] body #root .service-list a > span {
+    font-size: 1rem !important;
+  }
+
+  html[data-theme] body #root .service-list a > b {
+    font-size: 2rem !important;
+  }
+
+  html[data-theme] body #root .service-list a:hover > span,
+  html[data-theme] body #root .service-list a:hover > b {
+    transform: translate3d(1.5rem, 0, 0) !important;
+  }
+
+  html[data-theme] body #root .service-list a > i {
+    transform: translate3d(0, 0, 0) !important;
+    transition: transform .4s ease, background-color .28s ease, color .28s ease !important;
+  }
+
+  html[data-theme] body #root .service-list a:hover > i {
+    transform: translate3d(-1.5rem, 0, 0) !important;
+  }
+}

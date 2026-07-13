@@ -1,0 +1,95 @@
+/* Header scale and motion matched to the Eloqwnt reference behavior. */
+.header {
+  padding-inline: 4.75rem !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition:
+    transform .65s cubic-bezier(.16, 1, .3, 1),
+    background-color .3s ease,
+    box-shadow .3s ease !important;
+  will-change: transform;
+}
+
+.header.header-hidden {
+  transform: translate3d(0, calc(-100% - 2px), 0) !important;
+}
+
+.header:not(.header-hidden) {
+  transform: translate3d(0, 0, 0) !important;
+}
+
+.header .header-actions > .pill,
+.header .header-actions > .theme-toggle {
+  height: 3.2rem !important;
+  box-sizing: border-box !important;
+}
+
+.header .header-actions > .theme-toggle {
+  width: 3.2rem !important;
+  min-width: 3.2rem !important;
+  padding: 0 !important;
+}
+
+/* The reference header is immediately present; motion belongs to scrolling. */
+.header .logo-link,
+.header .nav > *,
+.header .header-actions {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition: none !important;
+}
+
+@media (min-width: 901px) {
+  .header .logo-lockup {
+    gap: 14.4px !important;
+  }
+
+  .header .logo-lockup-mark {
+    width: 57.6px !important;
+    height: 57.6px !important;
+  }
+
+  .header .logo-wordmark {
+    font-size: 30px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .header {
+    height: 72px !important;
+    padding-inline: 16px !important;
+  }
+
+  .header .logo-lockup {
+    gap: 8px !important;
+  }
+
+  .header .logo-lockup-mark {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .header .logo-wordmark {
+    font-size: 17px !important;
+  }
+
+  .header .menu {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 18px !important;
+  }
+
+  .header .header-actions > .theme-toggle {
+    width: 2.65rem !important;
+    min-width: 2.65rem !important;
+    height: 2.65rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .header .logo-link,
+  .header .nav > *,
+  .header .header-actions {
+    transition-duration: .01ms !important;
+  }
+}

@@ -234,7 +234,10 @@ main {
   gap: 2rem !important;
   padding: 0 !important;
   flex: 1 !important;
-  justify-content: center !important;
+  /* Stay centered on tall screens, but pin below the header when the stacked
+     hero content is taller than the viewport so the headline can never render
+     under the nav. */
+  justify-content: safe center !important;
 }
 .hero-title {
   font-size: clamp(2rem, 3.9vw, 3.5rem) !important; /* ~56px */
@@ -771,7 +774,6 @@ body.cu-active {
   backdrop-filter: blur(12px);
 }
 .cu-hero,
-.cu-expect,
 .cu-form-card {
   background: #fff !important;
   border-radius: var(--standart-section-radius) !important;
@@ -882,5 +884,160 @@ html[data-theme='dark'] .testimonial-track article {
   }
   .ind-hero-fs {
     padding: 0 1rem !important;
+  }
+}
+
+/* Challenge section — the Eloqwnt light surface override turns .tcx white,
+   so its original light-on-dark text token must switch with the theme too. */
+.tcx.tcx-error {
+  --tcx-text: #0f1518;
+  --tcx-line: rgba(15, 21, 24, 0.24);
+  background: #fff !important;
+  width: calc(100% + var(--pad-standart) + var(--pad-standart)) !important;
+  max-width: none !important;
+  margin-left: calc(-1 * var(--pad-standart)) !important;
+  margin-right: calc(-1 * var(--pad-standart)) !important;
+  border-radius: 0 !important;
+  /* Sticky descendants cannot stick inside the global .tcx overflow:hidden
+     override. This section's artwork already stays within its own bounds. */
+  overflow: visible !important;
+}
+html[data-theme='dark'] .tcx.tcx-error {
+  --tcx-text: #e7edf0;
+  --tcx-line: #182223;
+  background: #0a0a0a !important;
+}
+
+/* ==========================================================================
+   "Why us" comparison table — theme-aware rebuild
+   The .tcx family was authored as an always-dark component, but the
+   "white cards on grey canvas" flatten above forces .tcx white in BOTH
+   themes (it is missing from the dark-theme restore list). Siblings survive
+   because they carry their own dark inner card; the comparison table has
+   none, so its light-on-dark text collapsed on white. This block gives the
+   table its own theme tokens so it reads on-brand in light and dark.
+   ========================================================================== */
+.tcx.tcx-cmp {
+  --cmp-heading-fg: #0f1518;
+  --cmp-em-fg: #146b48;
+  --cmp-tag-fg: #146b48;
+  --cmp-tag-border: rgba(20, 107, 72, 0.38);
+  --cmp-tag-bg: #eef8f1;
+  --cmp-hair: #e6ece8;
+  --cmp-label-fg: #0f1518;
+  --cmp-us-bg: #eef8f1;
+  --cmp-us-fg: #173a2b;
+  --cmp-us-ring: rgba(20, 107, 72, 0.16);
+  --cmp-us-head-fg: #0f1518;
+  --cmp-chip-bg: #146b48;
+  --cmp-chip-fg: #ffffff;
+  --cmp-them-fg: #69736d;
+  --cmp-them-head-fg: #0f1518;
+  background: #fff !important;
+}
+html[data-theme='dark'] .tcx.tcx-cmp {
+  --cmp-heading-fg: #e7edf0;
+  --cmp-em-fg: #abe5b1;
+  --cmp-tag-fg: #abe5b1;
+  --cmp-tag-border: rgba(171, 229, 177, 0.55);
+  --cmp-tag-bg: rgba(171, 229, 177, 0.06);
+  --cmp-hair: rgba(255, 255, 255, 0.08);
+  --cmp-label-fg: #e7edf0;
+  --cmp-us-bg: rgba(171, 229, 177, 0.09);
+  --cmp-us-fg: #e7edf0;
+  --cmp-us-ring: rgba(171, 229, 177, 0.2);
+  --cmp-us-head-fg: #ffffff;
+  --cmp-chip-bg: #abe5b1;
+  --cmp-chip-fg: #0f1518;
+  --cmp-them-fg: rgba(231, 237, 240, 0.55);
+  --cmp-them-head-fg: #e7edf0;
+  background: #0a0a0a !important;
+}
+
+/* Header: heading, brand accent, and tag pill */
+.tcx-cmp .tcx-cmp-heading { color: var(--cmp-heading-fg) !important; }
+.tcx-cmp .tcx-cmp-heading em { color: var(--cmp-em-fg) !important; }
+.tcx-cmp .tcx-tag {
+  color: var(--cmp-tag-fg) !important;
+  border-color: var(--cmp-tag-border) !important;
+  background: var(--cmp-tag-bg) !important;
+}
+
+/* Shared cell colors (desktop grid + mobile cards read the same tokens) */
+.tcx-cmp .tcx-cmp-label { color: var(--cmp-label-fg) !important; }
+.tcx-cmp .tcx-cmp-us {
+  background: var(--cmp-us-bg) !important;
+  color: var(--cmp-us-fg) !important;
+}
+.tcx-cmp .tcx-cmp-us-text {
+  color: var(--cmp-us-fg) !important;
+  font-weight: 500 !important;
+}
+.tcx-cmp .tcx-cmp-brand .logo-wordmark { color: var(--cmp-us-head-fg) !important; }
+.tcx-cmp .tcx-cmp-them { color: var(--cmp-them-fg) !important; }
+.tcx-cmp .tcx-cmp-them-title { color: var(--cmp-them-head-fg) !important; }
+
+/* Check chip — compact brand tile instead of a full-height block */
+.tcx-cmp .tcx-cmp-check {
+  padding: 0 !important;
+  border-radius: 9px !important;
+  background: var(--cmp-chip-bg) !important;
+  color: var(--cmp-chip-fg) !important;
+}
+
+/* Desktop grid: highlighted "us" column with rounded ends + row hairlines */
+@media (min-width: 901px) {
+  .tcx-cmp .tcx-cmp-table { border-bottom: 1px solid var(--cmp-hair) !important; }
+  .tcx-cmp .tcx-cmp-label,
+  .tcx-cmp .tcx-cmp-them { border-top: 1px solid var(--cmp-hair) !important; }
+  .tcx-cmp .tcx-cmp-us {
+    gap: 1rem !important;
+    padding: 1.15rem 1.9rem !important;
+    align-items: center !important;
+    border-top: 1px solid var(--cmp-hair) !important;
+    border-left: 1px solid var(--cmp-us-ring) !important;
+    border-right: 1px solid var(--cmp-us-ring) !important;
+  }
+  .tcx-cmp .tcx-cmp-us-text { max-width: 34ch !important; padding: 0 !important; }
+  .tcx-cmp .tcx-cmp-us.tcx-cmp-row-head {
+    padding: 1.4rem !important;
+    border-top: 1px solid var(--cmp-us-ring) !important;
+    border-radius: 18px 18px 0 0 !important;
+  }
+  .tcx-cmp .tcx-cmp-us:nth-last-child(2) {
+    border-bottom: 1px solid var(--cmp-us-ring) !important;
+    border-radius: 0 0 18px 18px !important;
+  }
+  .tcx-cmp .tcx-cmp-check {
+    align-self: center !important;
+    width: 1.9rem !important;
+    min-width: 1.9rem !important;
+    height: 1.9rem !important;
+  }
+  .tcx-cmp .tcx-cmp-check svg { max-width: 12px !important; }
+}
+
+/* Mobile stacked cards: label chip on top, tinted answer card below */
+@media (max-width: 900px) {
+  .tcx-cmp .tcx-cmp-label {
+    background: var(--cmp-us-bg) !important;
+    border: 1px solid var(--cmp-hair) !important;
+    border-bottom: 0 !important;
+    color: var(--cmp-tag-fg) !important;
+  }
+  .tcx-cmp .tcx-cmp-us:not(.tcx-cmp-row-head) {
+    border: 1px solid var(--cmp-hair) !important;
+    border-top: 0 !important;
+  }
+  .tcx-cmp .tcx-cmp-us.tcx-cmp-row-head {
+    background: transparent !important;
+    border: 0 !important;
+  }
+  .tcx-cmp .tcx-cmp-check {
+    align-self: flex-start !important;
+    width: 1.75rem !important;
+    min-width: 1.75rem !important;
+    height: 1.75rem !important;
+    border-radius: 8px !important;
   }
 }

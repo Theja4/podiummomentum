@@ -402,20 +402,50 @@ body,main{background:var(--paper)}
 .project-media:hover{transform:translate(-3px,-3px)}
 .stats strong{text-decoration:underline;text-decoration-color:var(--aquamarine);text-decoration-thickness:5px;text-underline-offset:7px}
 .explore{border-bottom:2px solid var(--emerald)}
-.clients{background:#fff;position:relative}
+@property --clients-corner-edge{
+  syntax:"<color>";
+  inherits:true;
+  initial-value:#146b48;
+}
+@property --clients-corner-mid{
+  syntax:"<color>";
+  inherits:true;
+  initial-value:#67e0a3;
+}
+@property --clients-corner-tip{
+  syntax:"<color>";
+  inherits:true;
+  initial-value:#aff9c9;
+}
+.clients{
+  /* Light mode: a quieter, fully opaque green corner accent. */
+  --clients-corner-edge:#4d9772;
+  --clients-corner-mid:#8bd9ad;
+  --clients-corner-tip:#c7efd8;
+  background:#fff;
+  position:relative;
+  transition:
+    background-color .45s ease,
+    color .35s ease,
+    border-color .35s ease,
+    --clients-corner-edge .45s ease,
+    --clients-corner-mid .45s ease,
+    --clients-corner-tip .45s ease;
+}
 .clients:after{
   content:"";
   position:absolute;
   right:0;bottom:0;
   width:9.5rem;height:9.5rem;
-  /* Opaque brand triangle: emerald → aquamarine → celadon */
+  /* Component-scoped colors stay branded even when the fidelity theme remaps
+     the site's global accent tokens to monochrome. */
   background:
     linear-gradient(
       135deg,
       transparent 0 48%,
-      var(--emerald) 52%,
-      var(--aquamarine) 72%,
-      var(--celadon) 100%
+      var(--clients-corner-edge) 50%,
+      var(--clients-corner-mid) 72%,
+      var(--clients-corner-tip) 100%
     );
   border-radius:0 0 var(--radius) 0;
   pointer-events:none;
@@ -547,6 +577,9 @@ html[data-theme="dark"] .hero-band,html[data-theme="dark"] .hero-trust{border-co
 html[data-theme="dark"] .hero-video{border-color:#2b6345;box-shadow:12px 12px 0 #0d2c1c}
 html[data-theme="dark"] .who-brand-thumb{background:radial-gradient(circle at 72% 24%,rgba(103,224,163,.11),transparent 38%),linear-gradient(145deg,#050806 0%,#0a1710 54%,#102c1d 100%)}
 html[data-theme="dark"] .who-hi{color:#c7d1cb}
+/* Keep the reusable showreel wordmark legible in every dark thumbnail.
+   The fidelity layer gives the global wordmark a black !important color. */
+html[data-theme="dark"] .who-brand-thumb .logo-wordmark{color:#f4f7f5!important}
 html[data-theme="dark"] .hero-rating-avatars{border-right-color:#1d2721}
 html[data-theme="dark"] .hero-rating-avatars img{border-color:#000;background:#111;box-shadow:0 3px 12px rgba(0,0,0,.5)}
 html[data-theme="dark"] .hero-rating-score{color:#f6f8f6}
@@ -565,17 +598,13 @@ html[data-theme="dark"] .work-wrap{background:linear-gradient(180deg,#000 0%,#06
 html[data-theme="dark"] .project{border-color:#242d28}
 html[data-theme="dark"] .project-media{border-color:#39453e;box-shadow:10px 10px 0 #102c1d!important}
 html[data-theme="dark"] .stats strong{text-decoration-color:rgba(124,240,189,.58)}
-html[data-theme="dark"] .clients{background:#040504;border-color:#1d2721}
-html[data-theme="dark"] .clients:after{
-  /* Opaque brand gradient on dark */
-  background:
-    linear-gradient(
-      135deg,
-      transparent 0 46%,
-      var(--brand-forest,#146b48) 52%,
-      var(--emerald) 72%,
-      var(--aquamarine) 100%
-    );
+html[data-theme="dark"] .clients{
+  /* Bright mint edge against the dark card, settling into brand forest. */
+  --clients-corner-edge:#aff9c9;
+  --clients-corner-mid:#67e0a3;
+  --clients-corner-tip:#146b48;
+  background:#040504;
+  border-color:#1d2721;
 }
 html[data-theme="dark"] .services,html[data-theme="dark"] .testimonials{background:#060806;border-color:#202a24}
 html[data-theme="dark"] .service-list a{border-bottom-color:#252e29}
@@ -732,7 +761,12 @@ html[data-theme="dark"] .who-btm .who-logo{background:#fff;border-color:rgba(103
 .tcx{--tcx-bg:#0f1518;--tcx-panel:#101619;--tcx-line:#182223;--tcx-border:#243740;--tcx-green:#abe5b1;--tcx-green-dim:#81bb87;--tcx-green-soft:#e7f6ea;--tcx-text:#e7edf0;--tcx-muted:rgba(231,237,240,.6);--tcx-red:#f65443;--tcx-tline:rgba(120,161,124,.4);position:relative;margin:0 calc(var(--gutter) * -1);background:var(--tcx-bg);color:var(--tcx-text);overflow:clip}
 /* Breathing room between the About panel and the Challenge band (main's flex
    gap alone read as flush against the About panel's white fill). */
-.tcx-error{margin-top:76px}
+.tcx-error{
+  /* The global page shell is a flex column and .tcx receives auto side
+     margins, so this section otherwise shrink-wraps to its heading width. */
+  width:100%;
+  margin-top:76px;
+}
 .tcx-tag{display:inline-block;width:max-content;margin-bottom:2rem;padding:.375rem .6875rem;border:1px solid var(--tcx-green);color:var(--tcx-green);font-family:'DM Mono',ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.75rem;line-height:1;letter-spacing:.08em;text-transform:uppercase}
 .tcx-tag-red{color:var(--tcx-red);border-color:var(--tcx-red)}
 .tcx-divider{position:relative;display:flex;justify-content:center;align-items:center;width:1px;height:100%;background:var(--tcx-line)}
@@ -759,27 +793,30 @@ html[data-theme="dark"] .who-btm .who-logo{background:#fff;border-color:rgba(103
 .tcx-error-sticky{position:sticky;top:0;display:flex;flex-direction:column;align-items:center;height:100vh;padding:5.5rem 5% 0}
 .tcx-error-head{z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center}
 .tcx-error-heading{max-width:17ch;margin:0;color:var(--tcx-text);font-size:3.25rem;font-weight:500;line-height:1.1;letter-spacing:-.02em}
-/* Desktop: stage is transparent to layout so cards still position against .tcx */
-.tcx-error-stage{display:contents}
-.tcx-error-visual{z-index:2;display:flex;justify-content:center;align-items:center;width:100%;max-width:88rem;aspect-ratio:2.39;max-height:50vh}
-.tcx-error-center{width:28%;margin-top:4vw;filter:drop-shadow(0 1.25rem 2.5rem rgba(0,0,0,.28));transform:scale(.92);transition:transform .4s cubic-bezier(.33,0,.67,1)}
+/* A bounded stage lets the centerpiece and dialog art scale together without
+   relying on viewport-based offsets that collide at narrower desktop widths. */
+.tcx-error-stage{position:relative;flex:1;width:min(100%,88rem);min-height:0;margin:.75rem auto 0}
+.tcx-error-visual{position:absolute;z-index:2;inset:0;display:flex;justify-content:center;align-items:center;width:100%;height:100%;pointer-events:none}
+.tcx-error-center{width:clamp(19rem,min(36vw,59svh),36rem);max-width:44%;margin:0;filter:drop-shadow(0 1.25rem 2.5rem rgba(0,0,0,.28));transform:scale(.92);transition:transform .4s cubic-bezier(.33,0,.67,1)}
 .tcx-error-center.is-pulse{animation:tcxPulse .8s cubic-bezier(.33,0,.67,1)}
 @keyframes tcxPulse{0%{transform:scale(.92)}50%{transform:scale(1)}100%{transform:scale(.92)}}
-.tcx-error-bg{position:absolute;inset:0;display:flex;justify-content:space-between;width:100%;max-width:88rem;margin:0 auto;padding:0;pointer-events:none}
+.tcx-error-bg{position:absolute;inset:0;display:flex;justify-content:space-between;width:100%;margin:0;padding:0;pointer-events:none}
 .tcx-error .tcx-divider.is-center{margin:0 11%}
-.tcx-error-card{position:absolute;display:flex;justify-content:center;align-items:center;opacity:0;transform:translateY(150px)}
-.tcx-error-card.is-live{opacity:1;transform:translateY(0);transition:opacity .55s cubic-bezier(.22,.75,.3,1),transform .6s cubic-bezier(.22,.75,.3,1)}
-.tcx-error-card.is-1{bottom:25vh}
-.tcx-error-card.is-2{top:45vh}
-.tcx-error-card.is-3{bottom:12%}
-.tcx-error-card.is-4{bottom:40vh}
+.tcx-error-cards{position:absolute;z-index:3;inset:0;pointer-events:none}
+.tcx-error-card{position:absolute;display:flex;justify-content:center;align-items:center;width:clamp(10rem,min(18vw,27svh),16.5rem);opacity:0;transform:translateY(150px);transition:opacity .55s cubic-bezier(.22,.75,.3,1),transform .6s cubic-bezier(.22,.75,.3,1)}
+.tcx-error-card.is-live{opacity:1;transform:translateY(0)}
+.tcx-error-card.is-1{left:7%;bottom:5%}
+.tcx-error-card.is-2{left:2.5%;top:7%}
+.tcx-error-card.is-3{right:7%;bottom:4%}
+.tcx-error-card.is-4{right:2.5%;top:6%;width:clamp(9rem,min(15vw,23svh),13.5rem)}
 .tcx-error-dot{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--tcx-green-soft)}
-.tcx-error-card-visual{position:absolute;z-index:1;aspect-ratio:2;min-height:7vw;background:var(--tcx-bg)}
-.tcx-error-card-visual img{width:100%;height:100%;object-fit:contain}
-.tcx-error-card-visual.is-bottom-left{left:2px;bottom:2px}
-.tcx-error-card-visual.is-top-left{left:2px;top:2px}
-.tcx-error-card-visual.is-bottom-right{right:2px;bottom:2px}
-.tcx-error-card-visual.is-top-right{right:2px;top:2px}
+.tcx-error-card-visual{position:relative;z-index:1;width:100%;min-height:0;overflow:hidden;border-radius:clamp(9px,.75vw,12px);background:#10171a;border:1px solid rgba(231,237,240,.65);box-shadow:0 14px 32px rgba(0,0,0,.32)}
+.tcx-dialog-bar{display:flex;align-items:center;gap:4px;height:20px;padding:0 9px;background:#eef0f0;border-bottom:1px solid rgba(15,21,24,.12)}
+.tcx-dialog-bar i{display:block;width:7px;height:7px;border-radius:50%;background:#f22d2d}
+.tcx-dialog-bar i:nth-child(2){background:#f5bd24}
+.tcx-dialog-bar i:nth-child(3){background:#5aca77}
+.tcx-error-card-visual p{display:flex;align-items:center;min-height:clamp(3.8rem,6.1vw,5.6rem);margin:0;padding:.75rem 1rem;color:#e7edf0;font-size:clamp(.78rem,1.15vw,1.05rem);line-height:1.08;letter-spacing:-.025em}
+.tcx-error-card.is-4 .tcx-error-card-visual p{min-height:clamp(5rem,8vw,7rem)}
 /* Desktop fallback when reduced-motion / static: show cards without scroll staging */
 .tcx-static .tcx-error-card{opacity:1;transform:none}
 @media(min-width:992px){
@@ -837,6 +874,10 @@ html[data-theme="dark"] .who-btm .who-logo{background:#fff;border-color:rgba(103
 /* ---------- Checkered CTA banner ---------- */
 .tcx-cta{
   position:relative;
+  /* main is a flex column that sizes items to content; the card inside is
+     absolutely positioned, so without an explicit width this section has no
+     in-flow content and collapses to width:0 (card becomes a 2px sliver). */
+  width:100%;
   background:transparent;
   min-height:clamp(28rem,38vw,36rem);
   /* Breathing room between testimonials track controls and the CTA card */
@@ -871,11 +912,14 @@ html[data-theme="dark"] .who-btm .who-logo{background:#fff;border-color:rgba(103
   */
   .tcx-error-stage{
     display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:.55rem .6rem;align-items:center;justify-items:stretch;
-    width:100%;max-width:22.5rem;height:auto;margin:1.5rem auto 0;padding:0;
+    gap:clamp(.55rem,1.8vw,.9rem) clamp(.6rem,2vw,1rem);align-items:center;justify-items:stretch;
+    /* Pixel/vw bounds avoid inheriting the site's fluid root font size, which
+       makes rem-based artwork unexpectedly tiny around tablet widths. */
+    width:min(100%,clamp(355px,72vw,680px));max-width:none;height:auto;margin:1.5rem auto 0;padding:0;
     overflow:visible;
   }
-  .tcx-error-bg,.tcx-error-bg .tcx-divider{display:contents}
+  .tcx-error-bg{display:none}
+  .tcx-error-cards{display:contents}
   .tcx-error-visual{
     position:relative;inset:auto;grid-column:1/-1;order:3;z-index:1;
     display:flex;justify-content:center;align-items:center;
@@ -883,7 +927,7 @@ html[data-theme="dark"] .who-btm .who-logo{background:#fff;border-color:rgba(103
     margin:0;padding:.15rem 0 .35rem;pointer-events:none;
   }
   .tcx-error-center{
-    position:relative;left:auto;top:auto;width:min(38%,6.75rem);max-width:6.75rem;
+    position:relative;left:auto;top:auto;width:clamp(145px,32vw,240px);max-width:44%;
     margin:0;transform:none;z-index:2;opacity:0;
   }
   .tcx-error-center.is-pulse{animation:tcxPulseMobile .75s cubic-bezier(.33,0,.67,1)}
@@ -893,7 +937,7 @@ html[data-theme="dark"] .who-btm .who-logo{background:#fff;border-color:rgba(103
   .tcx-error-card{
     position:relative!important;left:auto!important;right:auto!important;
     top:auto!important;bottom:auto!important;
-    width:100%;max-width:none;opacity:0;will-change:transform,opacity;
+    width:100%!important;max-width:none;opacity:0;will-change:transform,opacity;
   }
   .tcx-error-card.is-2{order:1;transform:translate(-12px,-14px) scale(.9)}
   .tcx-error-card.is-4{order:2;transform:translate(12px,-14px) scale(.9)}
@@ -907,9 +951,10 @@ html[data-theme="dark"] .who-btm .who-logo{background:#fff;border-color:rgba(103
     background:#0c1215;border:1px solid rgba(171,229,177,.12);
     box-shadow:0 8px 22px rgba(0,0,0,.32);
   }
-  .tcx-error-card-visual img{
-    width:100%;height:auto;display:block;object-fit:contain;object-position:center;
-  }
+  .tcx-dialog-bar{height:clamp(16px,3.2vw,20px);padding:0 clamp(7px,1.5vw,9px);gap:3px}
+  .tcx-dialog-bar i{width:clamp(5px,1vw,7px);height:clamp(5px,1vw,7px)}
+  .tcx-error-card-visual p{min-height:clamp(58px,12vw,92px);padding:clamp(10px,2vw,15px);font-size:clamp(12px,2.2vw,17px);line-height:1.12}
+  .tcx-error-card.is-4 .tcx-error-card-visual p{min-height:clamp(58px,12vw,92px)}
   /* Staggered pop-in, then a soft float loop */
   .tcx-mobile-live .tcx-error-center,
   .tcx-static .tcx-error-center{
@@ -994,7 +1039,7 @@ html[data-theme="dark"] .who-btm .who-logo{background:#fff;border-color:rgba(103
   .tcx{margin:0 -18px;overflow:visible}
   .tcx-error-sticky{padding:2.5rem 16px 2rem}
   .tcx-error-stage{max-width:100%;gap:.45rem .5rem;margin-top:1.25rem}
-  .tcx-error-center{width:min(36%,6.1rem);max-width:6.1rem}
+  .tcx-error-center{width:clamp(125px,38vw,170px);max-width:48%}
   .tcx-error-card-visual{border-radius:9px}
   .tcx-team{min-height:auto;border-top:0}
   .tcx-team-sticky{position:static;align-items:center;padding:3rem 18px;pointer-events:auto}
@@ -2126,6 +2171,23 @@ html[data-theme="dark"] .tcx-btn-white:hover{
   box-shadow:0 28px 60px -32px rgba(8,13,16,.4);
 }
 
+/*
+ * Transparent media assets must not sit on a dark fallback surface. Their
+ * rounded alpha corners otherwise expose that surface as thin black hooks.
+ * Keep the wrapper clear so those pixels resolve to the card/section surface
+ * in both themes, and clip the bitmap to the exact same radius as its shell.
+ */
+.pm-case-media-link,
+.project-media,
+.tcx-error-card-visual{
+  background:transparent!important;
+}
+.pm-case-media-link img,
+.project-media img,
+.tcx-error-card-visual img{
+  border-radius:inherit;
+}
+
 /* Contact panel: drop hard offset “stamp” edge → soft elevation */
 .contact-panel{
   border:0!important;
@@ -2683,10 +2745,26 @@ html[data-theme="dark"] .testimonials,
 html[data-theme="dark"] .pm-case,
 html[data-theme="dark"] .pm-case-media-link,
 html[data-theme="dark"] .project-media,
-html[data-theme="dark"] .contact-panel,
-html[data-theme="dark"] .tcx-cta-content{
+html[data-theme="dark"] .contact-panel{
   border:0!important;
   border-color:transparent!important;
+}
+
+/* CTA booking card ("Book a call") — legible on a pure-black page.
+   The green mosaic that used to frame this card was removed, leaving a
+   near-black #0f1518 card on #000 with its border killed and a black
+   shadow: invisible. Give it a green hairline edge and a soft green
+   halo so it reads. Dark mode only — light mode already has contrast. */
+html[data-theme="dark"] .tcx-cta-content{
+  background:linear-gradient(152deg,#0c1b14 0%,#0a1410 58%,#0a120e 100%)!important;
+  border:1px solid rgba(103,224,163,.24)!important;
+  box-shadow:
+    0 0 0 1px rgba(103,224,163,.05),
+    0 44px 130px -64px rgba(103,224,163,.42),
+    0 30px 80px -34px rgba(0,0,0,.85)!important;
+}
+html[data-theme="dark"] .tcx-cta:before{
+  background:radial-gradient(58% 62% at 50% 46%,rgba(103,224,163,.3),transparent 72%);
 }
 
 /* ==========================================================================
@@ -3312,10 +3390,8 @@ html[data-theme="dark"] .header .logo-wordmark em{
 }
 
 /* ==========================================================================
-   FAQ accordion — single consolidated definition (do not add another one).
-   Collapse/expand relies purely on grid-template-rows; no opacity/transform
-   on the answer wrapper or its <p>, so an item can never render invisible
-   mid-transition.
+   FAQ accordion — geometry and motion measured from the reference FAQ.
+   Brand surfaces intentionally remain Podium Momentum's existing colors.
    ========================================================================== */
 .faq{
   background:var(--ice);
@@ -3325,174 +3401,235 @@ html[data-theme="dark"] .header .logo-wordmark em{
   margin:60px calc(var(--gutter) * -1) 0;
   padding:62px var(--gutter) 70px;
   display:grid;
-  grid-template-columns:minmax(14rem,22rem) minmax(0,1fr);
-  gap:clamp(1.5rem,3.5vw,3rem);
+  grid-template-columns:minmax(0,38.75rem) minmax(0,1fr);
+  gap:0;
   align-items:start;
 }
-html[data-theme="dark"] .faq{
-  background:#000;
-}
+html[data-theme="dark"] .faq{background:#000}
 .faq h2{
-  font-weight:400;
-  font-size:54px;
-  line-height:1.05;
-  margin-top:65px;
+  max-width:12ch;
+  margin:65px 0 0;
   color:var(--ink);
+  font-size:3rem;
+  font-weight:400;
+  line-height:1.05;
+  letter-spacing:-.06rem;
 }
 .faq-list{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:0;
   width:100%;
   min-width:0;
 }
 .faq-item{
-  background:#fff;
-  border:1px solid transparent;
-  border-radius:var(--soft-card,24px);
-  box-shadow:0 10px 28px -16px rgba(16,50,31,.12),0 2px 10px -6px rgba(8,13,16,.05);
-  transition:background-color .35s ease,border-color .35s ease,box-shadow .35s ease;
+  position:relative;
+  padding-bottom:1.5rem;
+  overflow:hidden;
+  background:transparent;
+  border:0;
+  border-radius:1rem;
+  box-shadow:none;
+  transition:background-color .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1);
 }
 .faq-item.active{
   background:#effdf5;
-  border-color:var(--emerald,#67e0a3);
-  box-shadow:0 16px 36px -14px rgba(16,50,31,.16),0 4px 14px -6px rgba(8,13,16,.06);
+  box-shadow:inset 0 0 0 1px var(--emerald,#67e0a3);
 }
-html[data-theme="dark"] .faq-item{
-  background:#0a0f0c;
-  border-color:rgba(255,255,255,.1);
-  box-shadow:none;
-}
+html[data-theme="dark"] .faq-item{background:transparent;box-shadow:none}
 html[data-theme="dark"] .faq-item.active{
   background:#0d1712;
-  border-color:rgba(103,224,163,.4);
+  box-shadow:inset 0 0 0 1px rgba(103,224,163,.4);
 }
 .faq-item button{
+  position:relative;
   width:100%;
+  min-height:7.3125rem;
   display:grid;
-  grid-template-columns:110px 1fr 62px;
-  gap:20px;
-  align-items:center;
+  grid-template-columns:1rem 7.44rem minmax(0,1fr) 3.75rem;
+  align-items:start;
   text-align:left;
   border:0;
   background:none;
-  padding:25px 24px;
-  min-height:92px;
+  padding:2.5rem 1.5rem 1.0625rem;
   cursor:pointer;
   color:var(--ink);
 }
+.faq-item button::after{
+  content:"";
+  position:absolute;
+  right:1.5rem;
+  bottom:0;
+  left:9.94rem;
+  height:1px;
+  background:currentColor;
+  opacity:.18;
+  transform-origin:left center;
+  transition:opacity .3s ease,transform .4s cubic-bezier(.16,1,.3,1);
+}
+.faq-item.active button::after{opacity:0;transform:scaleX(.96)}
 .faq-item button span{
-  font-size:16px;
+  grid-column:1;
+  padding-top:.05rem;
   color:var(--ink);
+  font-size:1rem;
+  line-height:1.17;
   opacity:.55;
 }
 .faq-item button b{
-  font-size:25px;
-  font-weight:400;
+  grid-column:3;
+  align-self:start;
+  padding-top:0;
   color:var(--ink);
+  font-size:1.5rem;
+  font-weight:400;
+  line-height:1.17;
+  letter-spacing:-.035rem;
+  transition:font-size .4s cubic-bezier(.16,1,.3,1),line-height .4s cubic-bezier(.16,1,.3,1),letter-spacing .4s cubic-bezier(.16,1,.3,1);
+}
+.faq-item.active button b{
+  font-size:2rem;
+  line-height:1.17;
+  letter-spacing:-.055rem;
 }
 .faq-item button i{
+  grid-column:4;
   position:relative;
-  font-style:normal;
-  width:58px;
-  height:58px;
+  justify-self:end;
+  width:3.75rem;
+  height:3.75rem;
+  padding:.75rem;
   border-radius:50%;
   background:var(--ice);
-  display:grid;
-  place-items:center;
-  flex-shrink:0;
-  transition:background-color .35s ease,transform .35s ease;
+  font-style:normal;
+  transition:background-color .4s cubic-bezier(.16,1,.3,1),color .3s ease;
 }
-.faq-item button i:before,
-.faq-item button i:after{
+.faq-item button i::before,
+.faq-item button i::after{
   content:"";
   position:absolute;
   left:50%;
   top:50%;
-  width:18px;
+  width:1.125rem;
   height:1.5px;
   background:var(--ink);
   transform:translate(-50%,-50%);
-  transition:transform .35s ease,background-color .35s ease;
+  transform-origin:center;
+  transition:transform .32s cubic-bezier(.16,1,.3,1),opacity .24s ease,background-color .3s ease;
 }
-.faq-item button i:after{
-  transform:translate(-50%,-50%) rotate(90deg);
-}
-.faq-item.active button i{
-  background:var(--emerald,#67e0a3);
-  transform:rotate(180deg);
-}
-.faq-item.active button i:before,
-.faq-item.active button i:after{
-  background:#06120b;
-}
-.faq-item.active button i:after{
-  transform:translate(-50%,-50%) rotate(90deg) scaleX(0);
+.faq-item button i::after{transform:translate(-50%,-50%) rotate(90deg)}
+html[data-theme="dark"] .faq-item button i::before,
+html[data-theme="dark"] .faq-item button i::after{background:#000}
+.faq-item.active button i{background:var(--emerald,#67e0a3)}
+.faq-item.active button i::before,
+.faq-item.active button i::after{background:#06120b}
+.faq-item.active button i::after{
   opacity:0;
+  transform:translate(-50%,-50%) rotate(90deg) scaleX(0);
 }
 .faq-answer{
   display:grid;
   grid-template-rows:0fr;
-  transition:grid-template-rows .4s cubic-bezier(.22,1,.36,1);
+  transition:grid-template-rows .3s cubic-bezier(.22,1,.36,1);
 }
-.faq-answer>div{
-  overflow:hidden;
-  min-height:0;
-}
+.faq-answer>div{min-height:0;overflow:hidden}
 .faq-item .faq-answer p{
-  margin:0 86px 24px 130px;
+  max-width:40ch;
+  margin:0 0 1.5rem 9.94rem;
   color:var(--ink);
+  font-size:1rem;
+  line-height:1.25;
   opacity:.68;
-  line-height:1.45;
 }
-.faq-item.active .faq-answer{
-  grid-template-rows:1fr;
+.faq-item.active .faq-answer{grid-template-rows:1fr}
+.faq-item button:focus-visible{
+  outline:2px solid var(--emerald,#67e0a3);
+  outline-offset:-3px;
+  border-radius:1rem;
 }
 @media(max-width:900px){
   .faq{
-    margin:24px -18px 0;
-    padding:36px 18px 42px;
+    grid-template-columns:1fr;
+    margin:24px -1rem 0;
+    padding:20px 0 42px;
+    border-radius:0 0 20px 20px;
   }
-  .faq h2{
-    font-size:clamp(1.85rem,7vw,2.35rem);
-    margin-top:18px;
-    line-height:1.05;
+  .faq>div:first-child{padding:0 20px}
+  .faq .eyebrow{font-size:20px}
+  .faq h2{display:none}
+  .faq-list{margin-top:46px}
+  .faq-item{
+    margin:1px 0;
+    padding-bottom:0;
+    border-radius:0;
+  }
+  .faq-item.active,
+  html[data-theme="dark"] .faq-item.active{
+    background:transparent;
+    box-shadow:none;
   }
   .faq-item button{
-    grid-template-columns:2rem 1fr 2.6rem;
-    gap:10px;
-    padding:16px 14px;
-    min-height:0;
+    min-height:68px;
+    grid-template-columns:15px 24px 15px minmax(0,1fr) 37px 15px;
+    padding:20px;
+    align-items:start;
   }
-  .faq-item button b{
-    font-size:1rem;
-    line-height:1.25;
+  .faq-item button::after{
+    right:35px;
+    left:74px;
+    opacity:.14;
+  }
+  .faq-item button span{
+    grid-column:1;
+    padding-top:1px;
+    font-size:15px;
+    line-height:1.4;
+  }
+  .faq-item button b,
+  .faq-item.active button b{
+    grid-column:4;
+    font-size:20px;
+    line-height:1.18;
+    letter-spacing:-.4px;
   }
   .faq-item button i{
-    width:2.6rem;
-    height:2.6rem;
+    grid-column:5;
+    width:37px;
+    height:37px;
+    padding:7px;
   }
-  .faq-item button i:before,
-  .faq-item button i:after{
-    width:14px;
-  }
+  .faq-item button i::before,
+  .faq-item button i::after{width:12px}
   .faq-item .faq-answer p{
-    margin:0 14px 18px 2.6rem;
-    font-size:.95rem;
-    line-height:1.45;
-  }
-}
-@media(max-width:520px){
-  .faq{
-    padding-left:14px;
-    padding-right:14px;
+    max-width:none;
+    margin:0 35px 20px 74px;
+    font-size:14px;
+    line-height:1.4;
+    opacity:.72;
   }
 }
 @media(prefers-reduced-motion:reduce){
+  .faq-item,
   .faq-answer,
+  .faq-item button::after,
+  .faq-item button b,
   .faq-item button i,
-  .faq-item button i:before,
-  .faq-item button i:after{
-    transition:none!important;
-  }
+  .faq-item button i::before,
+  .faq-item button i::after{transition:none!important}
+}
+
+/* Challenge dialogs are native UI now, so one radius owns both the shell and
+   its browser chrome. This final override intentionally wins over the shared
+   soft-card rules above and prevents doubled corner masks after resizing. */
+.tcx-error-card,
+.tcx-error-card-visual{
+  border-radius:clamp(9px,.75vw,12px)!important;
+}
+.tcx-error-card-visual{
+  overflow:hidden!important;
+  background:#10171a!important;
+}
+@media(max-width:767px){
+  .tcx-error-card,
+  .tcx-error-card-visual{border-radius:9px!important}
 }

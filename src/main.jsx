@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { createPortal } from 'react-dom'
 import './styles.css'
 import './contact-us.css'
 import './industry.css'
@@ -9,6 +10,10 @@ import { ServicesHub, ServiceDetail, matchServicesRoute } from './ServicesPages.
 import { serviceCatalog, getServicePath, getServiceBySlug, SERVICES_PATH } from './servicesData.js'
 import IndustryPage from './IndustryPage.jsx'
 import { industryList, matchIndustryRoute } from './industries.js'
+import ClientLogo from './ClientLogo.jsx'
+import './landing-hero.css'
+import './header-polish.css'
+import './button-system.css'
 
 const A = '/assets/'
 const BRAND = 'Podium Momentum'
@@ -191,19 +196,24 @@ function Header() {
       frame = requestAnimationFrame(() => {
         const current = window.scrollY
         const delta = current - previous
-        setScrolled(current > 24)
-        if (delta > 4 && current > 140) setHidden(true)
-        if (delta < -4 || current < 80) setHidden(false)
+        const hasScrolled = current > 24
+        setScrolled(hasScrolled)
+        document.body.classList.toggle('page-scrolled', hasScrolled)
+        if (delta > 4 && current > 24) setHidden(true)
+        if (delta < -4 || current < 24) setHidden(false)
         previous = current
         frame = 0
       })
     }
     // Sync initial scroll state (service/industry pages often open mid-scroll history)
-    setScrolled(window.scrollY > 24)
+    const hasInitialScroll = window.scrollY > 24
+    setScrolled(hasInitialScroll)
+    document.body.classList.toggle('page-scrolled', hasInitialScroll)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', onScroll)
       if (frame) cancelAnimationFrame(frame)
+      document.body.classList.remove('page-scrolled')
     }
   }, [])
   const [svcOpen, setSvcOpen] = useState(false)
@@ -419,29 +429,24 @@ function Header() {
 }
 
 function Hero() {
-  // Eloqwnt home hero: centered H1 + lead + CTA, showreel, metrics marquee
-  const title = 'The strategy first creative partner for scaling B2B tech companies'
-  const words = title.split(' ')
   return (
-    <section id="top" className="hero">
+    <section id="top" className="hero pm-landing-hero">
       <div className="hero-inner">
         <h1 className="hero-title">
-          {words.map((w, i) => (
-            <React.Fragment key={`${w}-${i}`}>
-              <span className="hero-word" style={{ '--wi': i }}>{w}</span>
-              {i < words.length - 1 ? ' ' : ''}
-            </React.Fragment>
-          ))}
+          <span>Build a <em>10X better website.</em> Become unforgettable.</span>
         </h1>
         <div className="hero-band">
+          <div className="hero-media">
+            <ShowreelPlayer variant="hero" autoplayOnLoad />
+          </div>
           <div className="hero-side">
             <p className="hero-lead">
-              Ambitious companies are often read as smaller than they are. We fix that with brand, web, and product design under one roof.
+              We create <em>sharper positioning</em> and websites that give ambitious brands the momentum to take the top spot in their category.
             </p>
             <div className="hero-action">
-              <Button light href={CONTACT_PATH}>Let’s chat</Button>
+              <Button light href={CONTACT_PATH}>Book a strategy call</Button>
             </div>
-            <div className="hero-rating">
+            <div className="hero-rating" role="group" aria-label="4.9 out of 5 average client rating">
               <div className="hero-rating-avatars" aria-hidden="true">
                 {ratingAvatars.map(img => (
                   <img src={`${A}${img}`} alt="" loading="lazy" key={img} />
@@ -456,8 +461,13 @@ function Hero() {
               </div>
             </div>
           </div>
-          <div className="hero-media">
-            <ShowreelPlayer variant="hero" autoplayOnLoad />
+        </div>
+        <div className="hero-trust">
+          <p>Trusted by 40+ ambitious<br />technology companies</p>
+          <div className="hero-logos" aria-hidden="true">
+            {clientLogos.slice(0, 6).map(id => (
+              <ClientLogo src={`${A}${id}.avif`} alt="" forceInvert={invertInDark.has(id)} key={id} />
+            ))}
           </div>
         </div>
       </div>
@@ -467,7 +477,7 @@ function Hero() {
 }
 
 function MetricsMarquee() {
-  const items = ['$1B+ RAISED BY CLIENTS', '+30% MARGIN GAIN POST REBRAND', '2.3X CONVERSION LIFT POST REBRAND', 'OPERATING TIER UPGRADE · POST PODIUM']
+  const items = ['$10M raised by clients', '+30% margin gain post-rebrand', '2.3x conversion lift post-rebrand', 'Operating tier upgrade · post-Podium']
   return <div className="marquee"><div className="marquee-track">{[...items, ...items].map((x, i) => <span key={i}>/ {x}</span>)}</div></div>
 }
 
@@ -482,10 +492,14 @@ function ShowreelThumb() {
 
 function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
   const videoRef = useRef(null)
+  const expandedVideoRef = useRef(null)
+  const closeButtonRef = useRef(null)
   const autoplayFired = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [started, setStarted] = useState(false)
   const [muted, setMuted] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [expandedTime, setExpandedTime] = useState(0)
 
   const playMuted = () => {
     const video = videoRef.current
@@ -528,7 +542,7 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
     const next = !video.muted
     video.muted = next
     setMuted(next)
-    if (!next && video.paused) {
+    if (!next) {
       video.play().then(() => {
         setStarted(true)
         setPlaying(true)
@@ -536,7 +550,40 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
     }
   }
 
-  // Autoplay muted in-card when ready. If ready immediately on land, wait 2s.
+  const openExpanded = e => {
+    e?.stopPropagation()
+    const video = videoRef.current
+    const time = video && Number.isFinite(video.currentTime) ? video.currentTime : 0
+    video?.pause()
+    setPlaying(false)
+    setExpandedTime(time)
+    setIsExpanded(true)
+  }
+
+  const closeExpanded = () => {
+    expandedVideoRef.current?.pause()
+    setIsExpanded(false)
+  }
+
+  useEffect(() => {
+    if (!isExpanded) return
+
+    const onKeyDown = e => {
+      if (e.key === 'Escape') closeExpanded()
+    }
+
+    document.body.classList.add('showreel-modal-open')
+    document.addEventListener('keydown', onKeyDown)
+    closeButtonRef.current?.focus()
+
+    return () => {
+      document.body.classList.remove('showreel-modal-open')
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [isExpanded])
+
+  // Start at the later of two seconds after landing and the point at which the
+  // browser reports that it can play the complete video without buffering.
   useEffect(() => {
     if (!autoplayOnLoad || autoplayFired.current) return
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
@@ -563,16 +610,14 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
 
     const onReady = () => launch()
     video.addEventListener('canplaythrough', onReady, { once: true })
-    video.addEventListener('canplay', onReady, { once: true })
     video.preload = 'auto'
     video.load()
-    if (video.readyState >= 3) launch()
+    if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) launch()
 
     return () => {
       cancelled = true
       window.clearTimeout(timer)
       video.removeEventListener('canplaythrough', onReady)
-      video.removeEventListener('canplay', onReady)
     }
   }, [autoplayOnLoad])
 
@@ -636,19 +681,77 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
           </button>
         )}
       </div>
+      {variant === 'hero' && (
+        <button
+          type="button"
+          className="hero-expand"
+          onClick={openExpanded}
+          aria-label={`Maximize ${BRAND} showreel`}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
+            <path d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      )}
     </div>
   )
 
-  if (variant === 'hero') return media
+  const expandedViewer = isExpanded && typeof document !== 'undefined' && createPortal(
+    <div className="showreel-modal" role="presentation" onClick={closeExpanded}>
+      <section
+        className="showreel-modal-frame"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${BRAND} showreel player`}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="showreel-modal-bar">
+          <span>Podium Momentum showreel</span>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="showreel-modal-close"
+            onClick={closeExpanded}
+            aria-label="Close showreel"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
+              <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+        <video
+          ref={expandedVideoRef}
+          className="showreel-modal-video"
+          src={`${A}showreel.mp4`}
+          poster={`${A}showreel-brand-bg.png`}
+          controls
+          playsInline
+          preload="metadata"
+          onLoadedMetadata={e => {
+            const duration = e.currentTarget.duration
+            e.currentTarget.currentTime = Number.isFinite(duration)
+              ? Math.min(expandedTime, duration)
+              : expandedTime
+          }}
+        />
+      </section>
+    </div>,
+    document.body
+  )
+
+  if (variant === 'hero') return <>{media}{expandedViewer}</>
 
   return (
-    <div className="who-vid-wrap" data-reveal="scale">
-      {media}
-      <div className="who-btm">
-        <span>Showreel</span>
-        <img src={`${A}brand-mark.svg`} alt="" className="who-logo" />
+    <>
+      <div className="who-vid-wrap" data-reveal="scale">
+        {media}
+        <div className="who-btm">
+          <span>Showreel</span>
+          <img src={`${A}brand-mark.svg`} alt="" className="who-logo" />
+        </div>
       </div>
-    </div>
+      {expandedViewer}
+    </>
   )
 }
 
@@ -759,7 +862,7 @@ function ProjectCase({ project, index }) {
             onClick={e => { e.preventDefault(); navigate(CONTACT_PATH) }}
           >
             <span className="pill-wipe pill-wipe-dark" aria-hidden="true" />
-            <span className="pill-label">Start a project</span>
+            <span className="pill-label">Explore project</span>
             <span className="pm-case-cta-arrow" aria-hidden="true">→</span>
           </a>
         </div>
@@ -786,7 +889,7 @@ function Work() {
         {projects.map((p, i) => <ProjectCase project={p} index={i} key={p.title} />)}
       </div>
       <div className="pm-cases-foot" data-reveal="up">
-        <Button href={CONTACT_PATH}>Start a project</Button>
+        <Button light href={CONTACT_PATH}>Start a project</Button>
       </div>
     </section>
   )
@@ -794,7 +897,7 @@ function Work() {
 
 function Clients() {
   const logos = clientLogos
-  return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><div className="clients-copy"><h2 data-reveal="line">We work with ambitious brands across every industry, teams whose ambition is ahead of how the market sees them.</h2><p data-reveal="up">Startup or established business, if your brand needs sharper positioning, design, or growth, we are ready.</p></div><div className="client-label" data-reveal="up"><span>Our clients</span><i aria-hidden="true" /></div><div className="logo-marquee"><div>{[...logos, ...logos].map((id, i) => <img src={`${A}${id}.avif`} alt="Client logo" className={invertInDark.has(id) ? 'logo-invert' : undefined} key={i} />)}</div></div></section>
+  return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><div className="clients-copy"><h2 data-reveal="line">We work with ambitious brands across every industry, teams whose ambition is ahead of how the market sees them.</h2><p data-reveal="up">Startup or established business, if your brand needs sharper positioning, design, or growth, we are ready.</p></div><div className="client-label" data-reveal="up"><span>Our clients</span><i aria-hidden="true" /></div><div className="logo-marquee"><div>{[...logos, ...logos].map((id, i) => <ClientLogo src={`${A}${id}.avif`} alt="Client logo" className={invertInDark.has(id) ? 'logo-invert' : ''} forceInvert={invertInDark.has(id)} key={i} />)}</div></div></section>
 }
 
 function Services() {
@@ -937,72 +1040,93 @@ function TcxButton({ children, href = CONTACT_PATH, white = false }) {
 function Challenge() {
   const ref = useRef(null)
   const challengeCards = [
-    // [animation order, position class, corner anchor, image]
-    [3, 'is-1', 'is-bottom-left', `${A}tc-challenge-1.webp`],
-    [1, 'is-2', 'is-top-left', `${A}tc-challenge-2.webp`],
-    [4, 'is-3', 'is-bottom-right', `${A}tc-challenge-3.webp`],
-    [2, 'is-4', 'is-top-right', `${A}tc-challenge-4.webp`],
+    // [animation order, position class, message]
+    [3, 'is-1', 'Doesn’t reflect the company’s true maturity.'],
+    [1, 'is-2', 'Website revamp has been long overdue'],
+    [4, 'is-3', 'Site has no personality, looks worse than competitors'],
+    [2, 'is-4', 'Not converting / weak CTAs'],
   ]
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      el.classList.add('tcx-static')
-      return
-    }
     const cards = [...el.querySelectorAll('[data-tcx-card]')]
       .sort((a, b) => Number(a.dataset.tcxCard) - Number(b.dataset.tcxCard))
     const center = el.querySelector('.tcx-error-center')
-    if (window.innerWidth < 992) {
-      const io = new IntersectionObserver(([entry]) => {
-        if (!entry.isIntersecting) return
-        el.classList.add('tcx-mobile-live')
-        // One soft pulse on the centerpiece after cards start landing.
-        if (center) {
-          window.setTimeout(() => {
-            center.classList.remove('is-pulse')
-            void center.offsetWidth
-            center.classList.add('is-pulse')
-          }, 420)
-        }
-        io.disconnect()
-      }, { threshold: .22, rootMargin: '0px 0px -8% 0px' })
-      io.observe(el)
-      return () => io.disconnect()
+    const mobileQuery = window.matchMedia('(max-width: 991px)')
+    const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let cleanupMode = () => {}
+
+    const pulseCenter = () => {
+      if (!center) return
+      center.classList.remove('is-pulse')
+      void center.offsetWidth
+      center.classList.add('is-pulse')
     }
-    const fired = new Set()
-    let frame = 0
-    const check = () => {
-      frame = 0
-      const rect = el.getBoundingClientRect()
-      const vh = window.innerHeight
-      cards.forEach((card, i) => {
-        if (fired.has(i)) return
-        // Same trigger map as the reference: top top / top -30% / top -40% / bottom 105%.
-        const hit = i === 0 ? rect.top <= 0
-          : i === 1 ? rect.top <= -.3 * vh
-          : i === 2 ? rect.top <= -.4 * vh
-          : rect.bottom <= 1.05 * vh
-        if (!hit) return
-        fired.add(i)
-        card.classList.add('is-live')
-        if (center) {
-          center.classList.remove('is-pulse')
-          void center.offsetWidth
-          center.classList.add('is-pulse')
-        }
-      })
+
+    const setupMode = () => {
+      cleanupMode()
+      el.classList.remove('tcx-static', 'tcx-mobile-live')
+      cards.forEach(card => card.classList.remove('is-live'))
+
+      if (reduceQuery.matches) {
+        el.classList.add('tcx-static')
+        cleanupMode = () => {}
+        return
+      }
+
+      if (mobileQuery.matches) {
+        const io = new IntersectionObserver(([entry]) => {
+          if (!entry.isIntersecting) return
+          el.classList.add('tcx-mobile-live')
+          window.setTimeout(pulseCenter, 420)
+          io.disconnect()
+        }, { threshold: .16, rootMargin: '0px 0px -6% 0px' })
+        io.observe(el)
+        cleanupMode = () => io.disconnect()
+        return
+      }
+
+      // Use normalized section progress instead of viewport-specific offsets.
+      // This keeps the sticky reveal intact across desktop sizes and live resizes.
+      const thresholds = [.04, .28, .52, .76]
+      let frame = 0
+      let visibleCount = 0
+      const check = () => {
+        frame = 0
+        const rect = el.getBoundingClientRect()
+        const range = Math.max(1, rect.height - window.innerHeight)
+        const progress = Math.max(0, Math.min(1, -rect.top / range))
+        let nextVisibleCount = 0
+        cards.forEach((card, i) => {
+          const isLive = progress >= thresholds[i]
+          card.classList.toggle('is-live', isLive)
+          if (isLive) nextVisibleCount += 1
+        })
+        if (nextVisibleCount > visibleCount) pulseCenter()
+        visibleCount = nextVisibleCount
+      }
+      const requestCheck = () => { if (!frame) frame = requestAnimationFrame(check) }
+      window.addEventListener('scroll', requestCheck, { passive: true })
+      window.addEventListener('resize', requestCheck, { passive: true })
+      check()
+      cleanupMode = () => {
+        window.removeEventListener('scroll', requestCheck)
+        window.removeEventListener('resize', requestCheck)
+        if (frame) cancelAnimationFrame(frame)
+      }
     }
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(check) }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    check()
+
+    setupMode()
+    mobileQuery.addEventListener('change', setupMode)
+    reduceQuery.addEventListener('change', setupMode)
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      if (frame) cancelAnimationFrame(frame)
+      cleanupMode()
+      mobileQuery.removeEventListener('change', setupMode)
+      reduceQuery.removeEventListener('change', setupMode)
     }
   }, [])
   return (
-    <section className="tcx tcx-error" ref={ref}>
+    <section id="challenge" className="tcx tcx-error" ref={ref}>
       <div className="tcx-error-sticky">
         <div className="tcx-error-head" data-reveal="up">
           <div className="tcx-tag tcx-tag-red">Challenge</div>
@@ -1010,24 +1134,25 @@ function Challenge() {
         </div>
         <div className="tcx-error-stage">
           <div className="tcx-error-visual">
-            <img className="tcx-error-center" src={`${A}challenge-growth-visual.svg`} alt="A digital product growing beyond an outdated website" />
+            <img className="tcx-error-center" src={`${A}challenge-momentum.svg`} alt="A website interface breaking through constraints with an upward momentum arrow" />
           </div>
           <div className="tcx-error-bg" aria-hidden="true">
-            {[0, 1, 2, 3, 4, 5, 6].map(col => {
-              const card = { 1: challengeCards[0], 2: challengeCards[1], 4: challengeCards[2], 5: challengeCards[3] }[col]
-              return (
-                <div className={`tcx-divider ${col === 3 ? 'is-center' : ''}`} key={col}>
-                  {card && (
-                    <div className={`tcx-error-card ${card[1]}`} data-tcx-card={card[0]} style={{ '--tcx-i': card[0] - 1 }}>
-                      <span className="tcx-error-dot" />
-                      <div className={`tcx-error-card-visual ${card[2]}`}>
-                        <img src={card[3]} alt="" loading="lazy" />
-                      </div>
-                    </div>
-                  )}
+            {[0, 1, 2, 3, 4, 5, 6].map(col => (
+              <span className={`tcx-divider ${col === 3 ? 'is-center' : ''}`} key={col} />
+            ))}
+          </div>
+          <div className="tcx-error-cards" aria-hidden="true">
+            {challengeCards.map(card => (
+              <div className={`tcx-error-card ${card[1]}`} data-tcx-card={card[0]} style={{ '--tcx-i': card[0] - 1 }} key={card[0]}>
+                <span className="tcx-error-dot" />
+                <div className="tcx-error-card-visual">
+                  <div className="tcx-dialog-bar" aria-hidden="true">
+                    <i /><i /><i />
+                  </div>
+                  <p>{card[2]}</p>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -1065,7 +1190,7 @@ function Compare() {
           ))}
         </div>
       </div>
-      <div className="tcx-cmp-cta" data-reveal="up"><Button href="#work">View more</Button></div>
+      <div className="tcx-cmp-cta" data-reveal="up"><Button light href="#work">View more</Button></div>
     </section>
   )
 }

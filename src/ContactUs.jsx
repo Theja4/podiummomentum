@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import ClientLogo from './ClientLogo.jsx'
 
 const TC = '/assets/tc-contact/'
 const A = '/assets/'
@@ -9,9 +10,9 @@ const clientLogos = ['a9cc6fba12268e37', '43201ae504d0ad9f', 'cfecff048b60daa1',
 const invertInDark = new Set(['d2c8ca3a50aba890', 'e72cc835698ff331'])
 
 const expectItems = [
-  ['00–10', 'icon-website.svg', 'Find the friction', "A live teardown of what's helping—and quietly costing you leads.", 'Priority list'],
-  ['10–20', 'icon-case.svg', 'See what good looks like', 'Relevant before-and-after work, chosen for your market and growth stage.', 'Proven patterns'],
-  ['20–30', 'icon-timeline.svg', 'Map the next move', 'A practical route forward with scope, timing, and investment range.', 'Clear roadmap'],
+  ['icon-website.svg', 'Find the friction', 'Spot what blocks leads.'],
+  ['icon-case.svg', 'Review the proof', 'See relevant work.'],
+  ['icon-timeline.svg', 'Choose the next move', 'Leave with a clear plan.'],
 ]
 
 const testimonialsCol1 = [
@@ -433,7 +434,7 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
               <div className="cu-logo-grid">
                 {clientLogos.slice(0, 8).map(id => (
                   <div className="cu-logo-cell" key={id}>
-                    <img src={`${A}${id}.avif`} alt="" className={invertInDark.has(id) ? 'cu-logo-invert' : undefined} />
+                    <ClientLogo src={`${A}${id}.avif`} alt="" className={invertInDark.has(id) ? 'cu-logo-invert' : ''} forceInvert={invertInDark.has(id)} />
                   </div>
                 ))}
               </div>
@@ -461,26 +462,24 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
         <div className="cu-container cu-expect-wrap">
           <section className="cu-expect" aria-labelledby="expect-title" data-reveal="panel">
             <div className="cu-expect-intro" data-reveal="up">
-              <span className="cu-expect-kicker">Your 30-minute session</span>
-              <h2 className="cu-expect-title" id="expect-title">Three conversations.<br /><span>One clear next move.</span></h2>
-              <p>No generic pitch deck. We use the time to diagnose, compare, and give you a useful way forward.</p>
+              <span className="cu-expect-kicker">Strategy session</span>
+              <h2 className="cu-expect-title" id="expect-title">One clear<br /><span>next move.</span></h2>
+              <p>Diagnose. Compare. Decide.</p>
               <div className="cu-expect-leave">
                 <span aria-hidden="true">↗</span>
-                <div><small>You leave with</small><strong>A prioritized website action plan</strong></div>
+                <strong>A prioritized action plan</strong>
               </div>
             </div>
 
             <ol className="cu-expect-list">
-              {expectItems.map(([time, icon, title, copy, outcome], index) => (
+              {expectItems.map(([icon, title, copy], index) => (
                 <li className="cu-expect-item" data-reveal="card" key={title}>
                   <div className="cu-expect-step">
                     <span>{String(index + 1).padStart(2, '0')}</span>
-                    <small>{time} min</small>
                   </div>
                   <div className="cu-expect-icon"><img src={`${TC}${icon}`} alt="" /></div>
                   <h3>{title}</h3>
                   <p>{copy}</p>
-                  <strong className="cu-expect-outcome"><span>✓</span>{outcome}</strong>
                 </li>
               ))}
             </ol>
@@ -552,7 +551,7 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
                     <p>{label}</p>
                   </div>
                   <div className="cu-pipe-logo">
-                    <img src={`${A}${logo}.avif`} alt="" className={invertInDark.has(logo) ? 'cu-logo-invert' : undefined} />
+                    <ClientLogo src={`${A}${logo}.avif`} alt="" className={invertInDark.has(logo) ? 'cu-logo-invert' : ''} forceInvert={invertInDark.has(logo)} />
                   </div>
                 </article>
               ))}
