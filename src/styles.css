@@ -354,7 +354,11 @@ body{overflow-x:hidden}.header{position:fixed;z-index:100;transition:transform .
   --btn-secondary-icon-bg:#fff;
   --btn-secondary-icon-filter:none;
 }
-::selection{background:var(--emerald);color:#000}
+/* Keep text selection independent from page accent remaps. Some route-specific
+   themes intentionally redefine --emerald to black, which made selected text
+   black-on-black in dark mode. */
+::selection{background:#67e0a3;color:#06120b;text-shadow:none}
+::-moz-selection{background:#67e0a3;color:#06120b;text-shadow:none}
 body,main{background:var(--paper)}
 .logo-lockup{display:inline-flex;align-items:center;gap:12px;width:auto;max-width:none;line-height:1;white-space:nowrap}
 .logo-lockup-mark{width:48px;height:48px;object-fit:contain;flex:0 0 auto}

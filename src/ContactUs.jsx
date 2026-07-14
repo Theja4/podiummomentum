@@ -10,9 +10,9 @@ const clientLogos = ['a9cc6fba12268e37', '43201ae504d0ad9f', 'cfecff048b60daa1',
 const invertInDark = new Set(['d2c8ca3a50aba890', 'e72cc835698ff331'])
 
 const expectItems = [
-  ['icon-website.svg', 'Find the friction', 'Spot what blocks leads.'],
-  ['icon-case.svg', 'Review the proof', 'See relevant work.'],
-  ['icon-timeline.svg', 'Choose the next move', 'Leave with a clear plan.'],
+  ['icon-website.svg', 'Website Performance Reality Check', 'We’ll walk through your current site and identify what’s not working.'],
+  ['icon-case.svg', 'Case Studies From Your Space', 'See before-and-after transformations from similar companies.'],
+  ['icon-timeline.svg', 'Timeline & Investment Clarity', 'Get realistic timelines and a ballpark investment for your project.'],
 ]
 
 const testimonialsCol1 = [
@@ -125,19 +125,21 @@ function MarqueeColumn({ items, reverse = false }) {
 }
 
 const budgetOptions = [
-  { value: '$10k to $25k', label: '$10k — $25k', hint: 'Focused engagement' },
-  { value: '$25k to $50k', label: '$25k — $50k', hint: 'Growth project' },
-  { value: '$50k to $100k', label: '$50k — $100k', hint: 'Full transformation' },
-  { value: '$100k+', label: '$100k+', hint: 'Ongoing partnership' },
+  { value: '$0 to $5k', label: '$0 to $5k', hint: 'Getting started' },
+  { value: '$5k to $15k', label: '$5k to $15k', hint: 'Focused build' },
+  { value: '$15k to $25k', label: '$15k to $25k', hint: 'Growth project' },
+  { value: '$25k to $50k', label: '$25k to $50k', hint: 'Full engagement' },
 ]
 
 function BudgetDropdown({ value, onChange, hasError }) {
   const [open, setOpen] = useState(false)
   const [openUp, setOpenUp] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(0)
+  // -1 means no option is keyboard-active; nothing gets force-highlighted on open.
+  const [activeIndex, setActiveIndex] = useState(-1)
   const rootRef = useRef(null)
   const menuRef = useRef(null)
   const selected = budgetOptions.find(option => option.value === value)
+  const selectedIndex = budgetOptions.findIndex(option => option.value === value)
 
   const updatePlacement = () => {
     const root = rootRef.current
@@ -150,7 +152,12 @@ function BudgetDropdown({ value, onChange, hasError }) {
     const spaceBelow = window.innerHeight - rect.bottom - gap
     const spaceAbove = rect.top - gap
     // Prefer down when it fits; flip up when bottom space is tight
-    setOpenUp(spaceBelow < menuHeight && spaceAbove > spaceBelow)
+    const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > spaceBelow
+    setOpenUp(shouldOpenUp)
+    // Cap the menu to the space actually available so it never spills past the
+    // viewport edge; it scrolls internally instead of getting clipped.
+    const available = Math.max(shouldOpenUp ? spaceAbove : spaceBelow, 140)
+    menuRef.current?.style.setProperty('--cu-menu-max', `${available}px`)
   }
 
   const openMenu = (next = true) => {
@@ -254,7 +261,7 @@ function BudgetDropdown({ value, onChange, hasError }) {
         aria-controls="budget-options"
         aria-activedescendant={open ? `budget-option-${activeIndex}` : undefined}
         aria-invalid={hasError || undefined}
-        onClick={() => openMenu(!open)}
+        onClick={() => { if (!open) setActiveIndex(selectedIndex); openMenu(!open) }}
         onKeyDown={onTriggerKeyDown}
       >
         <span id="budget-value" className={selected ? 'has-value' : ''}>{selected?.label || 'Select a range'}</span>
@@ -266,6 +273,7 @@ function BudgetDropdown({ value, onChange, hasError }) {
         role="listbox"
         aria-labelledby="budget-label"
         ref={menuRef}
+        onMouseLeave={() => setActiveIndex(selectedIndex)}
       >
         {budgetOptions.map((option, index) => (
           <button
@@ -276,6 +284,7 @@ function BudgetDropdown({ value, onChange, hasError }) {
             role="option"
             aria-selected={value === option.value}
             tabIndex={-1}
+            onMouseEnter={() => setActiveIndex(index)}
             onClick={() => choose(index)}
             onKeyDown={event => onOptionKeyDown(event, index)}
           >
@@ -306,10 +315,6 @@ function ContactForm() {
   return (
     <div className="cu-form-card" id="form">
       <div className="cu-form-intro">
-        <div className="cu-form-avatars">
-          <img src={`${TC}avatar-ayush.webp`} alt="" />
-          <img src={`${TC}avatar-harsh.webp`} alt="" />
-        </div>
         <div>
           <h2>Tell us what you’re building.</h2>
           <p>We’ll map the clearest next move in a 30-minute strategy session.</p>
@@ -474,8 +479,8 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
             <ol className="cu-expect-list">
               {expectItems.map(([icon, title, copy], index) => (
                 <li className="cu-expect-item" data-reveal="card" key={title}>
-                  <div className="cu-expect-step">
-                    <span>{String(index + 1).padStart(2, '0')}</span>
+                  <div className="cu-expect-bg-num" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
                   </div>
                   <div className="cu-expect-icon"><img src={`${TC}${icon}`} alt="" /></div>
                   <h3>{title}</h3>

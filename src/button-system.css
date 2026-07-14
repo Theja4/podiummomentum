@@ -659,8 +659,13 @@ html[data-theme='dark'] .ind-exp-item.is-open .ind-exp-title {
 .cu-budget-trigger:focus-visible,
 .cu-budget.is-open .cu-budget-trigger {
   border-color: var(--pm-btn-mint) !important;
-  background: #fff !important;
+  background: var(--cu-paper) !important;
   transform: none !important;
+}
+html[data-theme="dark"] .cu-budget-trigger:hover,
+html[data-theme="dark"] .cu-budget-trigger:focus-visible,
+html[data-theme="dark"] .cu-budget.is-open .cu-budget-trigger {
+  background: #0f1512 !important;
 }
 
 .cu-budget-arrow {
