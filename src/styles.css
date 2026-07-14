@@ -295,7 +295,7 @@ body{overflow-x:hidden}.header{position:fixed;z-index:100;transition:transform .
 
 @media(prefers-reduced-motion:reduce){.hero-title span,.hero-band,.hero-trust{opacity:1!important;transform:none!important;transition:none!important}}
 
-/* Branded showreel card: Hi we are + logo (sits above video until play). */
+/* Branded showreel card: Learn more about + logo (sits above video until play). */
 .who-brand-thumb{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,1.4vw,16px);padding:clamp(16px,3vw,28px);background:linear-gradient(145deg,#f0f3f6 0%,#c8d0d6 42%,#8b949c 100%);border-radius:inherit;overflow:hidden;pointer-events:none}
 .who-hi{margin:0;font-family:Mazzard,Arial,sans-serif;font-size:clamp(1.05rem,1.6vw,1.35rem);font-weight:500;letter-spacing:-.02em;color:#080808;line-height:1.15}
 .who-brand-logo{width:min(72%,200px);height:auto;object-fit:contain;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,.12))}
@@ -3319,8 +3319,7 @@ html[data-theme="dark"] .header .logo-wordmark em{
     gap: .35rem;
     width: 100%;
     max-height: min(70vh, 32rem);
-    overflow: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
     padding: .85rem .85rem 1rem;
     border-radius: 1.35rem;
     background: rgba(255,255,255,.96);
@@ -3343,10 +3342,50 @@ html[data-theme="dark"] .header .logo-wordmark em{
   .header .nav-dropdown-panel--mega{ width: min(28rem, 82vw) !important; }
   .header .nav-dropdown-panel--grid{ width: min(26rem, 82vw) !important; }
 
-  /* List scrolls inside the card; no outer clip */
+  /* Keep the header and rounded shell still; only the inset list scrolls. */
   .header .nav-dropdown-list{
+    flex: 1 1 auto;
+    min-height: 0;
     max-height: none;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(103,224,163,.72) rgba(103,224,163,.08);
+  }
+
+  .header .nav-dropdown-list > .nav-dropdown-item{
+    flex: 0 0 auto;
+  }
+
+  .header .nav-dropdown-list::-webkit-scrollbar{
+    width: 8px;
+  }
+
+  .header .nav-dropdown-list::-webkit-scrollbar-track{
+    margin-block: .35rem;
+    border-radius: 999px;
+    background: rgba(103,224,163,.08);
+  }
+
+  .header .nav-dropdown-list::-webkit-scrollbar-thumb{
+    min-height: 3.5rem;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background:
+      linear-gradient(180deg,var(--emerald,#67e0a3),var(--aquamarine,#7cf0bd)) padding-box;
+    box-shadow: 0 0 0 1px rgba(103,224,163,.12);
+  }
+
+  .header .nav-dropdown-list::-webkit-scrollbar-thumb:hover{
+    background:
+      linear-gradient(180deg,var(--aquamarine,#7cf0bd),var(--emerald,#67e0a3)) padding-box;
+    box-shadow: 0 0 0 1px rgba(103,224,163,.28),0 0 12px rgba(103,224,163,.2);
+  }
+
+  .header .nav-dropdown-list::-webkit-scrollbar-corner{
+    background: transparent;
   }
 
   .header .nav-dropdown-head,
@@ -3372,232 +3411,39 @@ html[data-theme="dark"] .header .logo-wordmark em{
 }
 
 /* ==========================================================================
-   FAQ accordion — geometry and motion measured from the reference FAQ.
-   Brand surfaces intentionally remain Podium Momentum's existing colors.
+   Landing FAQ — uses the same accordion primitive as the services pages.
+   Only the landing section's shell and heading need route-specific styling.
    ========================================================================== */
-.faq{
-  background:var(--ice);
-  border:0;
-  border-radius:var(--radius,32px);
+.home-faq{
+  width:100%;
+  padding:var(--pad-standart,3.75rem);
   overflow:hidden;
-  margin:60px calc(var(--gutter) * -1) 0;
-  padding:62px var(--gutter) 70px;
-  display:grid;
-  grid-template-columns:minmax(0,38.75rem) minmax(0,1fr);
-  gap:0;
-  align-items:start;
 }
-html[data-theme="dark"] .faq{background:#000}
-.faq h2{
+.home-faq .svc-faq-grid{
+  grid-template-columns:minmax(14rem,.8fr) minmax(0,1.4fr);
+  gap:clamp(2rem,4vw,3.5rem);
+}
+.home-faq h2{
   max-width:12ch;
-  margin:65px 0 0;
+  margin:3.25rem 0 0;
   color:var(--ink);
-  font-size:3rem;
-  font-weight:400;
-  line-height:1.05;
-  letter-spacing:-.06rem;
-}
-.faq-list{
-  display:flex;
-  flex-direction:column;
-  gap:0;
-  width:100%;
-  min-width:0;
-}
-.faq-item{
-  position:relative;
-  padding-bottom:1.5rem;
-  overflow:hidden;
-  background:transparent;
-  border:0;
-  border-radius:1rem;
-  box-shadow:none;
-  transition:background-color .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1);
-}
-.faq-item.active{
-  background:#effdf5;
-  box-shadow:inset 0 0 0 1px var(--emerald,#67e0a3);
-}
-html[data-theme="dark"] .faq-item{background:transparent;box-shadow:none}
-html[data-theme="dark"] .faq-item.active{
-  background:#0d1712;
-  box-shadow:inset 0 0 0 1px rgba(103,224,163,.4);
-}
-.faq-item button{
-  position:relative;
-  width:100%;
-  min-height:7.3125rem;
-  display:grid;
-  grid-template-columns:1rem 7.44rem minmax(0,1fr) 3.75rem;
-  align-items:start;
-  text-align:left;
-  border:0;
-  background:none;
-  padding:2.5rem 1.5rem 1.0625rem;
-  cursor:pointer;
-  color:var(--ink);
-}
-.faq-item button::after{
-  content:"";
-  position:absolute;
-  right:1.5rem;
-  bottom:0;
-  left:9.94rem;
-  height:1px;
-  background:currentColor;
-  opacity:.18;
-  transform-origin:left center;
-  transition:opacity .3s ease,transform .4s cubic-bezier(.16,1,.3,1);
-}
-.faq-item.active button::after{opacity:0;transform:scaleX(.96)}
-.faq-item button span{
-  grid-column:1;
-  padding-top:.05rem;
-  color:var(--ink);
-  font-size:1rem;
-  line-height:1.17;
-  opacity:.55;
-}
-.faq-item button b{
-  grid-column:3;
-  align-self:start;
-  padding-top:0;
-  color:var(--ink);
-  font-size:1.5rem;
-  font-weight:400;
-  line-height:1.17;
-  letter-spacing:-.035rem;
-  transition:font-size .4s cubic-bezier(.16,1,.3,1),line-height .4s cubic-bezier(.16,1,.3,1),letter-spacing .4s cubic-bezier(.16,1,.3,1);
-}
-.faq-item.active button b{
-  font-size:2rem;
-  line-height:1.17;
-  letter-spacing:-.055rem;
-}
-.faq-item button i{
-  grid-column:4;
-  position:relative;
-  justify-self:end;
-  width:3.75rem;
-  height:3.75rem;
-  padding:.75rem;
-  border-radius:50%;
-  background:var(--ice);
-  font-style:normal;
-  transition:background-color .4s cubic-bezier(.16,1,.3,1),color .3s ease;
-}
-.faq-item button i::before,
-.faq-item button i::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:1.125rem;
-  height:1.5px;
-  background:var(--ink);
-  transform:translate(-50%,-50%);
-  transform-origin:center;
-  transition:transform .32s cubic-bezier(.16,1,.3,1),opacity .24s ease,background-color .3s ease;
-}
-.faq-item button i::after{transform:translate(-50%,-50%) rotate(90deg)}
-html[data-theme="dark"] .faq-item button i::before,
-html[data-theme="dark"] .faq-item button i::after{background:#000}
-.faq-item.active button i{background:var(--emerald,#67e0a3)}
-.faq-item.active button i::before,
-.faq-item.active button i::after{background:#06120b}
-.faq-item.active button i::after{
-  opacity:0;
-  transform:translate(-50%,-50%) rotate(90deg) scaleX(0);
-}
-.faq-answer{
-  display:grid;
-  grid-template-rows:0fr;
-  transition:grid-template-rows .3s cubic-bezier(.22,1,.36,1);
-}
-.faq-answer>div{min-height:0;overflow:hidden}
-.faq-item .faq-answer p{
-  max-width:40ch;
-  margin:0 0 1.5rem 9.94rem;
-  color:var(--ink);
-  font-size:1rem;
-  line-height:1.25;
-  opacity:.68;
-}
-.faq-item.active .faq-answer{grid-template-rows:1fr}
-.faq-item button:focus-visible{
-  outline:2px solid var(--emerald,#67e0a3);
-  outline-offset:-3px;
-  border-radius:1rem;
+  font-size:clamp(2rem,3.2vw,3rem);
+  font-weight:500;
+  line-height:1.04;
+  letter-spacing:-.06em;
 }
 @media(max-width:900px){
-  .faq{
+  .home-faq{
+    padding:var(--pad-standart,1.25rem);
+  }
+  .home-faq .svc-faq-grid{
     grid-template-columns:1fr;
-    margin:24px -1rem 0;
-    padding:20px 0 42px;
-    border-radius:0 0 20px 20px;
+    gap:1.5rem;
   }
-  .faq>div:first-child{padding:0 20px}
-  .faq .eyebrow{font-size:20px}
-  .faq h2{display:none}
-  .faq-list{margin-top:46px}
-  .faq-item{
-    margin:1px 0;
-    padding-bottom:0;
-    border-radius:0;
+  .home-faq h2{
+    margin:1.25rem 0 .75rem;
+    font-size:clamp(2rem,9vw,2.5rem);
   }
-  .faq-item.active,
-  html[data-theme="dark"] .faq-item.active{
-    background:transparent;
-    box-shadow:none;
-  }
-  .faq-item button{
-    min-height:68px;
-    grid-template-columns:15px 24px 15px minmax(0,1fr) 37px 15px;
-    padding:20px;
-    align-items:start;
-  }
-  .faq-item button::after{
-    right:35px;
-    left:74px;
-    opacity:.14;
-  }
-  .faq-item button span{
-    grid-column:1;
-    padding-top:1px;
-    font-size:15px;
-    line-height:1.4;
-  }
-  .faq-item button b,
-  .faq-item.active button b{
-    grid-column:4;
-    font-size:20px;
-    line-height:1.18;
-    letter-spacing:-.4px;
-  }
-  .faq-item button i{
-    grid-column:5;
-    width:37px;
-    height:37px;
-    padding:7px;
-  }
-  .faq-item button i::before,
-  .faq-item button i::after{width:12px}
-  .faq-item .faq-answer p{
-    max-width:none;
-    margin:0 35px 20px 74px;
-    font-size:14px;
-    line-height:1.4;
-    opacity:.72;
-  }
-}
-@media(prefers-reduced-motion:reduce){
-  .faq-item,
-  .faq-answer,
-  .faq-item button::after,
-  .faq-item button b,
-  .faq-item button i,
-  .faq-item button i::before,
-  .faq-item button i::after{transition:none!important}
 }
 
 /* Challenge dialogs are native UI now, so one radius owns both the shell and

@@ -998,14 +998,16 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 3.5rem 1fr;
+  grid-template-columns: 3.5rem minmax(0, 1fr) 2.875rem;
   gap: 1rem;
-  align-items: start;
+  align-items: center;
   padding: 1.25rem 0.85rem;
   border-radius: 12px;
   border-top: 1px solid rgba(8, 13, 16, 0.08);
   overflow: hidden;
-  transition: transform 0.45s ease;
+  transition:
+    border-color 0.35s ease,
+    border-radius 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .svc-cap-list li:last-child {
@@ -1016,19 +1018,23 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--ice, #e4ebef);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: inherit;
+  background: var(--celadon, #aff9c9);
+  transform: scaleY(0.015);
+  transform-origin: center bottom;
   z-index: -1;
 }
 
-.svc-cap-list li:hover:before {
-  transform: scaleY(1);
+.svc-cap-list li:nth-child(3n + 2):before {
+  background: var(--aquamarine, #7cf0bd);
+}
+
+.svc-cap-list li:nth-child(3n):before {
+  background: var(--emerald, #67e0a3);
 }
 
 .svc-cap-list li:hover {
-  transform: translateX(4px);
+  border-color: transparent;
 }
 
 .svc-cap-list span {
@@ -1036,6 +1042,10 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
   opacity: 0.55;
   font-variant-numeric: tabular-nums;
   padding-top: 0.2rem;
+}
+
+.svc-cap-list li > div {
+  min-width: 0;
 }
 
 .svc-cap-list h3 {
@@ -1613,6 +1623,12 @@ html[data-theme="dark"] .svc-cap-list li {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
+html[data-theme="dark"] .svc-cap-list li:hover,
+html[data-theme="dark"] .svc-cap-list li:hover > span,
+html[data-theme="dark"] .svc-cap-list li:hover > div {
+  color: #fff;
+}
+
 html[data-theme="dark"] .svc-faq-item button i:before,
 html[data-theme="dark"] .svc-faq-item button i:after {
   background: #fff;
@@ -1709,6 +1725,30 @@ html[data-theme="dark"] .svc-stats {
     max-width: none;
   }
 
+  .svc-cap-list li {
+    grid-template-columns: 32px minmax(0, 1fr) 42px;
+    gap: 10px;
+    padding: 18px 8px;
+  }
+
+  .svc-cap-list span {
+    font-size: 13px;
+  }
+
+  .svc-cap-list h3 {
+    font-size: 18px;
+  }
+
+  .svc-cap-list p {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .svc-cap-arrow {
+    width: 42px;
+    height: 42px;
+  }
+
   .svc-close-actions {
     flex-direction: column;
     align-items: stretch;
@@ -1729,4 +1769,5 @@ html[data-theme="dark"] .svc-stats {
   .svc-partners-track {
     animation: none;
   }
+
 }

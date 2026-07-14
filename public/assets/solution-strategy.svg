@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 430" role="img" aria-labelledby="title desc">
+  <title id="title">Strategy compass</title>
+  <desc id="desc">A luminous compass gathers scattered signals into one clear direction.</desc>
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%"><stop stop-color="#8BFFD0" stop-opacity=".42"/><stop offset="1" stop-color="#8BFFD0" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rim" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#D7FFF0"/><stop offset=".45" stop-color="#67E0A3"/><stop offset="1" stop-color="#143A28"/></linearGradient>
+    <linearGradient id="needle" x1="0" x2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#79F5BA"/></linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="24" stdDeviation="22" flood-color="#07110C" flood-opacity=".32"/></filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <style>
+    .orbit{transform-origin:300px 215px;animation:spin 18s linear infinite}.orbit-b{animation-direction:reverse;animation-duration:26s}.needle{transform-origin:300px 215px;animation:seek 5s cubic-bezier(.65,0,.35,1) infinite}.signal{animation:pulse 3s ease-in-out infinite}.signal:nth-of-type(2n){animation-delay:-1.5s}.spark{animation:blink 2.6s ease-in-out infinite}.spark:nth-of-type(2n){animation-delay:-1.3s}@keyframes spin{to{transform:rotate(360deg)}}@keyframes seek{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(13deg)}}@keyframes pulse{50%{opacity:.45;transform:scale(.82)}}@keyframes blink{50%{opacity:.25}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+  </style>
+  <ellipse cx="300" cy="220" rx="225" ry="170" fill="url(#halo)"/>
+  <g class="orbit" fill="none" stroke="#153E2B" stroke-width="2" stroke-dasharray="3 12" opacity=".48"><ellipse cx="300" cy="215" rx="244" ry="151"/><ellipse cx="300" cy="215" rx="183" ry="186"/></g>
+  <g class="orbit orbit-b" fill="none" stroke="#5267FF" stroke-width="1.5" stroke-dasharray="2 16" opacity=".42"><circle cx="300" cy="215" r="204"/></g>
+  <g class="signal" transform="translate(83 129)"><rect width="46" height="20" rx="10" fill="#5267FF"/><circle cx="35" cy="10" r="4" fill="#fff" fill-opacity=".8"/></g>
+  <g class="signal" transform="translate(442 95)"><rect width="63" height="22" rx="11" fill="#FF8A4C"/><path d="M14 11h34" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+  <g class="signal" transform="translate(472 302)"><rect width="52" height="22" rx="6" fill="#FF5E66"/><path d="m12 11 7 6 16-13" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g class="signal" transform="translate(92 322)"><circle cx="13" cy="13" r="13" fill="#79F5BA"/><circle cx="13" cy="13" r="5" fill="#153E2B"/></g>
+  <g filter="url(#shadow)">
+    <circle cx="300" cy="215" r="143" fill="#07100C" stroke="url(#rim)" stroke-width="14"/>
+    <circle cx="300" cy="215" r="116" fill="#0E1B15" stroke="#D7FFF0" stroke-opacity=".25" stroke-width="2"/>
+    <g stroke="#B5EED5" stroke-linecap="round" opacity=".65">
+      <path d="M300 89v17M300 324v17M174 215h17M409 215h17" stroke-width="4"/>
+      <path d="m211 126 12 12m154 154 12 12m0-178-12 12M223 292l-12 12" stroke-width="2"/>
+    </g>
+    <g class="needle">
+      <path d="m300 215 102-55-78 91Z" fill="url(#needle)" filter="url(#glow)"/>
+      <path d="m300 215-90 53 66-78Z" fill="#5267FF" fill-opacity=".76"/>
+    </g>
+    <circle cx="300" cy="215" r="22" fill="#E8FFF5"/><circle cx="300" cy="215" r="10" fill="#14271D"/>
+  </g>
+  <g fill="#D7FFF0"><circle class="spark" cx="159" cy="72" r="4"/><circle class="spark" cx="524" cy="206" r="3"/><circle class="spark" cx="57" cy="238" r="3"/><circle class="spark" cx="430" cy="370" r="4"/></g>
+</svg>

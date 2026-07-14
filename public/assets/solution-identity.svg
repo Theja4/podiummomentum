@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 430" role="img" aria-labelledby="title desc">
+  <title id="title">Identity system</title><desc id="desc">Colourful modular pieces lock together into one distinct identity.</desc>
+  <defs>
+    <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#E2FFF3" stop-opacity=".96"/><stop offset="1" stop-color="#67E0A3" stop-opacity=".38"/></linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A88CFF"/><stop offset="1" stop-color="#5B49E8"/></linearGradient>
+    <filter id="shadow" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="20" stdDeviation="20" flood-color="#07110C" flood-opacity=".28"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <style>.tile{transform-box:fill-box;transform-origin:center;animation:float 5.5s ease-in-out infinite}.t2{animation-delay:-1.4s}.t3{animation-delay:-2.7s}.t4{animation-delay:-4s}.ring{transform-origin:300px 215px;animation:spin 20s linear infinite}.pulse{animation:pulse 3.2s ease-in-out infinite}@keyframes float{50%{transform:translateY(-12px) rotate(2deg)}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{opacity:.38;transform:scale(.88)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}</style>
+  <ellipse cx="300" cy="225" rx="210" ry="160" fill="#67E0A3" opacity=".09"/>
+  <g class="ring" fill="none" stroke="#67E0A3" stroke-dasharray="3 12" opacity=".45"><circle cx="300" cy="215" r="186"/><circle cx="300" cy="215" r="151"/></g>
+  <g filter="url(#shadow)">
+    <g class="tile t1"><rect x="198" y="102" width="102" height="106" rx="24" fill="url(#glass)" stroke="#DFFFF0" stroke-opacity=".72"/><circle cx="249" cy="155" r="23" fill="#0B1D13" opacity=".72"/></g>
+    <g class="tile t2"><path d="M316 102h84a24 24 0 0 1 24 24v82H316Z" fill="#121A25" stroke="#5267FF" stroke-opacity=".68"/><path d="m351 151 19-19 19 19-19 19Z" fill="#5267FF"/></g>
+    <g class="tile t3"><path d="M176 224h124v107H200a24 24 0 0 1-24-24Z" fill="#FF6B61"/><path d="M211 278h54" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".85"/></g>
+    <g class="tile t4"><path d="M316 224h108v83a24 24 0 0 1-24 24h-84Z" fill="url(#violet)"/><circle cx="370" cy="278" r="25" fill="none" stroke="#fff" stroke-width="8" opacity=".82"/></g>
+    <circle cx="308" cy="216" r="61" fill="#0D1913" stroke="#C7FFE3" stroke-width="9"/><circle cx="308" cy="216" r="31" fill="#79F5BA" filter="url(#glow)"/>
+  </g>
+  <g class="pulse"><path d="M118 169h46M141 146v46" stroke="#FFAE5D" stroke-width="8" stroke-linecap="round"/><circle cx="487" cy="142" r="13" fill="#5267FF"/><path d="m473 327 27-27 27 27-27 27Z" fill="#79F5BA"/></g>
+  <g fill="#D7FFF0"><circle cx="126" cy="276" r="4"/><circle cx="470" cy="232" r="4"/><circle cx="432" cy="77" r="3"/><circle cx="201" cy="367" r="3"/></g>
+</svg>

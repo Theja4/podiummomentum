@@ -274,7 +274,10 @@ html[data-theme="dark"] .cu-page{
 .cu-form-intro{padding:.1rem .1rem .35rem}
 .cu-form-intro h2{margin:0 0 .2rem;color:var(--cu-ink);font-size:1.18rem;font-weight:500;line-height:1.2;letter-spacing:-.025em}
 .cu-form-intro p{color:var(--cu-muted);max-width:28rem;font-size:.78rem;line-height:1.4}
+.cu-form-stage{display:grid;min-width:0;flex:1}
 .cu-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.cu-form-stage>.cu-form,.cu-form-stage>.cu-form-success{grid-area:1 / 1}
+.cu-form-card.is-sent .cu-form{visibility:hidden;pointer-events:none;user-select:none}
 .cu-form label{display:flex;flex-direction:column;gap:.42rem;font-size:.7rem;font-weight:600;letter-spacing:.025em;color:var(--cu-muted)}
 .cu-form input,.cu-form textarea{
   width:100%;border:1px solid var(--cu-border);background:#f8faf9;color:var(--cu-ink);
@@ -285,6 +288,7 @@ html[data-theme="dark"] .cu-page{
 .cu-form input:focus,.cu-form textarea:focus{border-color:#146b48;background:var(--cu-paper);box-shadow:0 0 0 3px rgba(103,224,163,.2);transform:translateY(-1px)}
 .cu-form textarea{resize:vertical;min-height:8.25rem}
 .cu-form-message{grid-column:1 / -1}
+.cu-form-status{grid-column:1 / -1;margin:-.25rem 0 0;color:#b74838;font-size:.72rem;line-height:1.4}
 .cu-form-actions{grid-column:1 / -1;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:1rem;margin-top:.15rem}
 .cu-budget{position:relative;min-width:0}
 .cu-budget-label{display:block;margin:0 0 .42rem;font-size:.7rem;font-weight:600;letter-spacing:.025em;color:var(--cu-muted)}
@@ -344,11 +348,55 @@ html:not([data-theme="dark"]) .cu-budget-trigger>span:first-child{color:#626c66}
   box-shadow:0 10px 28px rgba(51,139,94,.16);font-size:.84rem;font-weight:600;justify-content:space-between;
 }
 .cu-form .cu-form-submit:hover{background:var(--cu-aquamarine);color:#07100b;box-shadow:0 14px 30px rgba(51,139,94,.24)}
+.cu-form .cu-form-submit:disabled{cursor:wait;opacity:.68;transform:none;box-shadow:none}
 .cu-form-submit span:last-child{font-size:1rem;transition:transform .35s cubic-bezier(.16,1,.3,1)}
 .cu-form-submit:hover span:last-child{transform:translate(2px,-2px)}
-.cu-form-success{padding:1.5rem 0;display:flex;flex-direction:column;gap:.75rem}
-.cu-form-success h3{color:var(--cu-ink);font-size:1.5rem;font-weight:500}
-.cu-form-success p{color:var(--cu-muted)}
+.cu-form-success{
+  position:relative;z-index:2;min-width:0;min-height:100%;
+  display:grid;grid-template-rows:minmax(0,1fr) auto;gap:.25rem;
+  padding:.2rem .1rem .1rem;overflow:hidden;
+  animation:cuSuccessIn .75s cubic-bezier(.16,1,.3,1) both;
+}
+.cu-success-visual{position:relative;display:grid;place-items:center;min-height:15rem}
+.cu-success-signal{display:block;width:100%;height:auto;max-height:18.5rem;overflow:visible}
+.cu-signal-grid path{stroke:var(--cu-ink);stroke-width:.65;opacity:.055}
+.cu-signal-ring{stroke:url(#cu-signal-line);stroke-width:1;opacity:.4;transform-origin:280px 125px}
+.cu-signal-ring-outer{stroke-dasharray:5 12;animation:cuSignalOrbit 18s linear infinite}
+.cu-signal-ring-inner{stroke-dasharray:2 9;animation:cuSignalOrbitReverse 13s linear infinite}
+.cu-signal-route{stroke:var(--cu-ink);stroke-width:1;stroke-dasharray:3 6;opacity:.11}
+.cu-signal-flow{
+  stroke:url(#cu-signal-line);stroke-width:2;stroke-linecap:round;
+  stroke-dasharray:34 390;filter:url(#cu-signal-glow);
+  animation:cuSignalFlow 4.2s cubic-bezier(.45,0,.55,1) infinite;
+}
+.cu-signal-node circle:first-child{fill:var(--cu-card);stroke:var(--cu-emerald);stroke-width:1;opacity:.72}
+.cu-signal-node circle:last-child{fill:var(--cu-emerald)}
+.cu-signal-node{transform-box:fill-box;transform-origin:center;animation:cuSignalPulse 2.8s ease-in-out infinite}
+.cu-signal-node-two{animation-delay:-.7s}.cu-signal-node-three{animation-delay:-1.4s}.cu-signal-node-four{animation-delay:-2.1s}
+.cu-signal-halo{animation:cuSignalBreathe 3.5s ease-in-out infinite;transform-origin:280px 125px}
+.cu-signal-core-glow{fill:var(--cu-emerald);opacity:.2;filter:url(#cu-signal-glow);animation:cuSignalBreathe 3.5s ease-in-out infinite;transform-origin:280px 125px}
+.cu-signal-core{transform-origin:280px 125px;animation:cuSignalCoreIn .9s cubic-bezier(.16,1,.3,1) .16s both}
+.cu-signal-core circle:first-child{fill:var(--cu-card);stroke:var(--cu-emerald);stroke-width:1.3}
+.cu-signal-core circle:nth-child(2){fill:var(--cu-emerald)}
+.cu-signal-core path{stroke:#07100b;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:32;animation:cuSignalCheck .8s cubic-bezier(.16,1,.3,1) .65s both}
+.cu-signal-corners path{stroke:var(--cu-ink);stroke-width:1;opacity:.15}
+.cu-success-badge{
+  position:absolute;left:50%;top:calc(50% + 4.35rem);transform:translateX(-50%);
+  display:inline-flex;align-items:center;gap:.45rem;white-space:nowrap;
+  padding:.45rem .7rem;border-radius:999px;background:rgba(103,224,163,.11);
+  color:var(--cu-ink);font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+}
+.cu-success-copy{padding:.75rem 0 .1rem}
+.cu-form-success h3{color:var(--cu-ink);font-size:clamp(1.5rem,2.4vw,2rem);font-weight:500;letter-spacing:-.035em}
+.cu-form-success p{margin-top:.45rem;color:var(--cu-muted);max-width:30rem;font-size:.9rem;line-height:1.5}
+@keyframes cuSuccessIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes cuSignalOrbit{to{stroke-dashoffset:-136;transform:rotate(360deg)}}
+@keyframes cuSignalOrbitReverse{to{stroke-dashoffset:110;transform:rotate(-360deg)}}
+@keyframes cuSignalFlow{0%{stroke-dashoffset:424;opacity:0}12%,82%{opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes cuSignalPulse{0%,100%{transform:scale(.78);opacity:.45}50%{transform:scale(1.1);opacity:1}}
+@keyframes cuSignalBreathe{0%,100%{transform:scale(.88);opacity:.16}50%{transform:scale(1.16);opacity:.38}}
+@keyframes cuSignalCoreIn{from{opacity:0;transform:scale(.35) rotate(-18deg)}to{opacity:1;transform:none}}
+@keyframes cuSignalCheck{from{stroke-dashoffset:32}to{stroke-dashoffset:0}}
 
 /* Results / marquee */
 .cu-results{background:var(--cu-ice);padding:5.5rem 0;position:relative}
@@ -599,6 +647,15 @@ html[data-theme="dark"] .cu-expect-item p {
 }
 @media (prefers-reduced-motion:reduce){
   .cu-marquee-track,.cu-pipeline-row{animation:none}
+  .cu-form-success,
+  .cu-signal-ring-outer,
+  .cu-signal-ring-inner,
+  .cu-signal-flow,
+  .cu-signal-node,
+  .cu-signal-halo,
+  .cu-signal-core-glow,
+  .cu-signal-core,
+  .cu-signal-core path{animation:none}
 }
 
 /* Soft edges — no hard card strokes (matches landing audit) */

@@ -4,6 +4,7 @@ import ClientLogo from './ClientLogo.jsx'
 const TC = '/assets/tc-contact/'
 const A = '/assets/'
 const BRAND = 'Podium Momentum'
+const CONTACT_FORM_ENDPOINT = 'https://formspree.io/f/xojgvvjv'
 
 // Same client logos used on the landing page.
 const clientLogos = ['a9cc6fba12268e37', '43201ae504d0ad9f', 'cfecff048b60daa1', 'baa053d3454375d0', 'd2c8ca3a50aba890', 'ab3a9a6cf9778c11', '9a6b3e2b11136ee0', 'c90888271d904160', 'e72cc835698ff331']
@@ -299,34 +300,118 @@ function BudgetDropdown({ value, onChange, hasError }) {
   )
 }
 
+function StrategySignal() {
+  return (
+    <div className="cu-success-visual" aria-hidden="true">
+      <svg className="cu-success-signal" viewBox="0 0 560 250" fill="none">
+        <defs>
+          <linearGradient id="cu-signal-line" x1="70" y1="34" x2="480" y2="220" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#AFF9C9" stopOpacity=".16" />
+            <stop offset=".48" stopColor="#67E0A3" />
+            <stop offset="1" stopColor="#7CF0BD" stopOpacity=".12" />
+          </linearGradient>
+          <radialGradient id="cu-signal-core" cx="0" cy="0" r="1" gradientTransform="translate(280 125) rotate(90) scale(56)">
+            <stop stopColor="#7CF0BD" stopOpacity=".32" />
+            <stop offset="1" stopColor="#67E0A3" stopOpacity="0" />
+          </radialGradient>
+          <filter id="cu-signal-glow" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="7" result="blur" />
+            <feColorMatrix in="blur" values="0 0 0 0 0.404 0 0 0 0 0.878 0 0 0 0 0.639 0 0 0 .65 0" />
+          </filter>
+        </defs>
+
+        <g className="cu-signal-grid">
+          <path d="M44 70H516M44 125H516M44 180H516" />
+          <path d="M120 35V215M200 35V215M280 35V215M360 35V215M440 35V215" />
+        </g>
+
+        <ellipse className="cu-signal-ring cu-signal-ring-outer" cx="280" cy="125" rx="176" ry="82" />
+        <ellipse className="cu-signal-ring cu-signal-ring-inner" cx="280" cy="125" rx="116" ry="54" />
+        <path className="cu-signal-route" d="M58 177C121 177 118 82 190 82C246 82 237 167 305 167C371 167 366 73 446 73C478 73 494 91 510 108" />
+        <path className="cu-signal-flow" d="M58 177C121 177 118 82 190 82C246 82 237 167 305 167C371 167 366 73 446 73C478 73 494 91 510 108" />
+
+        <g className="cu-signal-node cu-signal-node-one">
+          <circle cx="104" cy="137" r="10" />
+          <circle cx="104" cy="137" r="3" />
+        </g>
+        <g className="cu-signal-node cu-signal-node-two">
+          <circle cx="190" cy="82" r="10" />
+          <circle cx="190" cy="82" r="3" />
+        </g>
+        <g className="cu-signal-node cu-signal-node-three">
+          <circle cx="446" cy="73" r="10" />
+          <circle cx="446" cy="73" r="3" />
+        </g>
+        <g className="cu-signal-node cu-signal-node-four">
+          <circle cx="475" cy="86" r="10" />
+          <circle cx="475" cy="86" r="3" />
+        </g>
+
+        <circle className="cu-signal-halo" cx="280" cy="125" r="58" fill="url(#cu-signal-core)" />
+        <circle className="cu-signal-core-glow" cx="280" cy="125" r="31" />
+        <g className="cu-signal-core">
+          <circle cx="280" cy="125" r="29" />
+          <circle cx="280" cy="125" r="22" />
+          <path d="M268.5 125.5L276.5 133.5L292.5 116.5" />
+        </g>
+
+        <g className="cu-signal-corners">
+          <path d="M48 52V40H60M500 40H512V52M48 198V210H60M500 210H512V198" />
+        </g>
+      </svg>
+      <span className="cu-success-badge">Interest confirmed</span>
+    </div>
+  )
+}
+
 function ContactForm() {
   const [sent, setSent] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [budget, setBudget] = useState('')
   const [budgetError, setBudgetError] = useState(false)
-  const onSubmit = e => {
+  const onSubmit = async e => {
     e.preventDefault()
     if (!budget) {
       setBudgetError(true)
       e.currentTarget.querySelector('.cu-budget-trigger')?.focus()
       return
     }
-    setSent(true)
+
+    const form = e.currentTarget
+    setSubmitting(true)
+    setSubmitError('')
+
+    try {
+      const response = await fetch(CONTACT_FORM_ENDPOINT, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' },
+      })
+
+      if (!response.ok) throw new Error('Formspree rejected the submission')
+
+      form.reset()
+      setBudget('')
+      setSent(true)
+    } catch (error) {
+      console.error('Contact form submission failed:', error)
+      setSubmitError('We couldn’t send your request. Please try again in a moment.')
+    } finally {
+      setSubmitting(false)
+    }
   }
   return (
-    <div className="cu-form-card" id="form">
+    <div className={`cu-form-card ${sent ? 'is-sent' : ''}`} id="form">
       <div className="cu-form-intro">
         <div>
           <h2>Tell us what you’re building.</h2>
           <p>We’ll map the clearest next move in a 30-minute strategy session.</p>
         </div>
       </div>
-      {sent ? (
-        <div className="cu-form-success">
-          <h3>Thanks; you’re on the list.</h3>
-          <p>We’ll reach out within one business day to lock your strategy session.</p>
-        </div>
-      ) : (
-        <form className="cu-form" onSubmit={onSubmit}>
+      <div className="cu-form-stage">
+        <form className="cu-form" onSubmit={onSubmit} aria-hidden={sent || undefined}>
+          <input type="hidden" name="_subject" value="New strategy session request" />
           <label>
             <span>Full name*</span>
             <input name="name" required placeholder="Jane Cooper" autoComplete="name" />
@@ -341,12 +426,17 @@ function ContactForm() {
           </label>
           <label>
             <span>Website</span>
-            <input name="website" type="url" placeholder="https://" autoComplete="url" />
+            <input name="website" type="text" inputMode="url" placeholder="company.com" autoComplete="url" />
           </label>
           <label className="cu-form-message">
-            <span>What are you looking to achieve?*</span>
+            <span>Describe what you are looking to achieve*</span>
             <textarea name="message" required rows={4} placeholder="Share the goal, the friction, and what success should look like." />
           </label>
+          {submitError && (
+            <p className="cu-form-status" id="contact-form-error" role="alert">
+              {submitError}
+            </p>
+          )}
           <div className="cu-form-actions">
             <BudgetDropdown
               value={budget}
@@ -357,13 +447,28 @@ function ContactForm() {
               }}
             />
             <input type="hidden" name="budget" value={budget} />
-            <button className="cu-btn cu-form-submit" type="submit">
-              <span>Book the session</span>
+            <button
+              className="cu-btn cu-form-submit"
+              type="submit"
+              disabled={submitting}
+              aria-busy={submitting}
+              aria-describedby={submitError ? 'contact-form-error' : undefined}
+            >
+              <span>{submitting ? 'Sending…' : 'Book the session'}</span>
               <span aria-hidden="true">↗</span>
             </button>
           </div>
         </form>
-      )}
+        {sent && (
+          <div className="cu-form-success" role="status" aria-live="polite">
+            <StrategySignal />
+            <div className="cu-success-copy">
+              <h3>Thanks; you’re on the list.</h3>
+              <p>We’ll reach out within one business day to lock your strategy session.</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

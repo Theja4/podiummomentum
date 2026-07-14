@@ -63,7 +63,7 @@ function Pill({ children, href, navigate, dark = false, icon = 'wave' }) {
   )
 }
 
-function DotLabel({ children }) {
+export function DotLabel({ children }) {
   return (
     <div className="svc-dot-label">
       <span className="svc-dot" aria-hidden="true" />
@@ -72,7 +72,7 @@ function DotLabel({ children }) {
   )
 }
 
-function ServiceFaq({ faqs }) {
+export function ServiceFaq({ faqs }) {
   const [active, setActive] = useState(null)
   return (
     <div className="svc-faq-list">
@@ -164,23 +164,21 @@ export function ServicesHub({ navigate }) {
             {serviceCatalog.map((s, i) => (
               <a
                 key={s.slug}
-                className="svc-hub-row"
+                className="svc-hub-row service-row-motion"
                 href={getServicePath(s.slug)}
                 data-reveal="service"
+                style={{ '--service-index': i }}
                 onClick={e => {
                   e.preventDefault()
                   go(getServicePath(s.slug), navigate)
                 }}
               >
-                <span className="svc-hub-num">{String(i + 1).padStart(2, '0')}</span>
+                <span className="svc-hub-num service-row-number">{String(i + 1).padStart(2, '0')}</span>
                 <div className="svc-hub-title-stack">
-                  <b className="svc-hub-title-main">{s.title}</b>
-                  <b className="svc-hub-title-ghost" aria-hidden="true">
-                    {s.title}
-                  </b>
+                  <b className="svc-hub-title-main service-row-title">{s.title}</b>
                 </div>
                 <p>{s.hubBlurb}</p>
-                <i aria-hidden="true">
+                <i className="service-row-arrow" aria-hidden="true">
                   <em>→</em>
                   <em>→</em>
                 </i>
@@ -408,12 +406,21 @@ export function ServiceDetail({ slug, navigate }) {
           </div>
           <ol className="svc-cap-list">
             {service.capabilities.map((cap, i) => (
-              <li key={cap.title} data-reveal="service">
-                <span>{String(i + 1).padStart(2, '0')}</span>
-                <div>
+              <li
+                className="service-row-motion"
+                key={cap.title}
+                data-reveal="service"
+                style={{ '--service-index': i }}
+              >
+                <span className="service-row-number">{String(i + 1).padStart(2, '0')}</span>
+                <div className="service-row-title">
                   <h3>{cap.title}</h3>
                   <p>{cap.body}</p>
                 </div>
+                <i className="service-row-arrow svc-cap-arrow" aria-hidden="true">
+                  <em>→</em>
+                  <em>→</em>
+                </i>
               </li>
             ))}
           </ol>

@@ -1062,7 +1062,8 @@ html[data-theme='dark'] body #root footer .footer-bottom > span {
 
 /* Service-row hover correction: restrained tint and one centered arrow. */
 html[data-theme] body #root .service-list a::before,
-html[data-theme] body #root .svc-hub-row::before {
+html[data-theme] body #root .svc-hub-row::before,
+html[data-theme] body #root .svc-cap-list .service-row-motion::before {
   background: linear-gradient(
     90deg,
     rgba(103, 224, 163, .18),
@@ -1072,13 +1073,15 @@ html[data-theme] body #root .svc-hub-row::before {
 
 html[data-theme='light'] body #root .service-list a:hover,
 html[data-theme='light'] body #root .svc-hub-row:hover,
-html[data-theme='light'] body #root .is-hub .svc-hub-row:hover {
+html[data-theme='light'] body #root .is-hub .svc-hub-row:hover,
+html[data-theme='light'] body #root .svc-cap-list .service-row-motion:hover {
   background: rgba(103, 224, 163, .08) !important;
   color: var(--pm-btn-ink) !important;
 }
 
 html[data-theme='dark'] body #root .service-list a::before,
-html[data-theme='dark'] body #root .svc-hub-row::before {
+html[data-theme='dark'] body #root .svc-hub-row::before,
+html[data-theme='dark'] body #root .svc-cap-list .service-row-motion::before {
   background: linear-gradient(
     90deg,
     rgba(20, 107, 72, .3),
@@ -1088,7 +1091,8 @@ html[data-theme='dark'] body #root .svc-hub-row::before {
 
 html[data-theme='dark'] body #root .service-list a:hover,
 html[data-theme='dark'] body #root .svc-hub-row:hover,
-html[data-theme='dark'] body #root .is-hub .svc-hub-row:hover {
+html[data-theme='dark'] body #root .is-hub .svc-hub-row:hover,
+html[data-theme='dark'] body #root .svc-cap-list .service-row-motion:hover {
   background: rgba(20, 107, 72, .12) !important;
   color: var(--pm-btn-white) !important;
 }
@@ -1097,7 +1101,9 @@ html[data-theme='dark'] body #root .service-list a:hover > span,
 html[data-theme='dark'] body #root .service-list a:hover > b,
 html[data-theme='dark'] body #root .svc-hub-row:hover .svc-hub-num,
 html[data-theme='dark'] body #root .svc-hub-row:hover b,
-html[data-theme='dark'] body #root .svc-hub-row:hover p {
+html[data-theme='dark'] body #root .svc-hub-row:hover p,
+html[data-theme='dark'] body #root .svc-cap-list .service-row-motion:hover > .service-row-number,
+html[data-theme='dark'] body #root .svc-cap-list .service-row-motion:hover > .service-row-title {
   color: var(--pm-btn-white) !important;
 }
 
@@ -1158,6 +1164,166 @@ html[data-theme] body #root .svc-hub-row:hover > i {
   color: var(--pm-btn-white) !important;
   box-shadow: none !important;
   transform: none !important;
+}
+
+/*
+ * Shared service-row motion language.
+ *
+ * The home and /services lists deliberately use the same easing, reveal
+ * cadence, fill sweep, content drift and arrow roll. Keeping this block after
+ * the button safety rules above prevents the two routes from drifting again.
+ */
+.service-row-motion {
+  --service-ease: cubic-bezier(.22, 1, .36, 1);
+  --service-fill-ease: cubic-bezier(.22, .75, .18, 1);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.service-row-motion::before {
+  transform: scaleY(.015) !important;
+  transform-origin: center bottom !important;
+  transition: transform .72s var(--service-fill-ease) !important;
+}
+
+.service-row-motion > .service-row-number,
+.service-row-motion > .service-row-title,
+.service-row-motion > .svc-hub-title-stack,
+.service-row-motion > p {
+  transition:
+    transform .72s var(--service-ease),
+    color .35s ease,
+    opacity .35s ease !important;
+}
+
+html[data-theme] body #root .service-row-motion > .service-row-arrow,
+body #root .service-row-motion > .service-row-arrow {
+  position: relative !important;
+  display: block !important;
+  width: 46px;
+  height: 46px;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 50% !important;
+  background: var(--pm-btn-mint) !important;
+  color: var(--pm-btn-ink) !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition:
+    background-color .65s var(--service-ease),
+    color .35s ease,
+    transform .75s var(--service-ease) !important;
+}
+
+html[data-theme] body #root .service-row-motion > .service-row-arrow::after,
+body #root .service-row-motion > .service-row-arrow::after {
+  display: none !important;
+}
+
+html[data-theme] body #root .service-row-motion > .service-row-arrow em,
+body #root .service-row-motion > .service-row-arrow em {
+  position: relative !important;
+  grid-area: auto !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition: transform .75s var(--service-ease) !important;
+}
+
+/* Match the home list's soft vertical entrance and give each row its own
+   stable local stagger instead of inheriting the page-wide modulo counter. */
+.motion-ready .service-row-motion[data-reveal="service"]:not(.is-inview) {
+  opacity: 0 !important;
+  transform: translate3d(0, 42px, 0) !important;
+}
+
+.motion-ready .service-row-motion[data-reveal="service"].is-inview {
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition:
+    opacity .9s cubic-bezier(.16, 1, .3, 1) calc(var(--service-index, 0) * 65ms),
+    transform .95s cubic-bezier(.16, 1, .3, 1) calc(var(--service-index, 0) * 65ms) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .service-row-motion:hover::before,
+  .service-row-motion:focus-visible::before {
+    transform: scaleY(1) !important;
+  }
+
+  .service-row-motion:hover > .service-row-number,
+  .service-row-motion:focus-visible > .service-row-number {
+    transform: translate3d(6px, 0, 0) !important;
+  }
+
+  .service-row-motion:hover > .service-row-title,
+  .service-row-motion:focus-visible > .service-row-title,
+  .service-row-motion:hover > .svc-hub-title-stack,
+  .service-row-motion:focus-visible > .svc-hub-title-stack {
+    transform: translate3d(8px, 0, 0) !important;
+  }
+
+  .service-row-motion:hover > p,
+  .service-row-motion:focus-visible > p {
+    transform: translate3d(5px, 0, 0) !important;
+  }
+
+  html[data-theme] body #root .service-row-motion:hover > .service-row-arrow,
+  html[data-theme] body #root .service-row-motion:focus-visible > .service-row-arrow,
+  body #root .service-row-motion:hover > .service-row-arrow,
+  body #root .service-row-motion:focus-visible > .service-row-arrow {
+    background: var(--pm-btn-forest) !important;
+    color: var(--pm-btn-white) !important;
+    transform: translate3d(-2px, 0, 0) !important;
+  }
+
+  html[data-theme] body #root .service-row-motion:hover > .service-row-arrow em,
+  html[data-theme] body #root .service-row-motion:focus-visible > .service-row-arrow em,
+  body #root .service-row-motion:hover > .service-row-arrow em,
+  body #root .service-row-motion:focus-visible > .service-row-arrow em {
+    transform: translate3d(0, -100%, 0) !important;
+  }
+}
+
+.service-row-motion:focus-visible {
+  outline: 2px solid var(--pm-btn-forest);
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  html[data-theme] body #root .service-row-motion > .service-row-arrow,
+  body #root .service-row-motion > .service-row-arrow {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready .service-row-motion[data-reveal="service"],
+  .service-row-motion,
+  .service-row-motion::before,
+  .service-row-motion > .service-row-number,
+  .service-row-motion > .service-row-title,
+  .service-row-motion > .svc-hub-title-stack,
+  .service-row-motion > p,
+  .service-row-motion > .service-row-arrow,
+  .service-row-motion > .service-row-arrow em {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .service-row-motion > .service-row-arrow em:last-child {
+    display: none !important;
+  }
 }
 
 /* Testimonial hover correction: quote and LinkedIn badge stay legible. */
@@ -1510,7 +1676,10 @@ html[data-theme='dark'] body #root footer .logo-wordmark em {
 
   html[data-theme] body #root .service-list a:hover,
   html[data-theme='light'] body #root .service-list a:hover,
-  html[data-theme='dark'] body #root .service-list a:hover {
+  html[data-theme='dark'] body #root .service-list a:hover,
+  html[data-theme] body #root .svc-cap-list .service-row-motion:hover,
+  html[data-theme='light'] body #root .svc-cap-list .service-row-motion:hover,
+  html[data-theme='dark'] body #root .svc-cap-list .service-row-motion:hover {
     background: transparent !important;
     border-radius: .25rem !important;
   }
@@ -1545,5 +1714,84 @@ html[data-theme='dark'] body #root footer .logo-wordmark em {
 
   html[data-theme] body #root .service-list a:hover > i {
     transform: translate3d(-1.5rem, 0, 0) !important;
+  }
+
+  /* The services-page list keeps its descriptive column, but mirrors the
+     homepage row's exact desktop travel distance and timing. */
+  html[data-theme] body #root .svc-hub-row.service-row-motion::before {
+    transform: scaleY(.01) !important;
+    transition: transform .6s ease !important;
+  }
+
+  html[data-theme] body #root .svc-hub-row.service-row-motion:hover::before,
+  html[data-theme] body #root .svc-hub-row.service-row-motion:focus-visible::before {
+    transform: scaleY(1) !important;
+  }
+
+  html[data-theme] body #root .svc-hub-row.service-row-motion > .service-row-number,
+  html[data-theme] body #root .svc-hub-row.service-row-motion > .svc-hub-title-stack,
+  html[data-theme] body #root .svc-hub-row.service-row-motion > p {
+    transform: translate3d(0, 0, 0) !important;
+    transition: transform .4s ease, color .35s ease, opacity .35s ease !important;
+  }
+
+  html[data-theme] body #root .svc-hub-row.service-row-motion:hover > .service-row-number,
+  html[data-theme] body #root .svc-hub-row.service-row-motion:focus-visible > .service-row-number,
+  html[data-theme] body #root .svc-hub-row.service-row-motion:hover > .svc-hub-title-stack,
+  html[data-theme] body #root .svc-hub-row.service-row-motion:focus-visible > .svc-hub-title-stack,
+  html[data-theme] body #root .svc-hub-row.service-row-motion:hover > p,
+  html[data-theme] body #root .svc-hub-row.service-row-motion:focus-visible > p {
+    transform: translate3d(1.5rem, 0, 0) !important;
+  }
+
+  html[data-theme] body #root .svc-hub-row.service-row-motion > .service-row-arrow {
+    transition: transform .4s ease, background-color .28s ease, color .28s ease !important;
+  }
+
+  html[data-theme] body #root .svc-hub-row.service-row-motion:hover > .service-row-arrow,
+  html[data-theme] body #root .svc-hub-row.service-row-motion:focus-visible > .service-row-arrow {
+    transform: translate3d(-1.5rem, 0, 0) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  /* There is no hover affordance on narrow touch layouts; hiding the circle
+     restores the compact two-column row used by the services page. */
+  html[data-theme] body #root .svc-hub-row.service-row-motion > .service-row-arrow,
+  body #root .svc-hub-row.service-row-motion > .service-row-arrow {
+    display: none !important;
+  }
+
+  /* Detail-page capability rows keep the same arrow motion, but use a fixed
+     compact control so the descriptive copy retains a readable measure. */
+  html[data-theme] body #root .svc-cap-list .svc-cap-arrow,
+  body #root .svc-cap-list .svc-cap-arrow {
+    display: block !important;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* This final override intentionally follows the desktop parity rules above. */
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme] body #root .service-row-motion,
+  html[data-theme] body #root .service-list a.service-row-motion,
+  html[data-theme] body #root .svc-hub-row.service-row-motion,
+  html[data-theme] body #root .service-row-motion::before,
+  html[data-theme] body #root .service-list a.service-row-motion::before,
+  html[data-theme] body #root .svc-hub-row.service-row-motion::before,
+  html[data-theme] body #root .service-list a.service-row-motion > .service-row-number,
+  html[data-theme] body #root .service-list a.service-row-motion > .service-row-title,
+  html[data-theme] body #root .svc-hub-row.service-row-motion > .service-row-number,
+  html[data-theme] body #root .svc-hub-row.service-row-motion > .svc-hub-title-stack,
+  html[data-theme] body #root .svc-hub-row.service-row-motion > p,
+  html[data-theme] body #root .service-list a.service-row-motion > .service-row-arrow,
+  html[data-theme] body #root .svc-hub-row.service-row-motion > .service-row-arrow,
+  html[data-theme] body #root .service-list a.service-row-motion > .service-row-arrow em,
+  html[data-theme] body #root .svc-hub-row.service-row-motion > .service-row-arrow em {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
   }
 }

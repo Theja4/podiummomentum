@@ -6,7 +6,7 @@ import './contact-us.css'
 import './industry.css'
 import './services-pages.css'
 import ContactUs from './ContactUs.jsx'
-import { ServicesHub, ServiceDetail, matchServicesRoute } from './ServicesPages.jsx'
+import { DotLabel, ServiceFaq, ServicesHub, ServiceDetail, matchServicesRoute } from './ServicesPages.jsx'
 import { serviceCatalog, getServicePath, getServiceBySlug, SERVICES_PATH } from './servicesData.js'
 import IndustryPage from './IndustryPage.jsx'
 import { industryList, matchIndustryRoute } from './industries.js'
@@ -14,6 +14,7 @@ import ClientLogo from './ClientLogo.jsx'
 import './landing-hero.css'
 import './header-polish.css'
 import './button-system.css'
+import './solution-section.css'
 
 const A = '/assets/'
 const BRAND = 'Podium Momentum'
@@ -92,12 +93,12 @@ const invertInDark = new Set(['d2c8ca3a50aba890','e72cc835698ff331'])
 
 const services = serviceCatalog.map(s => s.title)
 const faqs = [
-  [`What does ${BRAND} do?`, `${BRAND} is a strategic design partner that helps startups, tech companies, and corporate teams strengthen their brand, website, and digital product experience.`],
-  [`Can ${BRAND} help startups as well as established companies?`, `Yes. ${BRAND} works with both startups and established companies, especially in tech driven sectors.`],
-  [`Who is ${BRAND} best suited for?`, 'Founders, CEOs, CMOs, and product leaders at companies going through fundraising, repositioning, expansion, or acquisition.'],
-  [`What makes ${BRAND} different from a typical creative agency?`, `${BRAND} is built around business outcomes, not just deliverables. Brand, web, and UX are treated as connected systems.`],
-  [`When is the right time to hire ${BRAND}?`, 'When the business has outgrown its current brand, website, or product experience and needs to present itself at the next level.'],
-  [`What does ${BRAND} actually help companies with?`, 'Strategy, branding, websites, UX and UI, and design systems that support trust, fundraising, conversion, and growth.'],
+  { q: `What does ${BRAND} do?`, a: `${BRAND} is a strategic design partner that helps startups, tech companies, and corporate teams strengthen their brand, website, and digital product experience.` },
+  { q: `Can ${BRAND} help startups as well as established companies?`, a: `Yes. ${BRAND} works with both startups and established companies, especially in tech driven sectors.` },
+  { q: `Who is ${BRAND} best suited for?`, a: 'Founders, CEOs, CMOs, and product leaders at companies going through fundraising, repositioning, expansion, or acquisition.' },
+  { q: `What makes ${BRAND} different from a typical creative agency?`, a: `${BRAND} is built around business outcomes, not just deliverables. Brand, web, and UX are treated as connected systems.` },
+  { q: `When is the right time to hire ${BRAND}?`, a: 'When the business has outgrown its current brand, website, or product experience and needs to present itself at the next level.' },
+  { q: `What does ${BRAND} actually help companies with?`, a: 'Strategy, branding, websites, UX and UI, and design systems that support trust, fundraising, conversion, and growth.' },
 ]
 
 const testimonials = [
@@ -483,7 +484,7 @@ function MetricsMarquee() {
 function ShowreelThumb() {
   return (
     <div className="who-brand-thumb" aria-hidden="true">
-      <p className="who-hi">Hi we are,</p>
+      <p className="who-hi">Learn more about</p>
       <Logo variant="footer" />
     </div>
   )
@@ -882,14 +883,16 @@ function Services() {
       <div className="service-list">
         {serviceCatalog.map((s, i) => (
           <a
+            className="service-row-motion"
             href={getServicePath(s.slug)}
             onClick={e => { e.preventDefault(); navigate(getServicePath(s.slug)) }}
             key={s.slug}
             data-reveal="service"
+            style={{ '--service-index': i }}
           >
-            <span>{String(i + 1).padStart(2, '0')}</span>
-            <b>{s.title}</b>
-            <i><em>→</em><em>→</em></i>
+            <span className="service-row-number">{String(i + 1).padStart(2, '0')}</span>
+            <b className="service-row-title">{s.title}</b>
+            <i className="service-row-arrow"><em>→</em><em>→</em></i>
           </a>
         ))}
       </div>
@@ -901,8 +904,21 @@ function Services() {
 }
 
 function FAQ() {
-  const [active, setActive] = useState(null)
-  return <section id="faq" className="panel faq"><div><div className="eyebrow">● &nbsp; FAQ</div><h2>Frequently<br /> Asked Questions</h2></div><div className="faq-list">{faqs.map(([q, a], i) => <div className={active === i ? 'faq-item active' : 'faq-item'} key={q}><button aria-expanded={active === i} onClick={() => setActive(active === i ? null : i)}><span>{String(i + 1).padStart(2, '0')}</span><b>{q}</b><i aria-hidden="true" /></button><div className="faq-answer"><div><p>{a}</p></div></div></div>)}</div></section>
+  return (
+    <section id="faq" className="panel home-faq" data-reveal="panel">
+      <div className="svc-faq-grid">
+        <div className="home-faq-intro">
+          <DotLabel>FAQ</DotLabel>
+          <h2 data-reveal="line">
+            Frequently
+            <br />
+            Asked Questions
+          </h2>
+        </div>
+        <ServiceFaq faqs={faqs} />
+      </div>
+    </section>
+  )
 }
 
 function Testimonials() {
@@ -1132,6 +1148,136 @@ function Challenge() {
   )
 }
 
+const solutionCards = [
+  {
+    label: 'Clarity',
+    title: 'Make your value easy to see',
+    copy: 'We turn a fuzzy offer into a clear, confident story that helps the right clients understand why you are the right choice.',
+    image: `${A}solution-strategy.svg`,
+    accent: '#15985a',
+    soft: '#dff8e9',
+  },
+  {
+    label: 'Impact',
+    title: 'Be remembered for the right reasons',
+    copy: 'We give your brand the presence and consistency to earn trust, stand apart and make every first impression count.',
+    image: `${A}solution-identity.svg`,
+    accent: '#6657e8',
+    soft: '#ebe8ff',
+  },
+  {
+    label: 'More enquiries',
+    title: 'Turn more interest into action',
+    copy: 'We remove the friction that makes people hesitate, so more of the right visitors get in touch, book or buy.',
+    image: `${A}solution-experience.svg`,
+    accent: '#ed5d55',
+    soft: '#ffebe6',
+  },
+  {
+    label: 'More headspace',
+    title: 'Spend less time keeping things running',
+    copy: 'We create a dependable setup your team can manage easily, so you can focus on clients and growth instead of fixes.',
+    image: `${A}solution-engineering.svg`,
+    accent: '#d9782c',
+    soft: '#fff0de',
+  },
+]
+
+function Solution() {
+  const sectionRef = useRef(null)
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+    const cards = [...section.querySelectorAll('.solution-card')]
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const timers = []
+
+    const revealSection = () => {
+      section.classList.add('solution-is-visible')
+      timers.push(window.setTimeout(() => section.classList.add('solution-reveal-done'), 1400))
+    }
+    const revealCard = card => {
+      card.classList.add('solution-card-visible')
+      const index = Number(card.style.getPropertyValue('--solution-i')) || 0
+      timers.push(window.setTimeout(() => card.classList.add('solution-card-reveal-done'), 1150 + index * 90))
+    }
+
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      revealSection()
+      cards.forEach(revealCard)
+      return () => timers.forEach(window.clearTimeout)
+    }
+
+    const sectionObserver = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      revealSection()
+      sectionObserver.disconnect()
+    }, { threshold: .12, rootMargin: '0px 0px -8% 0px' })
+    const cardObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        revealCard(entry.target)
+        cardObserver.unobserve(entry.target)
+      })
+    }, { threshold: .16, rootMargin: '0px 0px -5% 0px' })
+
+    sectionObserver.observe(section)
+    cards.forEach(card => cardObserver.observe(card))
+    return () => {
+      sectionObserver.disconnect()
+      cardObserver.disconnect()
+      timers.forEach(window.clearTimeout)
+    }
+  }, [])
+
+  const moveCard = e => {
+    if (window.matchMedia('(hover: none)').matches) return
+    const card = e.currentTarget
+    const rect = card.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top) / rect.height
+    card.style.setProperty('--ry', `${(x - .5) * 7}deg`)
+    card.style.setProperty('--rx', `${(.5 - y) * 7}deg`)
+    card.style.setProperty('--mx', `${x * 100}%`)
+    card.style.setProperty('--my', `${y * 100}%`)
+  }
+  const resetCard = e => {
+    e.currentTarget.style.setProperty('--rx', '0deg')
+    e.currentTarget.style.setProperty('--ry', '0deg')
+  }
+  return (
+    <section className="solution-suite" aria-labelledby="solution-heading" ref={sectionRef}>
+      <div className="solution-head">
+        <div className="solution-kicker">Solutions</div>
+        <div className="solution-heading-wrap">
+          <h2 id="solution-heading" className="solution-heading">We solve what gets in the way of <em>more business and give you time back.</em></h2>
+        </div>
+        <p className="solution-intro">Clearer positioning. A stronger brand. A smoother path from interest to enquiry. We fix the gaps that cost you clients, slow down decisions and keep your team tied up.</p>
+      </div>
+      <div className="solution-grid">
+        {solutionCards.map((card, index) => (
+          <article
+            className="solution-card"
+            style={{ '--accent': card.accent, '--accent-soft': card.soft, '--solution-i': index }}
+            onPointerMove={moveCard}
+            onPointerLeave={resetCard}
+            key={card.label}
+          >
+            <div className="solution-visual">
+              <img src={card.image} alt="" loading="lazy" decoding="async" />
+            </div>
+            <div className="solution-card-copy">
+              <div className="solution-card-meta"><span>{String(index + 1).padStart(2, '0')} / {card.label}</span></div>
+              <h3>{card.title}</h3>
+              <p>{card.copy}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 // "Why us" comparison table: label rail, highlighted brand column with check
 // cells, and a muted "traditional agencies" column.
 function Compare() {
@@ -1226,7 +1372,7 @@ function HomePage() {
       document.body.classList.remove('page-loaded')
     }
   }, [])
-  return <><Header /><Hero /><main><About /><Challenge /><Work /><Clients /><Services /><Compare /><FAQ /><Testimonials /><CtaBanner /></main><Footer /></>
+  return <><Header /><Hero /><main><About /><Challenge /><Solution /><Work /><Clients /><Services /><Compare /><FAQ /><Testimonials /><CtaBanner /></main><Footer /></>
 }
 
 function App() {

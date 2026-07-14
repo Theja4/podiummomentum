@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 430" role="img" aria-labelledby="title desc">
+  <title id="title">Engineering system</title><desc id="desc">Connected modular blocks build upward with speed and momentum.</desc>
+  <defs>
+    <linearGradient id="mint" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#E0FFF0"/><stop offset="1" stop-color="#58D796"/></linearGradient>
+    <linearGradient id="dark" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#1A2A22"/><stop offset="1" stop-color="#07100C"/></linearGradient>
+    <filter id="shadow" x="-60%" y="-60%" width="220%" height="240%"><feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#06110B" flood-opacity=".34"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <style>.cube{transform-box:fill-box;transform-origin:center;animation:build 5.6s ease-in-out infinite}.c2{animation-delay:-1.1s}.c3{animation-delay:-2.2s}.c4{animation-delay:-3.3s}.c5{animation-delay:-4.4s}.flow{stroke-dasharray:8 12;animation:flow 1.8s linear infinite}.arrow{animation:rise 4s ease-in-out infinite}@keyframes build{50%{transform:translateY(-9px)}}@keyframes flow{to{stroke-dashoffset:-40}}@keyframes rise{50%{transform:translate(13px,-13px)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}</style>
+  <ellipse cx="296" cy="247" rx="224" ry="143" fill="#67E0A3" opacity=".1"/>
+  <g filter="url(#shadow)"><path d="m100 302 259-86 142 56-259 93Z" fill="url(#dark)" stroke="#7BE5AD" stroke-opacity=".35"/><path d="m134 300 221-72 104 41-220 78Z" fill="#101C17"/></g>
+  <g class="flow" fill="none" stroke="#79F5BA" stroke-width="6" stroke-linecap="round" filter="url(#glow)"><path d="M145 305c36-28 61 16 98-12s67 19 103-12 58 1 91-14"/><path d="M190 337c31-17 49 3 71-16"/></g>
+  <g filter="url(#shadow)">
+    <g class="cube c1"><path d="m243 223 47-18 46 18-47 20Z" fill="#E5FFF2"/><path d="m243 223 46 20v50l-46-20Z" fill="#5FD99A"/><path d="m289 243 47-20v50l-47 20Z" fill="#267B50"/></g>
+    <g class="cube c2"><path d="m292 201 47-18 45 18-46 20Z" fill="#D8FFEA"/><path d="m292 201 46 20v50l-46-20Z" fill="#67E0A3"/><path d="m338 221 46-20v50l-46 20Z" fill="#2A8C5A"/></g>
+    <g class="cube c3"><path d="m244 175 47-18 46 18-47 20Z" fill="#B8F8D6"/><path d="m244 175 46 20v49l-46-20Z" fill="#4AC989"/><path d="m290 195 47-20v49l-47 20Z" fill="#227449"/></g>
+    <g class="cube c4"><path d="m293 153 47-18 45 18-46 20Z" fill="#EEFFF7"/><path d="m293 153 46 20v49l-46-20Z" fill="url(#mint)"/><path d="m339 173 46-20v49l-46 20Z" fill="#2E9A61"/></g>
+    <g class="cube c5"><path d="m268 105 47-18 46 18-47 20Z" fill="#E8FFF4"/><path d="m268 105 46 20v49l-46-20Z" fill="#72E6AA"/><path d="m314 125 47-20v49l-47 20Z" fill="#2F9B61"/></g>
+  </g>
+  <g class="arrow" filter="url(#glow)"><path d="M403 204c39-31 53-65 65-111" fill="none" stroke="#E8FFF4" stroke-width="8" stroke-linecap="round"/><path d="m445 104 29-27 9 39" fill="#E8FFF4"/></g>
+  <g><rect x="105" y="144" width="78" height="58" rx="15" fill="#5267FF"/><path d="M127 171h34M127 184h21" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/><circle cx="481" cy="231" r="25" fill="#FF8A4C"/><path d="m470 231 8 8 15-18" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>
