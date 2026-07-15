@@ -101,6 +101,7 @@ export function usePageMotion(deps = [], rootSelector = null) {
       ...document.querySelectorAll('footer[data-reveal]'),
     ]
     const unique = [...new Set(nodes)]
+    const shrinkNodes = [...scope.querySelectorAll('[data-scroll-shrink]')]
     const io = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -118,9 +119,32 @@ export function usePageMotion(deps = [], rootSelector = null) {
       io.observe(node)
     })
 
+    let scrollFrame = 0
+    const updateScrollMotion = () => {
+      scrollFrame = 0
+      shrinkNodes.forEach(node => {
+        const stage = node.closest('[data-scroll-shrink-stage]')
+        if (!stage) return
+        const rect = stage.getBoundingClientRect()
+        const travel = Math.max(stage.offsetHeight - window.innerHeight, 1)
+        const progress = Math.max(0, Math.min(1, -rect.top / travel))
+        node.style.setProperty('--shrink-progress', progress.toFixed(4))
+      })
+    }
+    const requestScrollMotion = () => {
+      if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScrollMotion)
+    }
+    updateScrollMotion()
+    window.addEventListener('scroll', requestScrollMotion, { passive: true })
+    window.addEventListener('resize', requestScrollMotion)
+
     return () => {
       cancelAnimationFrame(raf)
+      cancelAnimationFrame(scrollFrame)
       io.disconnect()
+      window.removeEventListener('scroll', requestScrollMotion)
+      window.removeEventListener('resize', requestScrollMotion)
+      shrinkNodes.forEach(node => node.style.removeProperty('--shrink-progress'))
       splitNodes.forEach(restoreElement)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,7 +156,7 @@ export function expectedLandmarks(pageType) {
   const map = {
     home: ['#top', '#about', '#work', '#services', '#faq', 'footer'],
     servicesHub: ['.svc-page', '.svc-hub-hero', '.svc-hub-list', '.svc-featured', '.svc-partners', '.svc-expertise', '.svc-numbers', '.svc-testimonials', '.svc-hub-faq', '.svc-close', '.svc-contact-band'],
-    serviceDetail: ['.svc-page', '.svc-detail-hero', '.svc-detail-intro', '.svc-stats', '.svc-caps', '.svc-process', '.svc-work-strip', '.svc-faq', '.svc-close'],
+    serviceDetail: ['.svc-page', '.svc-detail-hero', '.svc-detail-intro', '.svc-stats', '.svc-caps', '.svc-work-strip', '.svc-testimonials', '.svc-process', '.svc-faq', '.svc-close'],
     industry: ['.ind-main', '.ind-hero-fs', '.ind-approach-grid', '.ind-exp-list', '.ind-work-list', '.ind-cta-band'],
     contact: ['.cu-page', '.cu-hero', '#form', 'footer'],
   }

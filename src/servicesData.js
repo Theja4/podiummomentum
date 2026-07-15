@@ -539,7 +539,7 @@ export const hubTestimonials = [
     quote:
       'Podium Momentum rebuilt our brand into one that finally matches the operation behind it. They gave us a system — strategic pillars and a defined voice that the whole team now uses.',
     name: 'Marcus Hale',
-    role: 'CEO, The Virtual Slimming Clinic',
+    role: 'CEO, VivaWell Clinic',
     image: '/assets/236e08442c17c9f5.avif',
   },
   {
