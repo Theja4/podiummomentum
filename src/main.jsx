@@ -184,16 +184,9 @@ function Header() {
   const [open, setOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [theme, setTheme] = useState(() => {
-    try {
-      return localStorage.getItem('pm-theme') || document.documentElement.dataset.theme || 'light'
-    } catch {
-      return 'light'
-    }
-  })
+  const [theme, setTheme] = useState('light')
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    try { localStorage.setItem('pm-theme', theme) } catch {}
   }, [theme])
   // Same header reveal as the landing page — every route needs page-loaded
   // or logo/nav stay at opacity:0 from the entrance animation CSS.
