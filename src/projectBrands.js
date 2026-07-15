@@ -53,7 +53,7 @@ export const projectBrandAliases = {
   Taraxa: 'Axion Chain',
   Liquild: 'FlowMint',
   Shaka: 'NovaSIM',
-  Incipet: 'Vetora AI',
+  Incipet: 'Kyntra',
   Sarwisi: 'Taskora',
   Vertus: 'Axiom Arc',
   Hybrid: 'Synapse Works',

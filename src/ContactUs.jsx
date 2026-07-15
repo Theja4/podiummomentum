@@ -473,7 +473,7 @@ function ContactForm() {
   )
 }
 
-export default function ContactUs({ onNavigateHome, footer = null }) {
+export default function ContactUs({ footer = null }) {
   useEffect(() => {
     document.title = `Book a Demo | ${BRAND}`
     document.body.classList.add('cu-active', 'page-loaded')
@@ -506,14 +506,6 @@ export default function ContactUs({ onNavigateHome, footer = null }) {
   return (
     <>
     <div className="cu-page">
-      <header className="cu-nav">
-        <a href="/" className="cu-nav-logo" onClick={e => { e.preventDefault(); onNavigateHome?.() }} aria-label={BRAND}>
-          <img src="/assets/brand-mark.svg" alt="" />
-          <span><b>podium</b><em>momentum</em></span>
-        </a>
-        <a className="cu-nav-cta" href="#form">Talk to Us</a>
-      </header>
-
       <section className="cu-hero" data-reveal="panel">
         <div className="cu-hero-bg" aria-hidden="true">
           <img className="cu-hero-gradient" src={`${TC}gradient-bg.svg`} alt="" />

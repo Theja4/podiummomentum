@@ -638,14 +638,136 @@ html[data-theme='dark'] .svc-hub-row:hover > i {
   color: var(--pm-btn-white) !important;
 }
 
-.ind-exp-item:hover .ind-exp-title,
-.ind-exp-item.is-open .ind-exp-title {
-  color: var(--pm-btn-forest);
+.ind-exp-body {
+  position: relative;
+  isolation: isolate;
 }
 
-html[data-theme='dark'] .ind-exp-item:hover .ind-exp-title,
-html[data-theme='dark'] .ind-exp-item.is-open .ind-exp-title {
-  color: var(--pm-btn-mint);
+.ind-exp-body::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -1.6rem -3.5rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(103, 224, 163, .2) 0%,
+    rgba(124, 240, 189, .1) 42%,
+    rgba(175, 249, 201, 0) 74%
+  );
+  opacity: var(--exp-accent-opacity, 0);
+  transform: translateZ(0) scale(.96);
+  transition:
+    opacity .2s linear,
+    transform .42s var(--pm-btn-ease);
+  pointer-events: none;
+}
+
+.ind-exp-item.is-focused .ind-exp-body::before {
+  transform: translateZ(0) scale(1);
+}
+
+.ind-exp-title {
+  position: relative;
+  color: inherit;
+  transition:
+    color .34s ease,
+    transform .16s cubic-bezier(.22, 1, .36, 1) !important;
+}
+
+.ind-exp-desc {
+  transition:
+    color .34s ease,
+    opacity .16s linear,
+    transform .18s cubic-bezier(.22, 1, .36, 1) !important;
+}
+
+.ind-exp-num {
+  transition:
+    color .34s ease,
+    opacity .16s linear,
+    text-shadow .34s ease !important;
+}
+
+.ind-exp-title::after {
+  content: attr(data-title);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    102deg,
+    var(--pm-btn-forest) 6%,
+    #229a66 52%,
+    var(--pm-btn-mint) 96%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  opacity: var(--exp-accent-opacity, 0);
+  transition: opacity .2s linear;
+  pointer-events: none;
+}
+
+.ind-exp-item.is-focused .ind-exp-num {
+  color: var(--pm-btn-forest);
+  text-shadow: 0 8px 24px rgba(20, 107, 72, .18);
+}
+
+.ind-exp-item.is-focused .ind-exp-desc {
+  color: #103d2c;
+}
+
+html[data-theme='dark'] .ind-exp-body::before {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(103, 224, 163, .2) 0%,
+    rgba(124, 240, 189, .1) 40%,
+    rgba(103, 224, 163, 0) 75%
+  );
+}
+
+html[data-theme='dark'] .ind-exp-title::after {
+  background-image: linear-gradient(
+    102deg,
+    var(--pm-btn-celadon) 5%,
+    var(--pm-btn-mint) 52%,
+    var(--pm-btn-aqua) 96%
+  );
+}
+
+html[data-theme='dark'] .ind-exp-item.is-focused .ind-exp-num {
+  color: var(--pm-btn-mint) !important;
+  text-shadow: 0 8px 28px rgba(103, 224, 163, .3);
+}
+
+html[data-theme='dark'] .ind-exp-item.is-focused .ind-exp-desc {
+  color: rgba(231, 255, 241, .92) !important;
+}
+
+/* Industry approach cards: keep the Podium mint wash vivid and readable. */
+html[data-theme='dark'] .ind-approach-card h3 {
+  color: #eef2f0 !important;
+}
+
+@media (hover: hover) {
+  html[data-theme='dark'] .ind-approach-card:hover {
+    color: var(--pm-btn-ink) !important;
+    border-color: var(--approach-accent) !important;
+    transform: translateY(-8px);
+  }
+
+  html[data-theme='dark'] .ind-approach-card:hover h3 {
+    color: var(--pm-btn-ink) !important;
+  }
+
+  html[data-theme='dark'] .ind-approach-card:hover p {
+    color: rgba(6, 18, 11, .72) !important;
+  }
+
+  html[data-theme='dark'] .ind-approach-card:hover .ind-approach-num {
+    color: var(--pm-btn-ink) !important;
+    background: rgba(6, 18, 11, .1) !important;
+  }
 }
 
 /* Contact budget control: preserve dropdown motion, remove control/label drift. */

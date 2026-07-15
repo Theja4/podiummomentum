@@ -182,10 +182,10 @@ const getClientsDataForSlug = (slug, blurbs) =>
 
 export default function IndustryPage({ slug, navigate }) {
   const industry = getIndustry(slug)
-  const [expOpen, setExpOpen] = useState(0)
   const [hoveredIdx, setHoveredIdx] = useState(null)
   const [heroIn, setHeroIn] = useState(false)
   const videoRef = useRef(null)
+  const expertiseRef = useRef(null)
 
   usePageMotion([slug], '.ind-main')
 
@@ -195,9 +195,86 @@ export default function IndustryPage({ slug, navigate }) {
       : `Industry | ${BRAND}`
     requestAnimationFrame(() => setHeroIn(true))
     window.scrollTo(0, 0)
-    setExpOpen(0)
     setHoveredIdx(null)
   }, [industry, slug])
+
+  // Keep the expertise copy's layout completely stable while using the row's
+  // distance from the viewport centre to drive a soft, continuous focus state.
+  // This avoids the observer feedback loop caused by animating width/font-size.
+  useEffect(() => {
+    const list = expertiseRef.current
+    if (!list) return undefined
+
+    const rows = [...list.querySelectorAll('.ind-exp-item')]
+    const desktop = window.matchMedia('(min-width: 768px)')
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let scrollFrame = 0
+
+    const setFocus = (row, focus, showAccent = true) => {
+      row.style.setProperty('--exp-title-scale', (0.86 + focus * 0.14).toFixed(3))
+      row.style.setProperty('--exp-copy-opacity', (0.58 + focus * 0.42).toFixed(3))
+      row.style.setProperty('--exp-copy-y', `${((1 - focus) * 8).toFixed(2)}px`)
+      row.style.setProperty('--exp-number-opacity', (0.48 + focus * 0.52).toFixed(3))
+      const accent = showAccent ? Math.max(0, Math.min(1, (focus - 0.35) / 0.65)) : 0
+      row.style.setProperty('--exp-accent-opacity', accent.toFixed(3))
+    }
+
+    const updateFocus = () => {
+      scrollFrame = 0
+
+      if (!desktop.matches || reducedMotion.matches) {
+        rows.forEach(row => {
+          row.classList.remove('is-focused')
+          setFocus(row, 1, false)
+        })
+        return
+      }
+
+      const focusY = window.innerHeight * 0.52
+      const focusRadius = Math.max(window.innerHeight * 0.32, 240)
+
+      const rowFocus = rows.map(row => {
+        const rect = row.getBoundingClientRect()
+        const rowY = rect.top + rect.height / 2
+        const linearFocus = Math.max(0, 1 - Math.abs(rowY - focusY) / focusRadius)
+        return linearFocus * linearFocus * (3 - 2 * linearFocus)
+      })
+
+      const strongestFocus = Math.max(...rowFocus)
+      const focusedIndex = strongestFocus >= 0.55 ? rowFocus.indexOf(strongestFocus) : -1
+
+      rows.forEach((row, index) => {
+        row.classList.toggle('is-focused', index === focusedIndex)
+        setFocus(row, rowFocus[index])
+      })
+    }
+
+    const requestFocusUpdate = () => {
+      if (!scrollFrame) scrollFrame = requestAnimationFrame(updateFocus)
+    }
+
+    updateFocus()
+    window.addEventListener('scroll', requestFocusUpdate, { passive: true })
+    window.addEventListener('resize', requestFocusUpdate)
+    desktop.addEventListener('change', requestFocusUpdate)
+    reducedMotion.addEventListener('change', requestFocusUpdate)
+
+    return () => {
+      cancelAnimationFrame(scrollFrame)
+      window.removeEventListener('scroll', requestFocusUpdate)
+      window.removeEventListener('resize', requestFocusUpdate)
+      desktop.removeEventListener('change', requestFocusUpdate)
+      reducedMotion.removeEventListener('change', requestFocusUpdate)
+      rows.forEach(row => {
+        row.style.removeProperty('--exp-title-scale')
+        row.style.removeProperty('--exp-copy-opacity')
+        row.style.removeProperty('--exp-copy-y')
+        row.style.removeProperty('--exp-number-opacity')
+        row.style.removeProperty('--exp-accent-opacity')
+        row.classList.remove('is-focused')
+      })
+    }
+  }, [slug])
 
   // Ensure muted autoplay and custom loop (clip last 4 seconds)
   useEffect(() => {
@@ -302,7 +379,7 @@ export default function IndustryPage({ slug, navigate }) {
       </section>
 
       {/* —— APPROACH: 4 tall cards —— */}
-      <section className="ind-section ind-section-white" data-reveal="panel">
+      <section className="ind-section ind-section-white ind-approach-sec" data-reveal="panel">
         <div className="ind-container">
           <div className="ind-section-head ind-section-head-row">
             <DotLabel>About</DotLabel>
@@ -327,37 +404,25 @@ export default function IndustryPage({ slug, navigate }) {
         </div>
       </section>
 
-      {/* —— EXPERTISE: large centered accordion —— */}
+      {/* —— EXPERTISE: scroll-centred focus list —— */}
       <section className="ind-section ind-section-white ind-expertise-sec" data-reveal="panel">
-        <div className="ind-container ind-container-narrow">
+        <div className="ind-container">
           <DotLabel>Expertise</DotLabel>
-          <div className="ind-exp-list">
-            {industry.expertise.map((item, i) => {
-              const open = expOpen === i
-              return (
-                <div key={item.title} data-reveal="up" style={{ width: '100%' }}>
-                  <button
-                    type="button"
-                    className={`ind-exp-item ${open ? 'is-open' : ''}`}
-                    aria-expanded={open}
-                    onClick={() => setExpOpen(open ? -1 : i)}
-                  >
-                    <span className="ind-exp-num" aria-hidden="true">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="ind-exp-body">
-                      <span className="ind-exp-title">{item.title}</span>
-                      <span className={`ind-exp-desc ${open ? 'is-open' : ''}`}>
-                        <span>{item.body}</span>
-                      </span>
-                    </span>
-                    <span className="ind-exp-num is-right" aria-hidden="true">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                  </button>
+          <div className="ind-exp-list" ref={expertiseRef}>
+            {industry.expertise.map((item, i) => (
+              <article className="ind-exp-item" key={item.title} data-reveal="up">
+                <span className="ind-exp-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="ind-exp-body">
+                  <h3 className="ind-exp-title" data-title={item.title}>{item.title}</h3>
+                  <p className="ind-exp-desc">{item.body}</p>
                 </div>
-              )
-            })}
+                <span className="ind-exp-num is-right" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -464,47 +529,47 @@ export default function IndustryPage({ slug, navigate }) {
       </section>
 
       {/* —— WHO WE ARE —— */}
-      <section className="ind-section ind-section-white ind-who" data-reveal="panel">
+      <section className="ind-section ind-section-white ind-who" data-reveal="who-section">
         <div className="ind-container">
           <DotLabel>Who we are</DotLabel>
           <div className="ind-who-grid-new">
-            <div className="ind-who-new-card" data-reveal="scale">
+            <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">01</span>
               <div className="ind-who-new-card-stat">25+</div>
               <div className="ind-who-new-card-body">Successful {industry.label} Projects</div>
             </div>
-            <div className="ind-who-new-card" data-reveal="scale">
+            <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">02</span>
               <div className="ind-who-new-card-title">Ongoing Support and Maintenance</div>
               <div className="ind-who-new-card-body">We provide continued assistance post-launch to ensure your solutions remain effective and up-to-date.</div>
             </div>
-            <div className="ind-who-new-card" data-reveal="scale">
+            <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">03</span>
               <div className="ind-who-new-card-stat">5+</div>
               <div className="ind-who-new-card-title">Years of Experience</div>
               <div className="ind-who-new-card-body">Expertise in helping brands and companies.</div>
             </div>
-            <div className="ind-who-new-card" data-reveal="scale">
+            <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">04</span>
               <div className="ind-who-new-card-title">Flexible Engagement Models</div>
               <div className="ind-who-new-card-body">We offer flexible partnerships, ranging from project-based work to long-term retainers.</div>
             </div>
-            <div className="ind-who-new-card" data-reveal="scale">
+            <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">05</span>
               <div className="ind-who-new-card-title">Fast Turnaround</div>
               <div className="ind-who-new-card-body">Delivering projects efficiently without compromising quality.</div>
             </div>
-            <div className="ind-who-new-card" data-reveal="scale">
+            <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">06</span>
               <div className="ind-who-new-card-title">User-Centric Design Philosophy</div>
               <div className="ind-who-new-card-body">We prioritize user experience to enhance {industry.slug === 'healthcare' ? 'patient' : 'user'} engagement and satisfaction.</div>
             </div>
-            <div className="ind-who-new-card" data-reveal="scale">
+            <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">07</span>
               <div className="ind-who-new-card-title">Regulatory Compliance</div>
               <div className="ind-who-new-card-body">We design with a focus on industry standards, ensuring both innovation and reliability.</div>
             </div>
-            <div className="ind-who-new-card" data-reveal="scale">
+            <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">08</span>
               <div className="ind-who-new-card-stat">99%</div>
               <div className="ind-who-new-card-title">Client Satisfaction</div>

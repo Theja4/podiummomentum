@@ -75,6 +75,7 @@ export function DotLabel({ children }) {
 
 function useAutoRail(speed = 0.7) {
   const ref = useRef(null)
+  const progressRef = useRef(null)
   const paused = useRef(false)
 
   useEffect(() => {
@@ -84,11 +85,19 @@ function useAutoRail(speed = 0.7) {
     let interval = 0
     const pause = () => { paused.current = true }
     const resume = () => { paused.current = false }
+    const updateProgress = () => {
+      const progress = progressRef.current
+      if (!progress) return
+      const loopAt = rail.scrollWidth / 2
+      const position = loopAt > 0 ? ((rail.scrollLeft % loopAt) + loopAt) % loopAt : 0
+      progress.style.setProperty('--rail-progress', Math.max(.035, Math.min(1, position / Math.max(1, loopAt))).toFixed(4))
+    }
     const tick = () => {
       if (!paused.current && rail.scrollWidth > rail.clientWidth) {
         rail.scrollLeft += speed
         const loopAt = rail.scrollWidth / 2
         if (rail.scrollLeft >= loopAt) rail.scrollLeft -= loopAt
+        updateProgress()
       }
     }
 
@@ -98,6 +107,9 @@ function useAutoRail(speed = 0.7) {
     rail.addEventListener('focusout', resume)
     rail.addEventListener('touchstart', pause, { passive: true })
     rail.addEventListener('touchend', resume, { passive: true })
+    rail.addEventListener('scroll', updateProgress, { passive: true })
+    window.addEventListener('resize', updateProgress, { passive: true })
+    updateProgress()
     interval = window.setInterval(tick, 24)
 
     return () => {
@@ -108,6 +120,8 @@ function useAutoRail(speed = 0.7) {
       rail.removeEventListener('focusout', resume)
       rail.removeEventListener('touchstart', pause)
       rail.removeEventListener('touchend', resume)
+      rail.removeEventListener('scroll', updateProgress)
+      window.removeEventListener('resize', updateProgress)
     }
   }, [speed])
 
@@ -119,13 +133,23 @@ function useAutoRail(speed = 0.7) {
     rail.scrollBy({ left: direction * rail.clientWidth * 0.72, behavior: 'smooth' })
   }
 
+  return { ref, nudge, progressRef }
+}
+
+function useManualRail() {
+  const ref = useRef(null)
+  const nudge = direction => {
+    const rail = ref.current
+    if (!rail) return
+    rail.scrollBy({ left: direction * Math.min(rail.clientWidth * .78, 430), behavior: 'smooth' })
+  }
   return { ref, nudge }
 }
 
-function RailControls({ label, onPrevious, onNext }) {
+function RailControls({ label, onPrevious, onNext, progressRef, showProgress = true }) {
   return (
-    <div className="svc-rail-controls" aria-label={`${label} carousel controls`}>
-      <span className="svc-rail-progress" aria-hidden="true"><i /></span>
+    <div className={`svc-rail-controls ${showProgress ? '' : 'is-compact'}`} aria-label={`${label} carousel controls`}>
+      {showProgress ? <span className="svc-rail-progress" ref={progressRef} aria-hidden="true"><i /></span> : null}
       <button type="button" onClick={onPrevious} aria-label={`Previous ${label}`}>←</button>
       <button type="button" onClick={onNext} aria-label={`Next ${label}`}>→</button>
     </div>
@@ -133,7 +157,7 @@ function RailControls({ label, onPrevious, onNext }) {
 }
 
 function ProjectRail({ works, serviceTitle }) {
-  const { ref, nudge } = useAutoRail(0.72)
+  const { ref, nudge, progressRef } = useAutoRail(0.72)
   const loopedWorks = [...works, ...works]
   return (
     <>
@@ -153,22 +177,22 @@ function ProjectRail({ works, serviceTitle }) {
           </article>
         ))}
       </div>
-      <RailControls label="projects" onPrevious={() => nudge(-1)} onNext={() => nudge(1)} />
+      <RailControls label="projects" progressRef={progressRef} onPrevious={() => nudge(-1)} onNext={() => nudge(1)} />
     </>
   )
 }
 
 function TestimonialsRail({ items }) {
-  const { ref, nudge } = useAutoRail(0.52)
-  const loopedItems = [...items, ...items]
+  const { ref, nudge } = useManualRail()
+  const visibleItems = items.slice(0, 4)
   return (
     <>
-      <div className="svc-testimonial-track" ref={ref} data-auto-rail="testimonials">
-        {loopedItems.map((t, i) => (
-          <article key={`${t.name}-${i}`} data-reveal="card" aria-hidden={i >= items.length ? 'true' : undefined}>
+      <div className="svc-testimonial-track" ref={ref} data-manual-rail="testimonials">
+        {visibleItems.map(t => (
+          <article key={t.name} data-reveal="card">
             <p>{t.quote}</p>
             <div className="svc-testimonial-person">
-              <img src={t.image} alt={i < items.length ? t.name : ''} loading="lazy" />
+              <img src={t.image} alt={t.name} loading="lazy" />
               <div>
                 <b>{t.name}</b>
                 <span>{t.role}</span>
@@ -178,7 +202,7 @@ function TestimonialsRail({ items }) {
           </article>
         ))}
       </div>
-      <RailControls label="testimonials" onPrevious={() => nudge(-1)} onNext={() => nudge(1)} />
+      <RailControls label="testimonials" showProgress={false} onPrevious={() => nudge(-1)} onNext={() => nudge(1)} />
     </>
   )
 }
@@ -191,7 +215,13 @@ function ServiceProcess({ steps }) {
         {steps.map((step, i) => {
           const open = active === i
           return (
-            <article key={step.title} className={open ? 'is-active' : ''} data-reveal="card" style={{ '--i': i }}>
+            <article
+              key={step.title}
+              className="svc-process-step"
+              data-expanded={open ? 'true' : 'false'}
+              data-reveal="card"
+              style={{ '--i': i }}
+            >
               <span>Step {i + 1}</span>
               <h3>{step.title}</h3>
               <button
@@ -511,8 +541,14 @@ export function ServiceDetail({ slug, navigate }) {
         <div className="svc-container">
           <DotLabel>Our expertise in numbers</DotLabel>
           <div className="svc-stats-grid">
-            {service.stats.map(stat => (
-              <article key={stat.label} data-reveal="card">
+            {service.stats.map((stat, index) => (
+              <article
+                className="svc-stat-card"
+                key={stat.label}
+                data-reveal="card"
+                data-stat-index={String(index + 1).padStart(2, '0')}
+                data-stat-value={stat.value}
+              >
                 <strong>{stat.value}</strong>
                 <b>{stat.label}</b>
                 <p>{stat.note}</p>
@@ -538,20 +574,21 @@ export function ServiceDetail({ slug, navigate }) {
           <ol className="svc-cap-list">
             {service.capabilities.map((cap, i) => (
               <li
-                className="service-row-motion"
+                className="svc-cap-card"
                 key={cap.title}
                 data-reveal="service"
                 style={{ '--service-index': i }}
               >
                 <span className="service-row-number">{String(i + 1).padStart(2, '0')}</span>
+                <span className="svc-cap-mark" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
                 <div className="service-row-title">
                   <h3>{cap.title}</h3>
                   <p>{cap.body}</p>
                 </div>
-                <i className="service-row-arrow svc-cap-arrow" aria-hidden="true">
-                  <em>→</em>
-                  <em>→</em>
-                </i>
               </li>
             ))}
           </ol>

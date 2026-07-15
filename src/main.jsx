@@ -94,7 +94,7 @@ const heroClientLogos = [
   { src: `${A}brand-logos/fictional/likeon.png`, alt: 'LikeOn' },
   { src: `${A}brand-logos/fictional/nively-os.png`, alt: 'Nively OS' },
   { src: `${A}brand-logos/fictional/orbitnine.png`, alt: 'OrbitNine' },
-  { src: `${A}brand-logos/fictional/vetora-ai.png`, alt: 'Vetora AI' },
+  { src: `${A}brand-logos/fictional/kyntra.png`, alt: 'Kyntra' },
 ]
 
 const clientMarqueeLogos = [
@@ -185,6 +185,9 @@ function Header() {
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [theme, setTheme] = useState('light')
+  const [svcOpen, setSvcOpen] = useState(false)
+  const [indOpen, setIndOpen] = useState(false)
+  const interactionOpen = open || svcOpen || indOpen
   useEffect(() => {
     document.documentElement.dataset.theme = theme
   }, [theme])
@@ -196,18 +199,29 @@ function Header() {
     return () => cancelAnimationFrame(id)
   }, [])
   useEffect(() => {
-    let previous = window.scrollY
+    let previous = Math.max(0, window.scrollY)
+    let directionDistance = 0
     let frame = 0
     const onScroll = () => {
       if (frame) return
       frame = requestAnimationFrame(() => {
-        const current = window.scrollY
+        const current = Math.max(0, window.scrollY)
         const delta = current - previous
         const hasScrolled = current > 24
         setScrolled(hasScrolled)
         document.body.classList.toggle('page-scrolled', hasScrolled)
-        if (delta > 4 && current > 24) setHidden(true)
-        if (delta < -4 || current < 24) setHidden(false)
+
+        if (interactionOpen || current <= 24) {
+          directionDistance = 0
+          setHidden(false)
+        } else if (delta > 0) {
+          directionDistance = directionDistance < 0 ? delta : directionDistance + delta
+          if (directionDistance > 8) setHidden(true)
+        } else if (delta < 0) {
+          directionDistance = directionDistance > 0 ? delta : directionDistance + delta
+          if (directionDistance < -8) setHidden(false)
+        }
+
         previous = current
         frame = 0
       })
@@ -222,9 +236,12 @@ function Header() {
       if (frame) cancelAnimationFrame(frame)
       document.body.classList.remove('page-scrolled')
     }
-  }, [])
-  const [svcOpen, setSvcOpen] = useState(false)
-  const [indOpen, setIndOpen] = useState(false)
+  }, [interactionOpen])
+
+  useEffect(() => {
+    if (interactionOpen) setHidden(false)
+  }, [interactionOpen])
+
   const svcRef = useRef(null)
   const indRef = useRef(null)
   const svcLeaveTimer = useRef(null)
@@ -304,8 +321,9 @@ function Header() {
   }
 
   return <header className={`header ${hidden ? 'header-hidden' : ''} ${scrolled ? 'header-scrolled' : ''}`}>
-    <a href="/" className="logo-link" aria-label={BRAND} onClick={e => { e.preventDefault(); navigate('/'); setOpen(false); setSvcOpen(false); setIndOpen(false) }}><Logo /></a>
-    <nav id="primary-navigation" className={open ? 'nav open' : 'nav'}>
+    <div className="header-inner">
+      <a href="/" className="logo-link" aria-label={BRAND} onClick={e => { e.preventDefault(); navigate('/'); setOpen(false); setSvcOpen(false); setIndOpen(false) }}><Logo /></a>
+      <nav id="primary-navigation" className={open ? 'nav open' : 'nav'}>
       <a href="/" onClick={e => { e.preventDefault(); navigate('/'); setOpen(false) }}>Home</a>
       <a href="#about" onClick={e => goHomeSection(e, '#about')}>About</a>
       <a href="#work" onClick={e => goHomeSection(e, '#work')}>Works</a>
@@ -402,8 +420,8 @@ function Header() {
           </div>
         </div>
       </div>
-    </nav>
-    <div className="header-actions">
+      </nav>
+      <div className="header-actions">
       <button
         className="menu"
         type="button"
@@ -431,6 +449,7 @@ function Header() {
               <path d="M20.2 15.2A8.4 8.4 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z" />
             </svg>}
       </button>
+      </div>
     </div>
   </header>
 }
@@ -484,6 +503,7 @@ function Hero() {
                 src={logo.src}
                 alt={logo.alt}
                 forceInvert={logo.forceInvert}
+                className={logo.alt === 'LikeOn' ? 'hero-logo--likeon' : ''}
                 key={logo.src}
               />
             ))}
@@ -873,7 +893,10 @@ function Work() {
           <span className="pm-cases-kicker-label">Featured cases</span>
         </span>
         <div className="pm-cases-intro">
-          <h2 data-reveal="line">Companies that closed the perception gap, and what changed.</h2>
+          <h2 data-reveal="line">
+            Companies that closed the <em>perception gap</em>,
+            <span>and what changed.</span>
+          </h2>
           <p data-reveal="line">Brand systems, websites, and measurable outcomes for scaling tech teams.</p>
         </div>
       </div>
@@ -1430,7 +1453,12 @@ function App() {
   const industryMatch = matchIndustryRoute(path)
 
   if (isContact) {
-    return <ContactUs onNavigateHome={() => navigate('/')} footer={<Footer />} />
+    return (
+      <>
+        <Header />
+        <ContactUs footer={<Footer />} />
+      </>
+    )
   }
   if (servicesMatch?.type === 'hub') {
     return (
@@ -1460,7 +1488,11 @@ function App() {
       <>
         <Header />
         <main className="svc-main">
-          <ServiceDetail slug={servicesMatch.slug} navigate={navigate} />
+          <ServiceDetail
+            key={servicesMatch.slug}
+            slug={servicesMatch.slug}
+            navigate={navigate}
+          />
         </main>
         <Footer />
       </>
