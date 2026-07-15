@@ -1,5 +1,7 @@
 // Industry pages — content + assets from eloqwnt.com/industry/*
 
+import { aliasProjectName, aliasProjectText } from './projectBrands.js'
+
 export const industryList = [
   { slug: 'healthcare', label: "Healthcare", path: '/industry/healthcare' },
   { slug: 'fintech', label: "Fintech", path: '/industry/fintech' },
@@ -13,7 +15,7 @@ export const industryList = [
   { slug: 'hospitality', label: "Hospitality", path: '/industry/hospitality' },
 ]
 
-export const industries = {
+const rawIndustries = {
   'healthcare': {
     slug: 'healthcare',
     label: "Healthcare",
@@ -402,6 +404,18 @@ export const industries = {
     who: ["/assets/industry-ui/who-hero-1.avif", "/assets/industry-ui/who-hero-2.avif"],
   },
 }
+
+export const industries = Object.fromEntries(
+  Object.entries(rawIndustries).map(([slug, industry]) => [slug, {
+    ...industry,
+    projects: (industry.projects || []).map(project => ({
+      ...project,
+      name: aliasProjectName(project.name),
+      desc: aliasProjectText(project.desc),
+    })),
+    blurbs: (industry.blurbs || []).map(aliasProjectText),
+  }]),
+)
 
 export function getIndustry(slug) {
   return industries[slug] || null

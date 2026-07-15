@@ -572,6 +572,7 @@ html[data-theme="dark"] .ind-clients-testimonial {
   font-size: clamp(2.2rem, 3.8vw, 3.2rem);
   font-weight: 500;
   letter-spacing: -0.03em;
+  text-align: center;
   color: var(--ink, #080808);
   cursor: pointer;
   transition: color 0.35s ease, opacity 0.35s ease, transform 0.35s ease;

@@ -74,22 +74,35 @@ const projects = [
   },
   {
     sector: 'Technology, SE',
-    title: 'Metapic',
-    headline: 'Metapic: influencer platform brand that finally matches scale',
+    title: 'LikeOn',
+    headline: 'LikeOn: influencer platform brand that finally matches scale',
     image: `${A}972304820e19d175.avif`,
-    company: 'Metapic',
+    company: 'LikeOn',
     location: 'Sweden / Europe',
     tags: ['#Branding', '#Website Design', '#Growth'],
     stack: 'Brand system, Webflow, CRO',
     timeline: '4 weeks',
-    description: "Metapic is Europe's leading influencer marketing platform with 100,000+ creators, major brand partnerships, and a product growing faster than its brand could keep up with.",
+    description: "LikeOn is a fast-growing European influencer marketing platform with 100,000+ creators, major brand partnerships, and a product growing faster than its brand could keep up with.",
     stats: [['50%+', 'Order value growth'], ['100k+', 'Creators on platform'], ['4:1', 'ROAS delivered in 3 weeks']],
     results: ['50%+ order value growth', '100k+ creators on platform', '4:1 ROAS delivered in 3 weeks'],
   },
 ]
 
-const clientLogos = ['a9cc6fba12268e37','43201ae504d0ad9f','cfecff048b60daa1','baa053d3454375d0','d2c8ca3a50aba890','ab3a9a6cf9778c11','9a6b3e2b11136ee0','c90888271d904160','e72cc835698ff331']
-const invertInDark = new Set(['d2c8ca3a50aba890','e72cc835698ff331'])
+const heroClientLogos = [
+  { brand: 'rezoomed', src: `${A}brand-logos/rezoomed-mark.jpg`, label: 'Rezoomed' },
+  { brand: 'jobposted', src: `${A}brand-logos/jobposted-mark.png`, label: 'JobPosted' },
+  { src: `${A}brand-logos/fictional/likeon.png`, alt: 'LikeOn' },
+  { src: `${A}brand-logos/fictional/nively-os.png`, alt: 'Nively OS' },
+  { src: `${A}brand-logos/fictional/orbitnine.png`, alt: 'OrbitNine' },
+  { src: `${A}brand-logos/fictional/vetora-ai.png`, alt: 'Vetora AI' },
+]
+
+const clientMarqueeLogos = [
+  ...heroClientLogos,
+  { src: `${A}brand-logos/fictional/northstar-ledger.png`, alt: 'Northstar Ledger' },
+  { src: `${A}brand-logos/fictional/revora-ai.png`, alt: 'Revora AI' },
+  { src: `${A}brand-logos/fictional/bricklane-capital.png`, alt: 'Bricklane Capital' },
+]
 
 const services = serviceCatalog.map(s => s.title)
 const faqs = [
@@ -102,10 +115,10 @@ const faqs = [
 ]
 
 const testimonials = [
-  [`${BRAND} rebuilt The Virtual Slimming Clinic into a brand that finally matches the clinical operation behind it. They gave us a system, with four strategic pillars and a defined voice that the whole team now uses.`, 'Qadir Hussain', 'CEO', `${A}236e08442c17c9f5.avif`],
-  [`Our previous website failed to reflect our standard of high end storytelling and technology. After ${BRAND} redesigned the site, it shifted the caliber of partners reaching out.`, 'Halie Graham', 'Executive Producer', `${A}c0bb9a494de2f7b0.png`],
-  ['The new website gets lots of trust, and influencers and brand clients get convinced to work with Metapic only by looking at the website :))', 'Jonathan', 'Associate Founder', `${A}ef42fa7cfd41a7e6.avif`],
-  ['We needed users to understand what we do just by looking at our website. As a result, we saw stronger interest and an increase in conversion.', 'Lihong Wang', 'CEO', `${A}b6bb0636a8e5a963.avif`],
+  [`${BRAND} rebuilt The Virtual Slimming Clinic into a brand that finally matches the clinical operation behind it. They gave us a system, with four strategic pillars and a defined voice that the whole team now uses.`, 'Marcus Hale', 'CEO', `${A}236e08442c17c9f5.avif`],
+  [`Our previous website failed to reflect our standard of high end storytelling and technology. After ${BRAND} redesigned the site, it shifted the caliber of partners reaching out.`, 'Oliver Grant', 'Executive Producer', `${A}c0bb9a494de2f7b0.png`],
+  ['The new website gets lots of trust, and influencers and brand clients get convinced to work with LikeOn only by looking at the website :))', 'Claire Bennett', 'Associate Founder', `${A}ef42fa7cfd41a7e6.avif`],
+  ['We needed users to understand what we do just by looking at our website. As a result, we saw stronger interest and an increase in conversion.', 'Daniel Brooks', 'CEO', `${A}b6bb0636a8e5a963.avif`],
 ]
 
 const ratingAvatars = ['236e08442c17c9f5.avif', 'c0bb9a494de2f7b0.png', 'ef42fa7cfd41a7e6.avif', 'b6bb0636a8e5a963.avif']
@@ -303,6 +316,7 @@ function Header() {
       <a href="/" onClick={e => { e.preventDefault(); navigate('/'); setOpen(false) }}>Home</a>
       <a href="#about" onClick={e => goHomeSection(e, '#about')}>About</a>
       <a href="#work" onClick={e => goHomeSection(e, '#work')}>Works</a>
+      <a href={getServicePath('ai-agents')} onClick={e => { e.preventDefault(); navigate(getServicePath('ai-agents')); setOpen(false); setSvcOpen(false); setIndOpen(false) }}>AI Agents</a>
       <div
         className={`nav-dropdown nav-dropdown--services ${svcOpen ? 'is-open' : ''}`}
         ref={svcRef}
@@ -465,8 +479,20 @@ function Hero() {
         <div className="hero-trust">
           <p>Trusted by 40+ ambitious<br />technology companies</p>
           <div className="hero-logos" aria-hidden="true">
-            {clientLogos.slice(0, 6).map(id => (
-              <ClientLogo src={`${A}${id}.avif`} alt="" forceInvert={invertInDark.has(id)} key={id} />
+            {heroClientLogos.map(logo => logo.brand ? (
+              <span className={`hero-brand-lockup hero-brand-lockup--${logo.brand}`} key={logo.src}>
+                <span className="hero-brand-mark">
+                  <img src={logo.src} alt="" />
+                </span>
+                <span className="hero-brand-name">{logo.label}</span>
+              </span>
+            ) : (
+              <ClientLogo
+                src={logo.src}
+                alt={logo.alt}
+                forceInvert={logo.forceInvert}
+                key={logo.src}
+              />
             ))}
           </div>
         </div>
@@ -484,7 +510,7 @@ function MetricsMarquee() {
 function ShowreelThumb() {
   return (
     <div className="who-brand-thumb" aria-hidden="true">
-      <p className="who-hi">Learn more about</p>
+      <p className="who-hi">Hi, we are</p>
       <Logo variant="footer" />
     </div>
   )
@@ -869,8 +895,15 @@ function Work() {
 }
 
 function Clients() {
-  const logos = clientLogos
-  return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><div className="clients-copy"><h2 data-reveal="line">We work with ambitious brands across every industry, teams whose ambition is ahead of how the market sees them.</h2><p data-reveal="up">Startup or established business, if your brand needs sharper positioning, design, or growth, we are ready.</p></div><div className="client-label" data-reveal="up"><span>Our clients</span><i aria-hidden="true" /></div><div className="logo-marquee"><div>{[...logos, ...logos].map((id, i) => <ClientLogo src={`${A}${id}.avif`} alt="Client logo" className={invertInDark.has(id) ? 'logo-invert' : ''} forceInvert={invertInDark.has(id)} key={i} />)}</div></div></section>
+  const logos = clientMarqueeLogos
+  return <section className="panel clients" data-reveal="panel"><div className="eyebrow" data-reveal="up">● &nbsp; Who we work with</div><div className="clients-copy"><h2 data-reveal="line">We work with ambitious brands across every industry, teams whose ambition is ahead of how the market sees them.</h2><p data-reveal="up">Startup or established business, if your brand needs sharper positioning, design, or growth, we are ready.</p></div><div className="client-label" data-reveal="up"><span>Our clients</span><i aria-hidden="true" /></div><div className="logo-marquee"><div>{[...logos, ...logos].map((logo, i) => logo.brand ? (
+    <span className={`marquee-brand-lockup marquee-brand-lockup--${logo.brand}`} key={`${logo.src}-${i}`}>
+      <span className="marquee-brand-mark"><img src={logo.src} alt="" /></span>
+      <span className="marquee-brand-name">{logo.label}</span>
+    </span>
+  ) : (
+    <ClientLogo src={logo.src} alt={logo.alt} className="marquee-fictional-logo" key={`${logo.src}-${i}`} />
+  ))}</div></div></section>
 }
 
 function Services() {
@@ -896,6 +929,28 @@ function Services() {
           </a>
         ))}
       </div>
+      <a
+        className="services-agent-feature"
+        href={getServicePath('ai-agents')}
+        onClick={e => { e.preventDefault(); navigate(getServicePath('ai-agents')) }}
+        data-reveal="up"
+      >
+        <div className="services-agent-feature-copy">
+          <span className="services-agent-feature-kicker">New capability · AI agent deployments</span>
+          <h3>Put your next best conversation on autopilot.</h3>
+          <p>Inbound calls, outbound follow-ups, and website chat — designed around the way clinics, real-estate teams, and service businesses actually work.</p>
+          <span className="services-agent-feature-link">Explore AI agents <i aria-hidden="true">↗</i></span>
+        </div>
+        <div className="services-agent-orbit" aria-hidden="true">
+          <span className="services-agent-orbit-ring ring-one" />
+          <span className="services-agent-orbit-ring ring-two" />
+          <span className="services-agent-node node-core">AI</span>
+          <span className="services-agent-node node-call">voice</span>
+          <span className="services-agent-node node-chat">chat</span>
+          <span className="services-agent-node node-book">book</span>
+          <span className="services-agent-wave" />
+        </div>
+      </a>
       <div className="services-cta" data-reveal="up">
         <Button href={SERVICES_PATH}>All Services</Button>
       </div>
@@ -924,7 +979,7 @@ function FAQ() {
 function Testimonials() {
   const track = useRef(null)
   const slide = direction => track.current?.scrollBy({ left: direction * Math.min(460, track.current.clientWidth * .82), behavior: 'smooth' })
-  return <section id="testimonials" className="testimonials"><div className="testimonial-head"><div className="eyebrow" data-reveal="up">● &nbsp; Testimonials</div><h2 data-reveal="line">What our clients say about working with us.</h2></div><div className="testimonial-track" ref={track}>{testimonials.map(([quote, name, role, img]) => <article key={name} data-reveal="card"><p>{quote}</p><div className="person"><img src={img} alt={name} /><div><b>{name}</b><span>{role}</span></div><i>in</i></div></article>)}</div><div className="track-control"><span></span><button onClick={() => slide(-1)} aria-label="Previous testimonial">←</button><button onClick={() => slide(1)} aria-label="Next testimonial">→</button></div></section>
+  return <section id="testimonials" className="testimonials"><div className="testimonial-head"><div className="eyebrow" data-reveal="up">● &nbsp; Testimonials</div><h2 data-reveal="line">What our clients say about working with us.</h2></div><div className="testimonial-track" ref={track}>{testimonials.map(([quote, name, role, img]) => <article key={name} data-reveal="card"><p>{quote}</p><div className="person"><img src={img} alt={name} /><div><b>{name}</b><span>{role}</span></div></div></article>)}</div><div className="track-control"><span></span><button onClick={() => slide(-1)} aria-label="Previous testimonial">←</button><button onClick={() => slide(1)} aria-label="Next testimonial">→</button></div></section>
 }
 
 function Footer() {
@@ -1250,7 +1305,7 @@ function Solution() {
       <div className="solution-head">
         <div className="solution-kicker">Solutions</div>
         <div className="solution-heading-wrap">
-          <h2 id="solution-heading" className="solution-heading">We solve what gets in the way of <em>more business and give you time back.</em></h2>
+          <h2 id="solution-heading" className="solution-heading">We solve what gets in the way of <em>more business,</em> and give you time back.</h2>
         </div>
         <p className="solution-intro">Clearer positioning. A stronger brand. A smoother path from interest to enquiry. We fix the gaps that cost you clients, slow down decisions and keep your team tied up.</p>
       </div>

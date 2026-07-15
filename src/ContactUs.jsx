@@ -20,17 +20,17 @@ const testimonialsCol1 = [
   {
     logo: 'logo-amazon.svg', flag: 'flag-in.webp', tag: 'SAAS',
     quote: 'The team is thoughtful, responsive, and has exceptional design sensibility. Bringing our collective brand vision to life wasn’t easy, but the results speak for themselves - it looks amazing!',
-    avatar: 'person-pinto.webp', name: 'Darryl Pinto', role: 'Growth Marketing Manager, Amazon',
+    avatar: 'person-pinto.webp', name: 'Jordan Ellis', role: 'Growth Marketing Manager, Amazon',
   },
   {
     logo: 'logo-coka.webp', flag: 'flag-us.png', tag: 'SERVICES',
     quote: `"${BRAND} created a website that helped us look credible in the space."`,
-    avatar: 'person-matthew.jpg', name: 'Matthew', role: 'Coka',
+    avatar: 'person-matthew.jpg', name: 'Casey Morgan', role: 'Coka',
   },
   {
     logo: 'logo-tripledart.png', flag: 'flag-in.webp', tag: 'SAAS',
     quote: `"${BRAND} has been our go-to partner for numerous SaaS client projects. They tackle each challenge with unmatched expertise and creativity, exceeding our expectations."`,
-    avatar: 'person-shiyam.webp', name: 'Shiyam Sunder', role: 'Co-founder, Tripledart',
+    avatar: 'person-shiyam.webp', name: 'Avery Thomas', role: 'Co-founder, Tripledart',
   },
 ]
 
@@ -38,17 +38,17 @@ const testimonialsCol2 = [
   {
     logo: 'logo-factors.svg', flag: 'flag-in.webp', tag: 'MARTECH',
     quote: `"${BRAND} was always responsive, quick to act, and highly collaborative. The final output exceeded our expectations - modern, clean, and exactly what we envisioned."`,
-    avatar: 'person-tanvi.jpeg', name: 'Tanvi', role: 'Product Marketing Lead, Factors AI',
+    avatar: 'person-tanvi.jpeg', name: 'Rhea Kapoor', role: 'Product Marketing Lead, Factors AI',
   },
   {
     logo: 'logo-deductive.svg', flag: 'flag-in.webp', tag: 'AI',
     quote: `"${BRAND} made our brand and website communicate our product effectively. The feedback has been amazing; people keep telling us how polished and engaging the site and the brand looks."`,
-    avatar: 'person-sameer.webp', name: 'Sameer Agarwal', role: 'Co-Founder & CTO, Deductive.ai',
+    avatar: 'person-sameer.webp', name: 'Devon Clarke', role: 'Co-Founder & CTO, Deductive.ai',
   },
   {
     logo: 'logo-skyroot.webp', flag: 'flag-in.webp', tag: 'SAAS',
     quote: `"The result of working with ${BRAND} was instantly visible - the site is very unique to our industry and showcases all our capabilities well."`,
-    avatar: 'person-sumil.jpg', name: 'Sumil Sudhakaran', role: 'Skyroot Aerospace',
+    avatar: 'person-sumil.jpg', name: 'Lucas Bennett', role: 'Skyroot Aerospace',
   },
 ]
 
@@ -56,17 +56,17 @@ const testimonialsCol3 = [
   {
     logo: 'logo-storylane.svg', flag: 'flag-in.webp', tag: 'MARTECH',
     quote: `"The ${BRAND} team is responsive, meets deadlines, and goes beyond expectations - it's a solid partner for any B2B company looking to scale their brand."`,
-    avatar: 'person-anand.webp', name: 'Anand Vatsya', role: 'Product Marketing, Outbound, Storylane',
+    avatar: 'person-anand.webp', name: 'Maya Sterling', role: 'Product Marketing, Outbound, Storylane',
   },
   {
     logo: 'logo-overpass.svg', flag: 'flag-uk.png', tag: 'SERVICES',
     quote: `"${BRAND}'s speed of execution, high-quality work, and transparent communication make them stand out. It's rare to find an agency this reliable, and that's why we keep coming back."`,
-    avatar: 'person-matt.webp', name: 'Matt Cope', role: 'Co-founder, Overpass Studio',
+    avatar: 'person-matt.webp', name: 'Owen Hartley', role: 'Co-founder, Overpass Studio',
   },
   {
     logo: 'logo-rezolv.svg', flag: 'flag-in.webp', tag: 'FINTECH',
     quote: `As an early-stage company, we needed a clear brand identity and messaging before launching. ${BRAND} delivered exactly that: concise, impactful copy and branding that feels right.`,
-    avatar: 'person-karan.webp', name: 'Karan Mehta', role: 'Founder, Rezolv',
+    avatar: 'person-karan.webp', name: 'Zara Collins', role: 'Founder, Rezolv',
   },
 ]
 

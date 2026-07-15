@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { industryList, getIndustry, matchIndustryRoute } from './industries.js'
 import { usePageMotion } from './usePageMotion.js'
+import { aliasProjectName, aliasProjectText } from './projectBrands.js'
 import './industry.css'
 
 export { matchIndustryRoute }
@@ -62,7 +63,7 @@ function DotLabel({ children }) {
   )
 }
 
-const getClientsDataForSlug = (slug, blurbs) => {
+const getRawClientsDataForSlug = (slug, blurbs) => {
   if (slug === 'healthcare') {
     return [
       { name: 'Get Talky', testimonial: blurbs[0], image: '/assets/industry-projects/healthcare-get-talky-0.avif', bgText: 'Get Talky' },
@@ -170,6 +171,14 @@ const getClientsDataForSlug = (slug, blurbs) => {
     bgText: `Client ${i + 1}`
   }));
 }
+
+const getClientsDataForSlug = (slug, blurbs) =>
+  getRawClientsDataForSlug(slug, blurbs).map(client => ({
+    ...client,
+    name: aliasProjectName(client.name),
+    bgText: aliasProjectName(client.name),
+    testimonial: aliasProjectText(client.testimonial),
+  }))
 
 export default function IndustryPage({ slug, navigate }) {
   const industry = getIndustry(slug)
@@ -519,4 +528,3 @@ export default function IndustryPage({ slug, navigate }) {
     </div>
   )
 }
-

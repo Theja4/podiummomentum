@@ -1,10 +1,12 @@
 /** Pure service catalog — Podium Momentum services hub + detail content. */
 
+import { aliasProjectName } from './projectBrands.js'
+
 export const SERVICES_PATH = '/services'
 export const BRAND = 'Podium Momentum'
 const IP = '/assets/industry-projects/'
 
-export const serviceCatalog = [
+const rawServiceCatalog = [
   {
     slug: 'website-design',
     title: 'Website Design',
@@ -374,7 +376,63 @@ export const serviceCatalog = [
       { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
     ],
   },
+  {
+    slug: 'ai-agents',
+    title: 'AI Agents',
+    shortTitle: 'AI Agents',
+    hubBlurb:
+      'Deploy voice agents and chatbots that answer, qualify, book, and follow up around the clock — tuned to how your business actually operates.',
+    heroEyebrow: 'AI Agent Deployments',
+    heroLead:
+      'Deploy AI agents that turn every call, chat, and follow-up into a better customer experience and a stronger pipeline.',
+    heroHeadline: 'Your best operator is always on',
+    heroBody:
+      'We design and deploy inbound and outbound AI voice agents and chatbots for high-intent service businesses. From a clinic booking the next appointment to a real-estate team qualifying a new enquiry, your agent handles the first conversation with speed, context, and a distinctly human point of view.',
+    heroImage: `${IP}ai-hybrid-mind-7.avif`,
+    stats: [
+      { value: '24/7', label: 'Always-on coverage', note: 'Capture intent after hours, on weekends, and across every time zone.' },
+      { value: '3×', label: 'More conversations', note: 'Handle more qualified inbound and outbound conversations without adding headcount.' },
+      { value: '< 1 min', label: 'Lead response time', note: 'Move from missed enquiry to useful first response while intent is still warm.' },
+      { value: '1 system', label: 'Voice + chat', note: 'One operating layer across phone, web chat, CRM, calendar, and follow-up.' },
+    ],
+    capabilities: [
+      { title: 'Inbound voice agents', body: 'Answer FAQs, triage intent, route calls, take messages, and book appointments with a natural, on-brand voice.' },
+      { title: 'Outbound qualification', body: 'Follow up with leads, re-engage dormant enquiries, confirm details, and hand warm conversations to your team.' },
+      { title: 'Website & WhatsApp chatbots', body: 'Guide visitors to the right service, capture context, and keep conversations moving beyond the first click.' },
+      { title: 'CRM & calendar orchestration', body: 'Connect your agent to the tools your team already uses so every call creates a clean next action.' },
+      { title: 'Conversation design', body: 'Scripts, guardrails, escalation paths, and knowledge bases shaped around real customer questions.' },
+      { title: 'Agent performance layer', body: 'Review outcomes, missed intents, bookings, and handoffs so the system improves every week.' },
+    ],
+    process: [
+      { title: 'Map the moments', body: 'We identify the conversations worth automating, from missed calls and appointment requests to lead qualification.' },
+      { title: 'Design the voice', body: 'Tone, prompts, knowledge, guardrails, and escalation rules are crafted around your brand and operating reality.' },
+      { title: 'Connect the system', body: 'We wire voice, chat, CRM, calendars, forms, and notifications into one dependable customer journey.' },
+      { title: 'Launch & tune', body: 'Your agent goes live with human oversight, analytics, and a steady optimisation rhythm after launch.' },
+    ],
+    faqs: [
+      { q: 'What kind of businesses are AI agents best for?', a: 'Any business with repeatable, high-intent conversations — especially clinics, real-estate agencies, education, home services, and professional services.' },
+      { q: 'Can an agent transfer to a human?', a: 'Yes. We define clear escalation rules and pass the conversation context along so your team can pick up without making the customer repeat themselves.' },
+      { q: 'Can the agent book appointments?', a: 'Yes. We can connect the experience to your calendar, booking flow, CRM, or internal routing rules.' },
+      { q: 'Will it sound like a robot?', a: 'The experience is designed around natural turn-taking, concise answers, and a voice that fits your brand. We test real scenarios before launch.' },
+      { q: 'Do you build the chatbot and voice agent together?', a: 'That is often the strongest setup. Customers can move between web chat, phone, and human support without losing context.' },
+      { q: 'How do we measure whether it is working?', a: 'We track response time, qualified conversations, bookings, handoffs, resolution, and the reasons people still need a human.' },
+    ],
+    related: ['website-design', 'landing-page', 'seo'],
+    works: [
+      { name: 'InnrevAI', year: '2024', image: `${IP}ai-innrevai-1.avif` },
+      { name: 'The Virtual Slimming Clinic', year: '2024', image: `${IP}healthcare-sofia-therapy-3.avif` },
+      { name: 'Dubai Realty', year: '2024', image: `${IP}real-estate-dubai-realty-1.avif` },
+    ],
+  },
 ]
+
+export const serviceCatalog = rawServiceCatalog.map(service => ({
+  ...service,
+  works: (service.works || []).map(work => ({
+    ...work,
+    name: aliasProjectName(work.name),
+  })),
+}))
 
 export const hubIntro = {
   heroLine: 'Solutions to help your brand stand out and grow',
@@ -403,7 +461,7 @@ export const hubFeatured = [
     tags: ['Product UX', 'Website Redesign', 'Motion'],
   },
   {
-    name: 'Metapic',
+    name: 'LikeOn',
     year: '2025',
     sector: 'Technology',
     blurb: '',
@@ -411,7 +469,7 @@ export const hubFeatured = [
     tags: ['Branding', 'Website Design', 'Growth'],
   },
   {
-    name: 'Planet9',
+    name: 'OrbitNine',
     year: '2024',
     sector: 'Fintech',
     blurb: '',
@@ -480,28 +538,28 @@ export const hubTestimonials = [
   {
     quote:
       'Podium Momentum rebuilt our brand into one that finally matches the operation behind it. They gave us a system — strategic pillars and a defined voice that the whole team now uses.',
-    name: 'Qadir Hussain',
+    name: 'Marcus Hale',
     role: 'CEO, The Virtual Slimming Clinic',
     image: '/assets/236e08442c17c9f5.avif',
   },
   {
     quote:
       'Our previous website failed to reflect our standard of high end storytelling and technology. After the redesign, it shifted the caliber of partners reaching out.',
-    name: 'Halie Graham',
+    name: 'Oliver Grant',
     role: 'Executive Producer',
     image: '/assets/c0bb9a494de2f7b0.png',
   },
   {
     quote:
       'The new website gets lots of trust — influencers and brand clients get convinced to work with us just by looking at the site.',
-    name: 'Jonathan',
-    role: 'Associate Founder, Metapic',
+    name: 'Claire Bennett',
+    role: 'Associate Founder, LikeOn',
     image: '/assets/ef42fa7cfd41a7e6.avif',
   },
   {
     quote:
       'We needed users to understand what we do just by looking at our website. As a result, we saw stronger interest and an increase in conversion.',
-    name: 'Lihong Wang',
+    name: 'Daniel Brooks',
     role: 'CEO',
     image: '/assets/b6bb0636a8e5a963.avif',
   },
@@ -552,7 +610,7 @@ export function matchServicesRoute(path) {
 /** Content shape checks for automated verification (no DOM). */
 export function validateServiceCatalog() {
   const errors = []
-  if (serviceCatalog.length !== 8) errors.push(`expected 8 services, got ${serviceCatalog.length}`)
+  if (serviceCatalog.length !== 9) errors.push(`expected 9 services, got ${serviceCatalog.length}`)
   const slugs = new Set()
   for (const s of serviceCatalog) {
     if (!s.slug) errors.push('missing slug')
