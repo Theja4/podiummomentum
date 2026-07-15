@@ -1219,47 +1219,52 @@ function Challenge() {
   )
 }
 
-const solutionCards = [
+const solutionShifts = [
   {
-    label: 'Clarity',
-    title: 'Make your value easy to see',
-    copy: 'We turn a fuzzy offer into a clear, confident story that helps the right clients understand why you are the right choice.',
-    image: `${A}solution-strategy.svg`,
-    accent: '#15985a',
-    soft: '#dff8e9',
+    discipline: 'Positioning',
+    before: 'Hard to explain',
+    after: 'Instantly understood',
+    copy: 'A sharper story gives buyers a reason to care — and your team the language to sell it.',
+    image: projects[0].image,
+    client: projects[0].title,
+    proof: projects[0].stats[0].join(' '),
   },
   {
-    label: 'Impact',
-    title: 'Be remembered for the right reasons',
-    copy: 'We give your brand the presence and consistency to earn trust, stand apart and make every first impression count.',
-    image: `${A}solution-identity.svg`,
-    accent: '#6657e8',
-    soft: '#ebe8ff',
+    discipline: 'Brand',
+    before: 'Easy to overlook',
+    after: 'Hard to forget',
+    copy: 'A distinct identity builds recognition, confidence and the presence your ambition deserves.',
+    image: projects[2].image,
+    client: projects[2].title,
+    proof: `${projects[2].stats[1][0]} creators on platform`,
   },
   {
-    label: 'More enquiries',
-    title: 'Turn more interest into action',
-    copy: 'We remove the friction that makes people hesitate, so more of the right visitors get in touch, book or buy.',
-    image: `${A}solution-experience.svg`,
-    accent: '#ed5d55',
-    soft: '#ffebe6',
+    discipline: 'Website',
+    before: 'Passive interest',
+    after: 'Qualified enquiries',
+    copy: 'A clearer journey turns first impressions into trust, momentum and measurable action.',
+    image: projects[1].image,
+    client: projects[1].title,
+    proof: projects[1].stats[1].join(' '),
   },
   {
-    label: 'More headspace',
-    title: 'Spend less time keeping things running',
-    copy: 'We create a dependable setup your team can manage easily, so you can focus on clients and growth instead of fixes.',
-    image: `${A}solution-engineering.svg`,
-    accent: '#d9782c',
-    soft: '#fff0de',
+    discipline: 'System',
+    before: 'Constant upkeep',
+    after: 'A team that moves faster',
+    copy: 'A dependable design foundation keeps every touchpoint consistent without daily firefighting.',
+    image: projects[0].image,
+    client: projects[0].title,
+    proof: projects[0].stats[2].join(' '),
   },
 ]
 
 function Solution() {
   const sectionRef = useRef(null)
+  const [activeShift, setActiveShift] = useState(0)
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
-    const cards = [...section.querySelectorAll('.solution-card')]
+    const shifts = [...section.querySelectorAll('.solution-shift')]
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const timers = []
 
@@ -1267,15 +1272,13 @@ function Solution() {
       section.classList.add('solution-is-visible')
       timers.push(window.setTimeout(() => section.classList.add('solution-reveal-done'), 1400))
     }
-    const revealCard = card => {
-      card.classList.add('solution-card-visible')
-      const index = Number(card.style.getPropertyValue('--solution-i')) || 0
-      timers.push(window.setTimeout(() => card.classList.add('solution-card-reveal-done'), 1150 + index * 90))
+    const revealShift = shift => {
+      shift.classList.add('solution-shift-visible')
     }
 
     if (reduceMotion || !('IntersectionObserver' in window)) {
       revealSection()
-      cards.forEach(revealCard)
+      shifts.forEach(revealShift)
       return () => timers.forEach(window.clearTimeout)
     }
 
@@ -1284,66 +1287,95 @@ function Solution() {
       revealSection()
       sectionObserver.disconnect()
     }, { threshold: .12, rootMargin: '0px 0px -8% 0px' })
-    const cardObserver = new IntersectionObserver(entries => {
+    const shiftObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return
-        revealCard(entry.target)
-        cardObserver.unobserve(entry.target)
+        revealShift(entry.target)
+        shiftObserver.unobserve(entry.target)
       })
     }, { threshold: .16, rootMargin: '0px 0px -5% 0px' })
 
     sectionObserver.observe(section)
-    cards.forEach(card => cardObserver.observe(card))
+    shifts.forEach(shift => shiftObserver.observe(shift))
     return () => {
       sectionObserver.disconnect()
-      cardObserver.disconnect()
+      shiftObserver.disconnect()
       timers.forEach(window.clearTimeout)
     }
   }, [])
 
-  const moveCard = e => {
-    if (window.matchMedia('(hover: none)').matches) return
-    const card = e.currentTarget
-    const rect = card.getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width
-    const y = (e.clientY - rect.top) / rect.height
-    card.style.setProperty('--ry', `${(x - .5) * 7}deg`)
-    card.style.setProperty('--rx', `${(.5 - y) * 7}deg`)
-    card.style.setProperty('--mx', `${x * 100}%`)
-    card.style.setProperty('--my', `${y * 100}%`)
-  }
-  const resetCard = e => {
-    e.currentTarget.style.setProperty('--rx', '0deg')
-    e.currentTarget.style.setProperty('--ry', '0deg')
-  }
+  const active = solutionShifts[activeShift]
   return (
     <section className="solution-suite" aria-labelledby="solution-heading" ref={sectionRef}>
       <div className="solution-head">
-        <div className="solution-kicker">Solutions</div>
-        <div className="solution-heading-wrap">
-          <h2 id="solution-heading" className="solution-heading">We solve what gets in the way of <em>more business,</em> and give you time back.</h2>
+        <div className="solution-kicker">
+          <span>Index 02</span>
+          <b>What changes</b>
         </div>
-        <p className="solution-intro">Clearer positioning. A stronger brand. A smoother path from interest to enquiry. We fix the gaps that cost you clients, slow down decisions and keep your team tied up.</p>
+        <div className="solution-heading-wrap">
+          <h2 id="solution-heading" className="solution-heading">From being underestimated to becoming <em>the obvious choice.</em></h2>
+          <div className="solution-intro-row">
+            <p className="solution-intro">We align positioning, identity, digital experience and the systems behind them — so your business is easier to understand, trust and choose.</p>
+            <a className="solution-proof-link" href="#work" onClick={e => { e.preventDefault(); navigate('#work') }}>
+              <span>See the evidence</span>
+              <i aria-hidden="true">↘</i>
+            </a>
+          </div>
+        </div>
       </div>
-      <div className="solution-grid">
-        {solutionCards.map((card, index) => (
-          <article
-            className="solution-card"
-            style={{ '--accent': card.accent, '--accent-soft': card.soft, '--solution-i': index }}
-            onPointerMove={moveCard}
-            onPointerLeave={resetCard}
-            key={card.label}
-          >
-            <div className="solution-visual">
-              <img src={card.image} alt="" loading="lazy" decoding="async" />
-            </div>
-            <div className="solution-card-copy">
-              <div className="solution-card-meta"><span>{String(index + 1).padStart(2, '0')} / {card.label}</span></div>
-              <h3>{card.title}</h3>
-              <p>{card.copy}</p>
-            </div>
-          </article>
-        ))}
+      <div className="solution-system">
+        <div
+          className="solution-shifts"
+          role="tablist"
+          aria-label="Business transformations"
+          style={{ '--solution-progress': (activeShift + 1) / solutionShifts.length }}
+        >
+          {solutionShifts.map((shift, index) => (
+            <button
+              className={`solution-shift ${activeShift === index ? 'is-active' : ''}`}
+              id={`solution-shift-${index}`}
+              type="button"
+              role="tab"
+              aria-selected={activeShift === index}
+              aria-controls="solution-evidence"
+              style={{ '--solution-i': index }}
+              onMouseEnter={() => setActiveShift(index)}
+              onFocus={() => setActiveShift(index)}
+              onClick={() => setActiveShift(index)}
+              key={shift.discipline}
+            >
+              <span className="solution-shift-index">{String(index + 1).padStart(2, '0')}</span>
+              <span className="solution-shift-discipline">{shift.discipline}</span>
+              <span className="solution-shift-story">
+                <span className="solution-shift-title">
+                  <span>{shift.before}</span>
+                  <i aria-hidden="true">→</i>
+                  <strong>{shift.after}</strong>
+                </span>
+                <span className="solution-shift-copy">{shift.copy}</span>
+              </span>
+              <span className="solution-shift-marker" aria-hidden="true">↗</span>
+            </button>
+          ))}
+        </div>
+        <figure
+          className="solution-evidence"
+          id="solution-evidence"
+          role="tabpanel"
+          aria-labelledby={`solution-shift-${activeShift}`}
+        >
+          <div className="solution-evidence-frame">
+            <img key={active.image} src={active.image} alt={`${active.client} project preview`} loading="lazy" decoding="async" />
+            <span className="solution-evidence-scan" aria-hidden="true" />
+          </div>
+          <figcaption>
+            <span>
+              <small>Evidence / {String(activeShift + 1).padStart(2, '0')}</small>
+              <b>{active.client}</b>
+            </span>
+            <strong>{active.proof}</strong>
+          </figcaption>
+        </figure>
       </div>
     </section>
   )
