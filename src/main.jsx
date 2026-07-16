@@ -180,7 +180,7 @@ function Button({ children, light = false, href = '#' }) {
   )
 }
 
-function Header() {
+function Header({ industryPage = false }) {
   const [open, setOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -320,7 +320,7 @@ function Header() {
     navigate(hash)
   }
 
-  return <header className={`header ${hidden ? 'header-hidden' : ''} ${scrolled ? 'header-scrolled' : ''}`}>
+  return <header className={`header ${industryPage ? 'header-industry' : ''} ${hidden ? 'header-hidden' : ''} ${scrolled ? 'header-scrolled' : ''}`}>
     <div className="header-inner">
       <a href="/" className="logo-link" aria-label={BRAND} onClick={e => { e.preventDefault(); navigate('/'); setOpen(false); setSvcOpen(false); setIndOpen(false) }}><Logo /></a>
       <nav id="primary-navigation" className={open ? 'nav open' : 'nav'}>
@@ -1533,7 +1533,7 @@ function App() {
   if (industryMatch?.type === 'detail') {
     return (
       <>
-        <Header />
+        <Header industryPage />
         <IndustryPage slug={industryMatch.slug} navigate={navigate} />
         <Footer />
       </>

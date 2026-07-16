@@ -40,8 +40,16 @@ html[data-theme='dark'] .header.header-scrolled {
   align-items: center;
   justify-content: space-between;
   transform-origin: 50% 50%;
-  animation: headerCenterReveal .6s ease-out 1.75s both;
+  animation: headerCenterReveal .6s ease-out .15s both;
   will-change: transform, opacity;
+}
+
+/* Industry detail heroes sit on an inset card. Keep the fixed navigation
+   inside that same card boundary so both surfaces read as one panel. */
+.header.header-industry {
+  left: var(--pad-standart, 3.75rem) !important;
+  right: var(--pad-standart, 3.75rem) !important;
+  width: auto !important;
 }
 
 @keyframes headerCenterReveal {
