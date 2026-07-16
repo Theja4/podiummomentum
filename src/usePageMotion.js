@@ -102,6 +102,19 @@ export function usePageMotion(deps = [], rootSelector = null) {
     ]
     const unique = [...new Set(nodes)]
     const shrinkNodes = [...scope.querySelectorAll('[data-scroll-shrink]')]
+
+    // Stagger repeated card families from the start of their own grid/rail.
+    // A page-wide modulo made adjacent cards inherit unrelated delays based on
+    // every reveal that appeared earlier in the document, which flattened the
+    // intended cascade on service pages.
+    const revealGroups = [...scope.querySelectorAll('[data-reveal-group]')]
+    revealGroups.forEach(group => {
+      const items = [...group.children].filter(child => child.matches('[data-reveal]'))
+      items.forEach((item, index) => {
+        item.style.setProperty('--reveal-index', index % 6)
+      })
+    })
+
     const io = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -115,7 +128,8 @@ export function usePageMotion(deps = [], rootSelector = null) {
     )
 
     unique.forEach((node, i) => {
-      node.style.setProperty('--reveal-order', i % 5)
+      const grouped = node.parentElement?.matches('[data-reveal-group]')
+      node.style.setProperty('--reveal-order', grouped ? 0 : i % 5)
       io.observe(node)
     })
 
@@ -145,6 +159,9 @@ export function usePageMotion(deps = [], rootSelector = null) {
       window.removeEventListener('scroll', requestScrollMotion)
       window.removeEventListener('resize', requestScrollMotion)
       shrinkNodes.forEach(node => node.style.removeProperty('--shrink-progress'))
+      // Route changes can reuse the same DOM nodes. Clear the observer state
+      // so the next industry's content is eligible for its entrance again.
+      unique.forEach(node => node.classList.remove('is-inview'))
       splitNodes.forEach(restoreElement)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -27,7 +27,6 @@
   .submit,
   .choices button,
   .menu,
-  .theme-toggle,
   .who-play,
   .who-mute,
   .subscribe-action,
@@ -321,7 +320,6 @@ html[data-theme='dark'] .elo-choice-row label input:checked + span {
 /* Circular utility controls: fixed geometry and true center alignment. */
 :where(
   .menu,
-  .theme-toggle,
   .who-play,
   .who-mute,
   .subscribe-action,
@@ -343,7 +341,6 @@ html[data-theme='dark'] .elo-choice-row label input:checked + span {
 
 :where(
   .menu,
-  .theme-toggle,
   .subscribe-action,
   .track-control button,
   .svc-slider-controls button,
@@ -357,8 +354,7 @@ html[data-theme='dark'] .elo-choice-row label input:checked + span {
   box-shadow: 0 8px 22px rgba(103, 224, 163, .2) !important;
 }
 
-.menu,
-.theme-toggle {
+.menu {
   width: 2.5rem !important;
   height: 2.5rem !important;
   min-width: 2.5rem;
@@ -368,7 +364,6 @@ html[data-theme='dark'] .elo-choice-row label input:checked + span {
   padding-bottom: .08em !important;
 }
 
-.theme-toggle svg,
 .subscribe-action svg,
 .who-mute svg {
   display: block;
@@ -1098,7 +1093,6 @@ html[data-theme] body #root .subscribe-action svg {
 
 /* Remaining button-shaped controls use explicit, contrast-safe soft states. */
 html[data-theme] body #root .menu,
-html[data-theme] body #root .theme-toggle,
 html[data-theme] body #root .who-mute,
 html[data-theme] body #root .faq-item button i,
 html[data-theme] body #root .svc-faq-item button i {
@@ -1107,7 +1101,6 @@ html[data-theme] body #root .svc-faq-item button i {
 }
 
 html[data-theme] body #root .menu:hover,
-html[data-theme] body #root .theme-toggle:hover,
 html[data-theme] body #root .who-mute:hover,
 html[data-theme] body #root .faq-item button:hover i,
 html[data-theme] body #root .svc-faq-item button:hover i,
@@ -1151,14 +1144,6 @@ html[data-theme="dark"] body #root main .tcx-cta-heading,
 html[data-theme="dark"] body #root .ind-main .ind-h1,
 html[data-theme="dark"] body #root .ind-main .ind-h2 {
   color: #fff !important;
-}
-
-html[data-theme="dark"] body #root main .svc-dot,
-html[data-theme="dark"] body #root main .ind-dot,
-html[data-theme="dark"] body #root .ind-main .ind-dot,
-html[data-theme="dark"] body #root .ind-main .svc-dot {
-  background: #fff !important;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Text shown alongside the footer controls in the supplied dark-mode example. */
@@ -1604,31 +1589,16 @@ html[data-theme] body #root :is(
   box-shadow: var(--pm-elevation-control-hover) !important;
 }
 
-html[data-theme] body #root :is(.menu, .theme-toggle) {
+html[data-theme] body #root .menu {
   border: 1px solid rgba(20, 107, 72, .2) !important;
   box-shadow: var(--pm-elevation-control) !important;
 }
 
-html[data-theme='dark'] body #root :is(.menu, .theme-toggle) {
+html[data-theme='dark'] body #root .menu {
   border-color: rgba(103, 224, 163, .22) !important;
 }
 
-html[data-theme] body #root :is(.menu, .theme-toggle):hover {
-  box-shadow: var(--pm-elevation-control-hover) !important;
-}
-
-/* Header actions share one primary CTA treatment. */
-html[data-theme] body #root .header .theme-toggle {
-  background: var(--pm-control-primary-bg) !important;
-  color: var(--pm-control-primary-fg) !important;
-  border-color: rgba(20, 107, 72, .2) !important;
-  box-shadow: var(--pm-elevation-control) !important;
-}
-
-html[data-theme] body #root .header .theme-toggle:hover {
-  background: var(--pm-control-primary-hover-bg) !important;
-  color: var(--pm-control-primary-hover-fg) !important;
-  border-color: var(--pm-control-primary-hover-bg) !important;
+html[data-theme] body #root .menu:hover {
   box-shadow: var(--pm-elevation-control-hover) !important;
 }
 

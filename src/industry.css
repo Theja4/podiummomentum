@@ -28,15 +28,6 @@
   letter-spacing: -0.01em;
 }
 
-.ind-dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  background: var(--emerald, #67e0a3);
-  box-shadow: 0 0 0 4px rgba(103, 224, 163, 0.18);
-  flex-shrink: 0;
-}
-
 /* —— Split-word entrance (hero) —— */
 .ind-split {
   display: inline;
@@ -211,11 +202,6 @@
 .ind-approach-sec .ind-container {
   position: relative;
   z-index: 1;
-}
-
-.ind-approach-sec .ind-dot {
-  background: var(--approach-emerald);
-  box-shadow: 0 0 0 4px rgba(103, 224, 163, 0.18);
 }
 
 .ind-approach-grid {
@@ -464,13 +450,6 @@
   justify-content: flex-start;
   gap: 1.5rem;
   padding: 0;
-}
-
-.ind-work-copy .ind-dot {
-  background: currentColor;
-  box-shadow: none;
-  width: 0.38rem;
-  height: 0.38rem;
 }
 
 .ind-work-title {

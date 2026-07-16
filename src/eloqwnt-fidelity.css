@@ -163,17 +163,6 @@ main {
   border-color: #000 !important;
   background: #fff !important;
 }
-.theme-toggle {
-  width: 2.5rem !important;
-  height: 2.5rem !important;
-  border-color: #000 !important;
-  background: #fff !important;
-  color: #000 !important;
-}
-.theme-toggle:hover {
-  background: #eff2f3 !important;
-  box-shadow: none !important;
-}
 
 /* CTAs: black pills (Eloqwnt) */
 .pill-light {
@@ -446,12 +435,6 @@ h2,
   font-size: 1rem !important;
   color: #000 !important;
 }
-.svc-dot,
-.ind-dot {
-  background: #000 !important;
-  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08) !important;
-}
-
 /* Services list rows — Eloqwnt large type */
 .service-list a,
 .svc-hub-row {
@@ -937,11 +920,6 @@ html[data-theme='dark'] .ind-work-title,
 html[data-theme='dark'] .ind-work-title span,
 html[data-theme='dark'] .ind-client-blurb.is-active {
   color: #f2f5f3 !important;
-}
-html[data-theme='dark'] .svc-dot,
-html[data-theme='dark'] .ind-dot {
-  background: #fff !important;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08) !important;
 }
 html[data-theme='dark'] .ind-exp-item {
   border-bottom-color: rgba(255, 255, 255, 0.14) !important;

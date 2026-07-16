@@ -112,7 +112,6 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
 .is-hub .svc-section-head-row { grid-template-columns: 44% 1fr; align-items:start; margin-bottom:110px; }
 .is-hub .svc-section-head h2 { font-size:38px; max-width:none; font-weight:500; line-height:1.05; letter-spacing:-1.6px; }
 .is-hub .svc-dot-label { font-size:16px; gap:14px; margin:0; }
-.is-hub .svc-dot { width:8px; height:8px; background:#000; box-shadow:none; }
 .is-hub .svc-hub-list { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
 .is-hub .svc-hub-row {
   display:flex;
@@ -365,15 +364,6 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
   margin: 0 0 1rem;
   font-size: 1rem;
   font-weight: 500;
-}
-
-.svc-dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  background: var(--emerald, #67e0a3);
-  box-shadow: 0 0 0 4px rgba(103, 224, 163, 0.18);
-  flex-shrink: 0;
 }
 
 .svc-kicker {
@@ -1192,6 +1182,7 @@ html[data-theme='dark'] .svc-page.is-hub .elo-footer {
 .svc-pills-row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.55rem;
 }
 

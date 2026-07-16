@@ -1,13 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ClientLogo from './ClientLogo.jsx'
+import { submitContactForm } from './contactForm.js'
 
 const TC = '/assets/tc-contact/'
 const A = '/assets/'
 const BRAND = 'Podium Momentum'
-const CONTACT_FORM_ENDPOINT = 'https://formspree.io/f/xojgvvjv'
-
-// Same client logos used on the landing page.
-const clientLogos = ['a9cc6fba12268e37', '43201ae504d0ad9f', 'cfecff048b60daa1', 'baa053d3454375d0', 'd2c8ca3a50aba890', 'ab3a9a6cf9778c11', '9a6b3e2b11136ee0', 'c90888271d904160', 'e72cc835698ff331']
 const invertInDark = new Set(['d2c8ca3a50aba890', 'e72cc835698ff331'])
 
 const expectItems = [
@@ -368,31 +365,16 @@ function ContactForm() {
   const [sent, setSent] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
-  const [budget, setBudget] = useState('')
-  const [budgetError, setBudgetError] = useState(false)
   const onSubmit = async e => {
     e.preventDefault()
-    if (!budget) {
-      setBudgetError(true)
-      e.currentTarget.querySelector('.cu-budget-trigger')?.focus()
-      return
-    }
-
     const form = e.currentTarget
     setSubmitting(true)
     setSubmitError('')
 
     try {
-      const response = await fetch(CONTACT_FORM_ENDPOINT, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { Accept: 'application/json' },
-      })
-
-      if (!response.ok) throw new Error('Formspree rejected the submission')
+      await submitContactForm(new FormData(form))
 
       form.reset()
-      setBudget('')
       setSent(true)
     } catch (error) {
       console.error('Contact form submission failed:', error)
@@ -402,74 +384,49 @@ function ContactForm() {
     }
   }
   return (
-    <div className={`cu-form-card ${sent ? 'is-sent' : ''}`} id="form">
-      <div className="cu-form-intro">
-        <div>
-          <h2>Tell us what you’re building.</h2>
-          <p>We’ll map the clearest next move in a 30-minute strategy session.</p>
-        </div>
+    <form className="cu-brief-form" id="contact-form" onSubmit={onSubmit}>
+      <input type="hidden" name="_subject" value="New contact page brief" />
+      <input type="hidden" name="company" value="Not provided" />
+      <input type="hidden" name="website" value="Contact page" />
+      <input type="hidden" name="budget" value="Not specified" />
+      <input type="hidden" name="submission_type" value="Contact brief" />
+
+      <div className="cu-brief-row">
+        <label className="cu-brief-field">
+          <span>Name</span>
+          <input name="name" required placeholder="Your name" autoComplete="name" />
+        </label>
+        <label className="cu-brief-field">
+          <span>Email</span>
+          <input name="email" type="email" required placeholder="you@company.com" autoComplete="email" />
+        </label>
       </div>
-      <div className="cu-form-stage">
-        <form className="cu-form" onSubmit={onSubmit} aria-hidden={sent || undefined}>
-          <input type="hidden" name="_subject" value="New strategy session request" />
-          <label>
-            <span>Full name*</span>
-            <input name="name" required placeholder="Jane Cooper" autoComplete="name" />
-          </label>
-          <label>
-            <span>Work email*</span>
-            <input name="email" type="email" required placeholder="jane@company.com" autoComplete="email" />
-          </label>
-          <label>
-            <span>Company*</span>
-            <input name="company" required placeholder="Acme Inc." autoComplete="organization" />
-          </label>
-          <label>
-            <span>Website</span>
-            <input name="website" type="text" inputMode="url" placeholder="company.com" autoComplete="url" />
-          </label>
-          <label className="cu-form-message">
-            <span>Describe what you are looking to achieve*</span>
-            <textarea name="message" required rows={4} placeholder="Share the goal, the friction, and what success should look like." />
-          </label>
-          {submitError && (
-            <p className="cu-form-status" id="contact-form-error" role="alert">
-              {submitError}
-            </p>
-          )}
-          <div className="cu-form-actions">
-            <BudgetDropdown
-              value={budget}
-              hasError={budgetError}
-              onChange={nextValue => {
-                setBudget(nextValue)
-                setBudgetError(false)
-              }}
-            />
-            <input type="hidden" name="budget" value={budget} />
-            <button
-              className="cu-btn cu-form-submit"
-              type="submit"
-              disabled={submitting}
-              aria-busy={submitting}
-              aria-describedby={submitError ? 'contact-form-error' : undefined}
-            >
-              <span>{submitting ? 'Sending…' : 'Book the session'}</span>
-              <span aria-hidden="true">↗</span>
-            </button>
-          </div>
-        </form>
-        {sent && (
-          <div className="cu-form-success" role="status" aria-live="polite">
-            <StrategySignal />
-            <div className="cu-success-copy">
-              <h3>Thanks; you’re on the list.</h3>
-              <p>We’ll reach out within one business day to lock your strategy session.</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+
+      <label className="cu-brief-field cu-brief-message">
+        <span>What are we moving?</span>
+        <textarea name="message" required rows={2} placeholder="Tell us in a few lines…" />
+      </label>
+
+      <button
+        className={`cu-brief-submit ${sent ? 'is-sent' : ''}`}
+        type="submit"
+        disabled={submitting || sent}
+        aria-busy={submitting}
+        aria-describedby={submitError ? 'contact-form-error' : undefined}
+      >
+        <span>{submitting ? 'Sending…' : sent ? 'Brief sent' : 'Send the brief'}</span>
+        <span className="cu-brief-arrow" aria-hidden="true">{sent ? '✓' : '↗'}</span>
+      </button>
+
+      <p
+        className={`cu-brief-status ${submitError ? 'is-error' : sent ? 'is-success' : ''}`}
+        id="contact-form-error"
+        role={submitError ? 'alert' : 'status'}
+        aria-live="polite"
+      >
+        {submitError || (sent ? 'Thank you. We’ll reply within one business day.' : '')}
+      </p>
+    </form>
   )
 }
 
@@ -499,68 +456,39 @@ export default function ContactUs({ footer = null }) {
     return () => {
       io.disconnect()
       document.body.classList.remove('cu-active')
-      document.title = `${BRAND} | Brand and Web Design Agency for Tech Companies`
+      document.title = `${BRAND} | Brand and Web Design Agency`
     }
   }, [])
 
   return (
     <>
     <div className="cu-page">
-      <section className="cu-hero" data-reveal="panel">
-        <div className="cu-hero-bg" aria-hidden="true">
-          <img className="cu-hero-gradient" src={`${TC}gradient-bg.svg`} alt="" />
-          <img className="cu-hero-decor" src={`${TC}contact-bg-light.svg`} alt="" />
-        </div>
-        <div className="cu-container cu-hero-grid">
-          <div className="cu-hero-left" data-reveal="up">
-            <h1 className="cu-h2">Get a SaaS website that makes your product impossible to ignore</h1>
-
-            <div className="cu-trust">
-              <div className="cu-trust-top">
-                <p className="cu-trust-title">Trusted by <span>40+</span> B2B Technology Companies</p>
-                <div className="cu-clutch">
-                  <img className="cu-clutch-icon" src={`${TC}clutch-icon.webp`} alt="Clutch" />
-                  <div>
-                    <div className="cu-clutch-row">
-                      <span>Clutch</span>
-                      <span className="cu-stars">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <img src={`${TC}star.svg`} alt="" key={i} />
-                        ))}
-                      </span>
-                    </div>
-                    <span className="cu-clutch-score">4.9 Stars</span>
-                  </div>
-                </div>
-              </div>
-              <div className="cu-logo-grid">
-                {clientLogos.slice(0, 8).map(id => (
-                  <div className="cu-logo-cell" key={id}>
-                    <ClientLogo src={`${A}${id}.avif`} alt="" className={invertInDark.has(id) ? 'cu-logo-invert' : ''} forceInvert={invertInDark.has(id)} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="cu-stats">
-              <div className="cu-stat">
-                <strong>50</strong>
-                <span>Increase in Leads</span>
-              </div>
-              <span className="cu-stat-div" aria-hidden="true" />
-              <div className="cu-stat">
-                <strong>60</strong>
-                <span>Increase in User Engagement</span>
-              </div>
-            </div>
-
+      <section className="cu-brief-hero" id="contact-brief">
+        <img
+          className="cu-brief-art"
+          src="/assets/contact/contact-hero-ribbons.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="cu-brief-shade" aria-hidden="true" />
+        <div className="cu-brief-layout">
+          <div className="cu-brief-copy">
+            <h1>
+              <span>Ready to</span>
+              <span>look like the</span>
+              <span>brand you’re</span>
+              <span>becoming?</span>
+            </h1>
+            <p className="cu-brief-intro">A new identity, a sharper site or a launch worth noticing.</p>
           </div>
-
-          <div className="cu-hero-right" data-reveal="card">
-            <ContactForm />
-          </div>
+          <ContactForm />
         </div>
+        <a className="cu-brief-scroll" href="#strategy-session" aria-label="Continue to the strategy session details">
+          <span aria-hidden="true">↓</span>
+        </a>
+      </section>
 
+      <section className="cu-hero cu-hero-follow" id="strategy-session">
         <div className="cu-container cu-expect-wrap">
           <section className="cu-expect" aria-labelledby="expect-title" data-reveal="panel">
             <div className="cu-expect-intro" data-reveal="up">
@@ -636,7 +564,7 @@ export default function ContactUs({ footer = null }) {
             </div>
           </div>
           <div className="cu-change-cta">
-            <a className="cu-btn" href="#form">Book your strategy session</a>
+            <a className="cu-btn" href="#contact-brief">Book your strategy session</a>
           </div>
         </div>
       </section>
@@ -667,7 +595,7 @@ export default function ContactUs({ footer = null }) {
           <div className="cu-decide-copy">
             <h2 className="cu-h2">Can’t decide if {BRAND} is right for your business?</h2>
             <p>You don’t have to figure it out alone. Book a free session and we’ll walk you through exactly why businesses choose us.</p>
-            <a className="cu-btn" href="#form">Book a call</a>
+            <a className="cu-btn" href="#contact-brief">Book a call</a>
           </div>
           <div className="cu-decide-visual">
             <img className="cu-decide-grid" src={`${TC}cta-grid.svg`} alt="" aria-hidden="true" />

@@ -57,7 +57,6 @@ function SplitWords({ text, className = '' }) {
 function DotLabel({ children }) {
   return (
     <div className="ind-dot-label">
-      <span className="ind-dot" aria-hidden="true" />
       <span>{children}</span>
     </div>
   )
@@ -77,7 +76,7 @@ const getRawClientsDataForSlug = (slug, blurbs) => {
   }
   if (slug === 'fintech') {
     return [
-      { name: 'Alpha Ledger', testimonial: blurbs[0], image: '/assets/industry-projects/fintech-alpha-ledger-0.avif', bgText: 'Alpha' },
+      { name: 'Alpha Ledger', testimonial: blurbs[0], image: '/assets/selected-work/northstar-ledger-thumbnail-v2.png', bgText: 'Alpha' },
       { name: 'Pie Assets', testimonial: blurbs[1], image: '/assets/industry-projects/fintech-pie-assets-1.avif', bgText: 'Pie Assets' },
       { name: 'Rahmat', testimonial: blurbs[2], image: '/assets/industry-projects/fintech-rahmat-2.avif', bgText: 'Rahmat' },
       { name: 'Reddex', testimonial: blurbs[3], image: '/assets/industry-projects/fintech-reddex-3.avif', bgText: 'Reddex' },
@@ -193,9 +192,20 @@ export default function IndustryPage({ slug, navigate }) {
     document.title = industry
       ? `${industry.label} Design Agency | ${BRAND}`
       : `Industry | ${BRAND}`
-    requestAnimationFrame(() => setHeroIn(true))
+    // Industry routes reuse this component, so changing the slug does not
+    // remount it. Reset before the new content is shown, then wait through a
+    // paint before adding the ready class again to replay the entrance.
+    setHeroIn(false)
+    let revealFrame = 0
+    const resetFrame = requestAnimationFrame(() => {
+      revealFrame = requestAnimationFrame(() => setHeroIn(true))
+    })
     window.scrollTo(0, 0)
     setHoveredIdx(null)
+    return () => {
+      cancelAnimationFrame(resetFrame)
+      if (revealFrame) cancelAnimationFrame(revealFrame)
+    }
   }, [industry, slug])
 
   // Keep the expertise copy's layout completely stable while using the row's
@@ -460,8 +470,8 @@ export default function IndustryPage({ slug, navigate }) {
           </div>
 
           <div className="ind-work-footer" data-reveal="up">
-            <Pill href="/#work" onNavigate={path => navigate?.(path.startsWith('/') ? path : '/')} dark>
-              All projects
+            <Pill href={CONTACT_PATH} onNavigate={navigate} dark>
+              Contact us
             </Pill>
           </div>
         </div>

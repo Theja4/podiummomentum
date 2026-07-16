@@ -67,7 +67,6 @@ function Pill({ children, href, navigate, dark = false, icon = 'wave' }) {
 export function DotLabel({ children }) {
   return (
     <div className="svc-dot-label">
-      <span className="svc-dot" aria-hidden="true" />
       <span>{children}</span>
     </div>
   )
@@ -161,7 +160,12 @@ function ProjectRail({ works, serviceTitle }) {
   const loopedWorks = [...works, ...works]
   return (
     <>
-      <div className="svc-work-strip-scroll" ref={ref} data-auto-rail="projects">
+      <div
+        className="svc-work-strip-scroll"
+        ref={ref}
+        data-auto-rail="projects"
+        data-reveal-group="carousel"
+      >
         {loopedWorks.map((p, i) => (
           <article key={`${p.name}-${i}`} data-reveal="card" aria-hidden={i >= works.length ? 'true' : undefined}>
             <div className="svc-featured-media" data-project-label={p.name}>
@@ -187,7 +191,12 @@ function TestimonialsRail({ items }) {
   const visibleItems = items.slice(0, 4)
   return (
     <>
-      <div className="svc-testimonial-track" ref={ref} data-manual-rail="testimonials">
+      <div
+        className="svc-testimonial-track"
+        ref={ref}
+        data-manual-rail="testimonials"
+        data-reveal-group="carousel"
+      >
         {visibleItems.map(t => (
           <article key={t.name} data-reveal="card">
             <p>{t.quote}</p>
@@ -211,7 +220,7 @@ function ServiceProcess({ steps }) {
   const [active, setActive] = useState(null)
   return (
     <div className="svc-process-shell" data-reveal="panel">
-      <div className="svc-process-grid">
+      <div className="svc-process-grid" data-reveal-group="process">
         {steps.map((step, i) => {
           const open = active === i
           return (
@@ -332,7 +341,7 @@ export function ServicesHub({ navigate }) {
 
       <section className="svc-hub-list-wrap" data-reveal="panel">
         <div className="svc-container">
-          <div className="svc-hub-list">
+          <div className="svc-hub-list" data-reveal-group="rows">
             {serviceCatalog.map((s, i) => (
               <a
                 key={s.slug}
@@ -366,7 +375,7 @@ export function ServicesHub({ navigate }) {
             <DotLabel>Our Works</DotLabel>
             <h2 data-split="words">Check Our Featured Projects</h2>
           </div>
-          <div className="svc-featured-grid">
+          <div className="svc-featured-grid" data-reveal-group="projects">
             {hubFeatured.map(p => (
               <FeaturedCard key={p.name} p={p} />
             ))}
@@ -427,7 +436,7 @@ export function ServicesHub({ navigate }) {
                 </Pill>
               </div>
             </div>
-            <div className="svc-numbers-grid">
+            <div className="svc-numbers-grid" data-reveal-group="stats">
               {hubNumbers.map(n => (
                 <article key={n.label} data-reveal="card">
                   {n.index ? <span className="svc-numbers-index">{n.index}</span> : null}
@@ -540,7 +549,7 @@ export function ServiceDetail({ slug, navigate }) {
       <section className="svc-stats" data-reveal="panel">
         <div className="svc-container">
           <DotLabel>Our expertise in numbers</DotLabel>
-          <div className="svc-stats-grid">
+          <div className="svc-stats-grid" data-reveal-group="stats">
             {service.stats.map((stat, index) => (
               <article
                 className="svc-stat-card"
@@ -571,7 +580,7 @@ export function ServiceDetail({ slug, navigate }) {
               {service.title} Services — Seamless, Results-Driven Experiences
             </h2>
           </div>
-          <ol className="svc-cap-list">
+          <ol className="svc-cap-list" data-reveal-group="mosaic">
             {service.capabilities.map((cap, i) => (
               <li
                 className="svc-cap-card"
@@ -661,7 +670,7 @@ export function ServiceDetail({ slug, navigate }) {
             <DotLabel>Related</DotLabel>
             <h2 data-split="words">Keep exploring</h2>
           </div>
-          <div className="svc-related-grid">
+          <div className="svc-related-grid" data-reveal-group="related">
             {related.map(s => (
               <a
                 key={s.slug}

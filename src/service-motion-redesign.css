@@ -521,7 +521,7 @@
   background: transparent !important;
   border-radius: 0;
   min-width: 0;
-  transform: none !important;
+  transform: none;
 }
 
 .svc-page.is-detail .svc-work-strip-scroll .svc-featured-media {
@@ -653,7 +653,7 @@
   padding: 2rem;
   background: #fff !important;
   border-radius: 1.25rem;
-  transform: none !important;
+  transform: none;
 }
 
 .svc-page.is-hub .svc-testimonial-track {
@@ -669,7 +669,7 @@
 
 .svc-page.is-hub .svc-testimonial-track article {
   flex: 0 0 430px;
-  transform: none !important;
+  transform: none;
 }
 
 .svc-page.is-hub .svc-testimonial-track::-webkit-scrollbar,
@@ -723,7 +723,7 @@
   border-left: 1px solid rgba(8, 13, 16, .16);
   background: transparent !important;
   box-shadow: none;
-  transform: none !important;
+  transform: none;
 }
 
 .svc-page.is-detail .svc-process-grid article:last-child {
@@ -1028,8 +1028,210 @@ html[data-theme='dark'] .svc-rail-controls button:hover {
   .svc-page.is-detail .svc-process-answer p { font-size: 16px; }
 }
 
+/* --------------------------------------------------------------------------
+   Card-family scroll choreography
+
+   The observer reveals every card independently. Each grid owns its stagger,
+   so cards enter as a composed group instead of inheriting arbitrary delays
+   from unrelated elements higher up the page. Animations use `backwards`
+   fill only: once the entrance is over, the existing hover transforms regain
+   control without fighting a permanently-filled keyframe.
+   -------------------------------------------------------------------------- */
+
+.motion-ready .svc-page [data-reveal-group] > [data-reveal].is-inview {
+  animation-duration: .98s;
+  animation-timing-function: cubic-bezier(.16, 1, .3, 1);
+  animation-delay: calc(var(--reveal-index, 0) * 90ms);
+  animation-fill-mode: backwards;
+}
+
+.motion-ready .svc-page [data-reveal-group='rows'] > [data-reveal].is-inview:nth-child(odd) {
+  animation-name: svcRevealRowLeft;
+}
+
+.motion-ready .svc-page [data-reveal-group='rows'] > [data-reveal].is-inview:nth-child(even) {
+  animation-name: svcRevealRowRight;
+}
+
+.motion-ready .svc-page [data-reveal-group='projects'] > [data-reveal].is-inview:nth-child(odd),
+.motion-ready .svc-page [data-reveal-group='stats'] > [data-reveal].is-inview:nth-child(odd),
+.motion-ready .svc-page [data-reveal-group='mosaic'] > [data-reveal].is-inview:nth-child(even),
+.motion-ready .svc-page [data-reveal-group='related'] > [data-reveal].is-inview:nth-child(odd) {
+  animation-name: svcRevealCardLeft;
+}
+
+.motion-ready .svc-page [data-reveal-group='projects'] > [data-reveal].is-inview:nth-child(even),
+.motion-ready .svc-page [data-reveal-group='stats'] > [data-reveal].is-inview:nth-child(even),
+.motion-ready .svc-page [data-reveal-group='mosaic'] > [data-reveal].is-inview:nth-child(odd),
+.motion-ready .svc-page [data-reveal-group='related'] > [data-reveal].is-inview:nth-child(even) {
+  animation-name: svcRevealCardRight;
+}
+
+.motion-ready .svc-page [data-reveal-group='carousel'] > [data-reveal].is-inview {
+  animation-name: svcRevealCarousel;
+}
+
+.motion-ready .svc-page [data-reveal-group='process'] > [data-reveal].is-inview {
+  animation-name: svcRevealProcess;
+  animation-duration: 1.08s;
+  animation-delay: calc(var(--reveal-index, 0) * 115ms + 80ms);
+}
+
+/* Media settles a little slower than its card, giving project imagery depth. */
+.motion-ready .svc-page [data-reveal-group='projects'] > [data-reveal].is-inview img,
+.motion-ready .svc-page [data-reveal-group='carousel'] > [data-reveal].is-inview .svc-featured-media img {
+  animation: svcRevealImage 1.35s cubic-bezier(.16, 1, .3, 1)
+    calc(var(--reveal-index, 0) * 90ms + 60ms) backwards;
+}
+
+/* Secondary content lands after the card surface instead of appearing flat. */
+.motion-ready .svc-page [data-reveal-group='projects'] > [data-reveal].is-inview .svc-featured-meta,
+.motion-ready .svc-page [data-reveal-group='carousel'] > [data-reveal].is-inview .svc-work-strip-meta,
+.motion-ready .svc-page [data-reveal-group='carousel'] > [data-reveal].is-inview > p,
+.motion-ready .svc-page [data-reveal-group='carousel'] > [data-reveal].is-inview .svc-testimonial-person,
+.motion-ready .svc-page [data-reveal-group='stats'] > [data-reveal].is-inview > *,
+.motion-ready .svc-page [data-reveal-group='mosaic'] > [data-reveal].is-inview > *,
+.motion-ready .svc-page [data-reveal-group='process'] > [data-reveal].is-inview > *,
+.motion-ready .svc-page [data-reveal-group='related'] > [data-reveal].is-inview > * {
+  animation: svcRevealInner .72s cubic-bezier(.16, 1, .3, 1)
+    calc(var(--reveal-index, 0) * 90ms + 180ms) backwards;
+}
+
+.motion-ready .svc-page [data-reveal-group='stats'] > [data-reveal].is-inview > p,
+.motion-ready .svc-page [data-reveal-group='mosaic'] > [data-reveal].is-inview > div,
+.motion-ready .svc-page [data-reveal-group='process'] > [data-reveal].is-inview > div,
+.motion-ready .svc-page [data-reveal-group='related'] > [data-reveal].is-inview > span,
+.motion-ready .svc-page [data-reveal-group='carousel'] > [data-reveal].is-inview .svc-testimonial-person {
+  animation-delay: calc(var(--reveal-index, 0) * 90ms + 260ms);
+}
+
+@keyframes svcRevealRowLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-4.5rem, 1.25rem, 0) rotate(-.45deg);
+    clip-path: inset(0 16% 0 0 round 1rem);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes svcRevealRowRight {
+  from {
+    opacity: 0;
+    transform: translate3d(4.5rem, 1.25rem, 0) rotate(.45deg);
+    clip-path: inset(0 0 0 16% round 1rem);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes svcRevealCardLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-1.25rem, 4.75rem, 0) rotate(-2deg) scale(.935);
+    clip-path: inset(0 0 13% 0 round 1.75rem);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes svcRevealCardRight {
+  from {
+    opacity: 0;
+    transform: translate3d(1.25rem, 4.75rem, 0) rotate(2deg) scale(.935);
+    clip-path: inset(0 0 13% 0 round 1.75rem);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes svcRevealCarousel {
+  from {
+    opacity: 0;
+    transform: translate3d(5rem, 1.75rem, 0) rotate(1.2deg) scale(.94);
+    clip-path: inset(0 9% 0 0 round 1.4rem);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes svcRevealProcess {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 4rem, 0) scaleY(.88);
+    transform-origin: 50% 100%;
+    clip-path: inset(24% 0 0 round 1rem);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform-origin: 50% 100%;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes svcRevealImage {
+  from {
+    transform: scale(1.14);
+    filter: saturate(.72) contrast(.9);
+  }
+  to {
+    transform: scale(1);
+    filter: none;
+  }
+}
+
+@keyframes svcRevealInner {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.15rem, 0);
+  }
+}
+
+@media (max-width: 700px) {
+  .motion-ready .svc-page [data-reveal-group] > [data-reveal].is-inview {
+    animation-duration: .82s;
+    animation-delay: calc(var(--reveal-index, 0) * 65ms);
+  }
+
+  .motion-ready .svc-page [data-reveal-group='process'] > [data-reveal].is-inview {
+    animation-delay: calc(var(--reveal-index, 0) * 70ms + 40ms);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .svc-page.is-detail .svc-detail-hero { transform: scale(.965); }
   .svc-scroll-cue,
-  .svc-rail-progress i { animation: none !important; }
+  .svc-rail-progress i,
+  .motion-ready .svc-page [data-reveal-group] > [data-reveal].is-inview,
+  .motion-ready .svc-page [data-reveal-group] > [data-reveal].is-inview * {
+    animation: none !important;
+  }
 }

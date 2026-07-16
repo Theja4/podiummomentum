@@ -22,7 +22,7 @@ if (!result.ok) {
 }
 
 // Spot-check detail content shape
-for (const slug of ['website-design', 'branding', 'webflow-development']) {
+for (const slug of ['website-design', 'branding', 'ai-agents']) {
   const s = getServiceBySlug(slug)
   if (!s) {
     console.error('missing', slug)

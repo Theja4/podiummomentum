@@ -11,6 +11,7 @@ const rawServiceCatalog = [
     slug: 'website-design',
     title: 'Website Design',
     shortTitle: 'Web Design',
+    cardLine: 'Built to convert, not just impress.',
     hubBlurb:
       'Get a high-performing website that captivates and converts. Our web design blends creativity and strategy for seamless digital experiences.',
     heroEyebrow: 'Web Design',
@@ -43,12 +44,12 @@ const rawServiceCatalog = [
     faqs: [
       { q: 'How long does it take to design a website?', a: 'Most full marketing sites run 4–10 weeks depending on scope, content readiness, and stakeholder cycles. We lock a timeline in discovery.' },
       { q: 'Can you align the design with my brand?', a: 'Yes. We either extend your system or rebuild the parts that no longer match your product and market position.' },
-      { q: 'Do you also handle development?', a: 'We design for production and can partner on Webflow or hand off to your engineering team with clear specs and components.' },
-      { q: 'What industries do you specialize in?', a: 'Technology, SaaS, AI, fintech, health, and other ambition-led B2B and product companies.' },
+      { q: 'Do you also handle development?', a: 'We design for production and can partner on the build or hand off to your engineering team with clear specs and components.' },
+      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambition-led companies.' },
       { q: 'What do you need from me to start the project?', a: 'Business goals, audience notes, brand assets if any, competitor set, and access to product or leadership for a working session.' },
       { q: 'How many design revisions do you offer?', a: 'Structured review rounds are built into the plan so feedback stays focused — not endless open loops.' },
     ],
-    related: ['branding', 'webflow-development', 'seo'],
+    related: ['branding', 'ux-ui', 'seo'],
     works: [
       { name: 'Vanquish', year: '2024', image: '/assets/industry-projects/pattech-7.avif' },
       { name: 'ContinuOS', year: '2024', image: '/assets/industry-projects/ai-continuos-0.avif' },
@@ -60,6 +61,7 @@ const rawServiceCatalog = [
     slug: 'branding',
     title: 'Branding',
     shortTitle: 'Branding',
+    cardLine: 'An identity people remember and trust.',
     hubBlurb: 'We craft unique visual identities, logos, and messaging to build recognition, trust, and long-term success.',
     heroEyebrow: 'Branding',
     heroLead: 'We craft unique visual identities, logos, and messaging to build recognition, trust, and long-term success.',
@@ -68,7 +70,7 @@ const rawServiceCatalog = [
       'A strong brand is more than a logo — it’s how people recognize, trust, and choose you. We craft visual identities and messaging systems that create lasting equity.',
     heroImage: `${IP}taraxa-0.avif`,
     stats: [
-      { value: '40+', label: 'Tech brands shaped', note: 'From seed-stage to scale-up category leaders.' },
+      { value: '40+', label: 'Brands shaped', note: 'From seed-stage to scale-up category leaders.' },
       { value: '4.9', label: 'Average client rating', note: 'Founders rate clarity of process as highly as craft.' },
       { value: '3×', label: 'Faster brand adoption', note: 'Systems that sales, product, and marketing actually use.' },
       { value: '8/10', label: 'Return for more', note: 'Identity work often continues into site and product UI.' },
@@ -91,7 +93,7 @@ const rawServiceCatalog = [
       { q: 'How long does branding take?', a: 'Focused identity systems usually take 4–8 weeks. Full repositioning with messaging and launch assets can run longer.' },
       { q: 'Do you rebrand or refine?', a: 'Both. We recommend the lightest intervention that closes the perception gap without discarding equity that works.' },
       { q: 'Will this work for fundraising?', a: 'Yes — we design for investor-grade clarity: story, proof, and a visual system that feels ready for the next stage.' },
-      { q: 'What industries do you specialize in?', a: 'Technology, SaaS, AI, fintech, health, and other ambition-led B2B and product companies.' },
+      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambition-led companies.' },
     ],
     related: ['website-design', 'content-creation', 'ux-ui'],
     works: [
@@ -104,6 +106,7 @@ const rawServiceCatalog = [
     slug: 'ux-ui',
     title: 'UX/UI',
     shortTitle: 'UX/UI',
+    cardLine: 'Interfaces that feel obvious to use.',
     hubBlurb:
       'We design intuitive, engaging interfaces that enhance usability, boost conversions, and create seamless digital experiences for your audience.',
     heroEyebrow: 'UX/UI',
@@ -139,9 +142,9 @@ const rawServiceCatalog = [
       { q: 'Can you improve an existing product’s UX/UI?', a: 'Absolutely. We often start with activation, pricing, or onboarding where impact is fastest.' },
       { q: 'How many design revisions do you offer?', a: 'Structured review rounds are included so feedback stays focused and shippable.' },
       { q: 'What do you need from me to start the project?', a: 'Goals, current product access, analytics if available, brand assets, and stakeholders for working sessions.' },
-      { q: 'What industries do you specialize in?', a: 'Fintech, SaaS, AI, health, and other product-led companies.' },
+      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambition-led companies.' },
     ],
-    related: ['website-design', 'motion-design', 'landing-page'],
+    related: ['website-design', 'branding', 'landing-page'],
     works: [
       { name: 'Planet9 UI/UX', year: '2024', image: '/assets/industry-projects/fintech-planet9-ui-ux-4.avif' },
       { name: 'Frado UI/UX', year: '2025', image: '/assets/industry-projects/frado-1.avif' },
@@ -149,57 +152,10 @@ const rawServiceCatalog = [
     ],
   },
   {
-    slug: 'motion-design',
-    title: 'Motion Design',
-    shortTitle: 'Motion',
-    hubBlurb:
-      'Bring your brand to life with stunning motion graphics and UI animations that enhance storytelling, engagement, and user experience.',
-    heroEyebrow: 'Motion',
-    heroLead:
-      'Bring your brand to life with stunning motion graphics and UI animations that enhance storytelling, engagement, and user experience.',
-    heroHeadline: 'Why Is Motion Design Important',
-    heroBody:
-      'Motion design brings visuals to life, making content more engaging, memorable, and impactful. It enhances storytelling, improves user experience, and increases audience retention.',
-    heroImage: `${IP}ai-innrevai-1.avif`,
-    stats: [
-      { value: '90%', label: 'Of Our Clients Come Back', note: 'Once brands experience the power of well-crafted motion, they want more.' },
-      { value: '4.9/5', label: 'Average Motion Project Approval Rating', note: 'High standards, seamless execution—our motion work speaks for itself.' },
-      { value: '10K+', label: 'Hours Dedicated to Motion', note: 'Thousands of hours spent refining movement, pacing, and visual storytelling.' },
-      { value: '100+', label: 'Motion Projects Completed', note: 'Helping brands, products, and interfaces come to life through seamless animation.' },
-    ],
-    capabilities: [
-      { title: 'Brand Animation', body: 'Animated logos and visual identities that enhance brand recognition.' },
-      { title: 'Website & UI Motion', body: 'Seamless micro-interactions and transitions for intuitive user experiences.' },
-      { title: 'Product Explainer Videos', body: 'Engaging motion graphics that simplify complex ideas.' },
-      { title: 'Social Media Motion Content', body: 'Eye-catching animations optimized for social engagement.' },
-      { title: 'Ad & Promo Videos', body: 'High-converting animated content for marketing campaigns.' },
-      { title: '3D Motion & Experimental Design', body: 'Advanced motion techniques to push creative boundaries.' },
-    ],
-    process: [
-      { title: 'Concept & Storyboarding', body: 'We first define the vision, narrative, and animation style.' },
-      { title: 'Design & Asset Creation', body: 'Then, we craft the visual elements and refine motion details.' },
-      { title: 'Animation & Refinement', body: 'After that, we bring everything to life with smooth, dynamic movement.' },
-      { title: 'Final Delivery & Optimization', body: 'Finally, we optimize for different platforms and ensure seamless integration.' },
-    ],
-    faqs: [
-      { q: 'What are the benefits of motion design?', a: 'Motion increases engagement, clarifies complex ideas, and makes brand moments memorable across product and marketing.' },
-      { q: 'What makes your motion design different?', a: 'Purpose over decoration — timing, easing, and narrative aligned to brand and product goals.' },
-      { q: 'How does your motion design process work?', a: 'Storyboards → design assets → animation craft → platform-optimized delivery with structured feedback.' },
-      { q: 'Who typically uses your motion design services?', a: 'Product, brand, and growth teams who need UI motion, explainers, launch films, and social systems.' },
-      { q: 'What do you need from me to start the project?', a: 'Brand assets, reference motion, audience goals, and any existing product UI or campaign brief.' },
-    ],
-    related: ['ux-ui', 'branding', 'content-creation'],
-    works: [
-      { name: 'Alpha Ledger', year: '2024', image: '/assets/industry-projects/alpha-ledger-0.avif' },
-      { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
-      { name: 'ContinuOS', year: '2024', image: '/assets/industry-projects/ai-continuos-0.avif' },
-      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
-    ],
-  },
-  {
     slug: 'seo',
     title: 'SEO',
     shortTitle: 'SEO',
+    cardLine: 'Found first, chosen faster.',
     hubBlurb:
       'Boost rankings, increase organic traffic, and grow your business with expert SEO strategies, technical optimization, and content-driven results.',
     heroEyebrow: 'SEO',
@@ -246,6 +202,7 @@ const rawServiceCatalog = [
     slug: 'content-creation',
     title: 'Content Creation',
     shortTitle: 'Content Creation',
+    cardLine: 'Words that turn readers into customers.',
     hubBlurb: 'Content That Turns Visitors into Loyal Customers',
     heroEyebrow: 'Content Creation',
     heroLead: 'Content That Turns Visitors into Loyal Customers',
@@ -279,7 +236,7 @@ const rawServiceCatalog = [
       { q: 'How do you measure content success?', a: 'Rankings, engagement, assisted conversions, and sales usage — not vanity metrics alone.' },
       { q: 'Do you need subject-matter experts?', a: 'We interview your experts and turn depth into clear narratives without jargon overload.' },
     ],
-    related: ['seo', 'branding', 'motion-design'],
+    related: ['seo', 'branding', 'ux-ui'],
     works: [
       { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
       { name: 'Taraxa', year: '2024', image: `${IP}taraxa-0.avif` },
@@ -290,6 +247,7 @@ const rawServiceCatalog = [
     slug: 'landing-page',
     title: 'Landing Page',
     shortTitle: 'Landing Page',
+    cardLine: 'One page, built to convert.',
     hubBlurb: 'Strategic, visually compelling landing pages that tell stories, capture leads, and maximize conversions.',
     heroEyebrow: 'Landing Page',
     heroLead: 'Strategic, visually compelling landing pages that tell stories, capture leads, and maximize conversions.',
@@ -323,7 +281,7 @@ const rawServiceCatalog = [
       { q: 'Can you integrate with our stack?', a: 'We design for your CRM, forms, and analytics tools or partner with your team on implementation.' },
       { q: 'What about multi-variant tests?', a: 'We can design modular sections so testing does not require a full rebuild.' },
     ],
-    related: ['website-design', 'seo', 'webflow-development'],
+    related: ['website-design', 'seo', 'content-creation'],
     works: [
       { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
       { name: 'Alpha Ledger', year: '2024', image: '/assets/industry-projects/alpha-ledger-0.avif' },
@@ -331,55 +289,10 @@ const rawServiceCatalog = [
     ],
   },
   {
-    slug: 'webflow-development',
-    title: 'Webflow Development',
-    shortTitle: 'Webflow Dev',
-    hubBlurb:
-      'We create fast, visually impressive Webflow websites that are easy to manage, fully responsive, and optimized for performance and growth.',
-    heroEyebrow: 'Webflow Development',
-    heroLead:
-      'We create fast, visually impressive Webflow websites that are easy to manage, fully responsive, and optimized for performance and growth.',
-    heroHeadline: 'Design systems that marketing can run',
-    heroBody:
-      'We build Webflow sites that protect craft in production — clean structure, CMS power, and performance so your team ships updates without breaking the brand.',
-    heroImage: `${IP}incipet-2.avif`,
-    stats: [
-      { value: '100+', label: 'Webflow launches', note: 'Marketing sites and multi-template systems.' },
-      { value: 'Core', label: 'Web Vitals focus', note: 'Speed and stability treated as product requirements.' },
-      { value: 'CMS', label: 'Editor-ready', note: 'Content models marketers actually understand.' },
-      { value: '90%', label: 'Client return rate', note: 'Teams come back for new templates and campaigns.' },
-    ],
-    capabilities: [
-      { title: 'Pixel-true builds', body: 'Faithful implementation of design systems and edge states.' },
-      { title: 'CMS architecture', body: 'Collections and fields that scale with content ops.' },
-      { title: 'Interactions', body: 'Motion that feels premium without killing performance.' },
-      { title: 'SEO & schema', body: 'Technical foundations baked into the build.' },
-      { title: 'Integrations', body: 'Forms, analytics, and marketing tools wired cleanly.' },
-      { title: 'Training & docs', body: 'So your team can update with confidence.' },
-    ],
-    process: [
-      { title: 'Structure plan', body: 'Pages, CMS, and component inventory before build.' },
-      { title: 'Build system', body: 'Styles, symbols, and responsive behavior locked.' },
-      { title: 'Content & QA', body: 'Populate, test, and harden across devices.' },
-      { title: 'Launch & handoff', body: 'Domain, docs, training, and post-launch support.' },
-    ],
-    faqs: [
-      { q: 'Why Webflow?', a: 'It gives teams design-quality sites with marketing independence — when structured well.' },
-      { q: 'Can you migrate an existing site?', a: 'Yes. We plan content models and redirects so SEO equity is protected.' },
-      { q: 'Do you only build, not design?', a: 'We can build from your Figma or deliver design + Webflow as one engagement.' },
-      { q: 'How do you handle performance?', a: 'Asset discipline, interaction budgets, and Core Web Vitals checks before launch.' },
-    ],
-    related: ['website-design', 'landing-page', 'seo'],
-    works: [
-      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
-      { name: 'Incipet', year: '2024', image: `${IP}incipet-2.avif` },
-      { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
-    ],
-  },
-  {
     slug: 'ai-agents',
     title: 'AI Agents',
     shortTitle: 'AI Agents',
+    cardLine: 'Always on, answering and booking.',
     hubBlurb:
       'Deploy voice agents and chatbots that answer, qualify, book, and follow up around the clock — tuned to how your business actually operates.',
     heroEyebrow: 'AI Agent Deployments',
@@ -438,7 +351,7 @@ export const hubIntro = {
   heroLine: 'Solutions to help your brand stand out and grow',
   title: 'Our Core Creative Offerings',
   lead: 'Everything your brand needs to grow — under one roof.',
-  body: 'We combine years of expertise in UX/UI, motion design, Webflow development, and web design to build high-performance digital experiences that look great and drive results.',
+  body: 'We combine years of expertise in UX/UI, branding, content, and web design to build high-performance digital experiences that look great and drive results.',
   offeringsLabel: 'Our Services',
 }
 
@@ -465,7 +378,7 @@ export const hubFeatured = [
     year: '2025',
     sector: 'Technology',
     blurb: '',
-    image: '/assets/972304820e19d175.avif',
+    image: '/assets/selected-work/likeon-thumbnail-v2.png',
     tags: ['Branding', 'Website Design', 'Growth'],
   },
   {
@@ -493,13 +406,13 @@ export const hubPartners = [
 export const hubExpertise = {
   label: 'Expertise',
   title: 'We solve real problems',
-  body: 'We combine strategy, branding, UX and UI, and web design to build high-performance digital experiences that not only look great but move the metrics that matter for scaling technology companies.',
-  image: '/assets/972304820e19d175.avif',
+  body: 'We combine strategy, branding, UX and UI, and web design to build high-performance digital experiences that not only look great but move the metrics that matter for ambitious brands.',
+  image: '/assets/selected-work/likeon-thumbnail-v2.png',
   imageAlt: 'Podium Momentum brand and web design work',
 }
 
 export const hubNumbers = [
-  { index: '01', value: '40+', label: 'Technology Companies' },
+  { index: '01', value: '40+', label: 'Brands' },
   { index: '02', value: '4.9', label: 'Average Client Rating' },
   { index: '03', value: '2.3×', label: 'Conversion Lift Post-Rebrand' },
   { index: '04', value: '$10M+', label: 'Raised By Clients' },
@@ -524,11 +437,11 @@ export const hubFaqs = [
   { q: 'Do you offer revisions?', a: 'Yes. Structured review rounds are built into every engagement so feedback stays focused and the work keeps moving.' },
   { q: 'How long does branding take?', a: 'Focused identity systems usually take 4–8 weeks. Full repositioning with messaging and launch assets can run longer.' },
   { q: 'What do you need from me to start the project?', a: 'Business goals, audience notes, brand assets if any, competitor set, and access to product or leadership for a working session.' },
-  { q: 'What industries do you specialize in?', a: 'Technology, SaaS, AI, fintech, health, hospitality, and other ambition-led product companies.' },
+  { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambition-led companies.' },
   { q: 'How long does it take to design a website?', a: 'Most full marketing sites run 4–10 weeks depending on scope, content readiness, and stakeholder cycles.' },
   { q: 'How can my website enhance my branding?', a: 'Your site is the operating system of the brand online. When identity, messaging, and UX align, visitors feel the same quality as your product.' },
   { q: 'What is user experience (UX) design?', a: 'Structure, flow, and interaction design that makes products understandable and usable — not just pretty screens.' },
-  { q: 'What is a content management system (CMS)?', a: 'A system that lets marketing update pages and content without breaking the design — we set these up for Webflow and similar platforms.' },
+  { q: 'What is a content management system (CMS)?', a: 'A system that lets marketing update pages and content without breaking the design — we plan the content model so your team can run it.' },
   { q: "How can I optimize my website's speed?", a: 'Asset discipline, clean structure, interaction budgets, and Core Web Vitals checks before and after launch.' },
   { q: 'Why is website design important?', a: 'It’s often the first impression of your brand. Strong design builds trust, captures attention, and turns visitors into customers.' },
 ]
@@ -610,7 +523,7 @@ export function matchServicesRoute(path) {
 /** Content shape checks for automated verification (no DOM). */
 export function validateServiceCatalog() {
   const errors = []
-  if (serviceCatalog.length !== 9) errors.push(`expected 9 services, got ${serviceCatalog.length}`)
+  if (serviceCatalog.length !== 7) errors.push(`expected 7 services, got ${serviceCatalog.length}`)
   const slugs = new Set()
   for (const s of serviceCatalog) {
     if (!s.slug) errors.push('missing slug')

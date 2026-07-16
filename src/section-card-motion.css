@@ -1,0 +1,46 @@
+/*
+ * Shared section-card entrance for Services and Industries.
+ *
+ * The landing page treats each large white section as the animated surface:
+ * it enters oversized and low, then shrinks and settles into the grey canvas.
+ * Keep this scoped to direct child sections so nested project/stat cards can
+ * retain their own staggered reveals. Hero surfaces are intentionally omitted.
+ */
+.motion-ready .svc-page > section[data-reveal="panel"]:not(.svc-hub-hero),
+.motion-ready .ind-main > section[data-reveal="panel"],
+.motion-ready .ind-main > .ind-who[data-reveal="who-section"] {
+  opacity: 0;
+  transform: translate3d(0, 96px, 0) scale(1.08);
+  transform-origin: center top;
+  transition:
+    opacity 1.05s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.motion-ready .svc-page > section[data-reveal="panel"]:not(.svc-hub-hero).is-inview,
+.motion-ready .ind-main > section[data-reveal="panel"].is-inview,
+.motion-ready .ind-main > .ind-who[data-reveal="who-section"].is-inview {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  will-change: auto;
+}
+
+@media (max-width: 900px) {
+  .motion-ready .svc-page > section[data-reveal="panel"]:not(.svc-hub-hero),
+  .motion-ready .ind-main > section[data-reveal="panel"],
+  .motion-ready .ind-main > .ind-who[data-reveal="who-section"] {
+    transform: translate3d(0, 56px, 0) scale(1.045);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready .svc-page > section[data-reveal="panel"]:not(.svc-hub-hero),
+  .motion-ready .ind-main > section[data-reveal="panel"],
+  .motion-ready .ind-main > .ind-who[data-reveal="who-section"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+}

@@ -35,7 +35,7 @@ const rawIndustries = {
       { title: "Healthcare Branding and Visual Identity", body: "We build trusted, memorable healthcare brands that stand out with clarity and authority." },
       { title: "UX/UI Design for Healthcare Platforms", body: "We craft intuitive UI/UX experiences that engage users and drive results." },
       { title: "Website Design & Development for Healthcare Providers", body: "We design and develop healthcare websites that build trust, engage users, and elevate organizations online." },
-      { title: "Motion Design for Healthcare Campaigns", body: "We craft motion that captures attention \u2014 turning ideas into clear, dynamic stories." },
+      { title: "Content Creation for Healthcare Campaigns", body: "We craft content that captures attention \u2014 turning ideas into clear, compelling stories." },
     ],
     projects: [
       { name: "Get Talky", sector: "AI, US", desc: "Get Talky \u2014 A HIPAA-compliant AI-powered virtual front desk platform for healthcare practices that automates patient communication, scheduling, and interactions 24/7.", image: "/assets/industry-projects/healthcare-get-talky-0.avif" },
@@ -78,11 +78,11 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
-      { name: "Alpha Ledger", sector: "Trading Platform, UK", desc: "Alpha Ledger \u2014 is a UK-based sophisticated fintech platform aiming to create a transparent, data-driven marketplace connecting skilled traders with capital, while providing institutional-grade analytics and verification systems to support both sides of the equation.", image: "/assets/industry-projects/fintech-alpha-ledger-0.avif" },
+      { name: "Alpha Ledger", sector: "Trading Platform, UK", desc: "Alpha Ledger \u2014 is a UK-based sophisticated fintech platform aiming to create a transparent, data-driven marketplace connecting skilled traders with capital, while providing institutional-grade analytics and verification systems to support both sides of the equation.", image: "/assets/selected-work/northstar-ledger-thumbnail-v2.png" },
       { name: "Pie Assets", sector: "Investment Firm, US", desc: "Pie Assets \u2014 A fractional real estate investment platform democratizing property ownership by enabling individuals to purchase shares in fix-and-flip and rental properties through crowdfunding.", image: "/assets/industry-projects/fintech-pie-assets-1.avif" },
       { name: "Rahmat", sector: "Fintech, UZ", desc: "Rahmat \u2014 A Uzbek fintech app digitizing restaurant payments and tipping via QR codes, integrating with major payment systems while ensuring fiscal compliance and providing feedback capabilities for hospitality businesses.", image: "/assets/industry-projects/fintech-rahmat-2.avif" },
       { name: "Reddex", sector: "Payment Processor, US", desc: "Reddex \u2014 A US-based payment processor that simplifies complex payment solutions for businesses of all risk levels, offering high-risk merchant processing and cash discount programs through modern technology and human-centered design.", image: "/assets/industry-projects/fintech-reddex-3.avif" },
@@ -123,8 +123,8 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
       { name: "Taraxa", sector: "DePIN for AI, US", desc: "Taraxa \u2014 a layer-1 blockchain protocol featuring high-speed transaction processing (5,000+ TPS), Ethereum compatibility, and industry-lowest transaction fees while maintaining security and decentralization.", image: "/assets/industry-projects/web3-taraxa-0.avif" },
@@ -165,8 +165,8 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
       { name: "Shaka", sector: "Telco Startup, UK", desc: "Shaka \u2014 a London startup that enables brands, influencers, and businesses to launch branded mobile phone services with eSIM technology in minutes, creating new revenue streams without telecom infrastructure.", image: "/assets/industry-projects/technology-shaka-0.avif" },
@@ -208,8 +208,8 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
       { name: "Pie Assets", sector: "Investment Firm, US", desc: "Pie Assets \u2014 A fractional real estate investment platform democratizing property ownership by enabling individuals to purchase shares in fix-and-flip and rental properties through crowdfunding.", image: "/assets/industry-projects/corporate-pie-assets-0.avif" },
@@ -250,8 +250,8 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
       { name: "ContinuOS", sector: "AI Operating System, US", desc: "ContinuOS \u2014 is a pioneering AI-powered operating system that learns from user web browsing habits to create personalized, adaptive digital experiences, transforming routine online interactions into intelligent, predictive computing environments.", image: "/assets/industry-projects/ai-continuos-0.avif" },
@@ -295,8 +295,8 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
       { name: "Pie Assets", sector: "Investment Firm, US", desc: "Pie Assets \u2014 A fractional real estate investment platform democratizing property ownership by enabling individuals to purchase shares in fix-and-flip and rental properties through crowdfunding.", image: "/assets/industry-projects/real-estate-pie-assets-0.avif" },
@@ -326,8 +326,8 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
       { name: "SAAKINUN", sector: "Fashion, UZ", desc: "SAAKINUN \u2014 A Tashkent-based modest fashion brand that designs and manufactures feminine, elegant dresses combining Islamic modesty requirements with contemporary fashion aesthetics, serving Muslim women globally.", image: "/assets/industry-projects/e-commerce-saakinun-0.avif" },
@@ -361,8 +361,8 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
       { name: "HFactor", sector: "Hydrogen Infused Water, US", desc: "HFactor Water \u2014 a premium hydrogen-infused beverage that delivers molecular hydrogen in purified water, offering antioxidant benefits, enhanced athletic performance, and anti-inflammatory support for health-conscious consumers seeking superior hydration.", image: "/assets/industry-projects/fmcg-hfactor-0.avif" },
@@ -391,8 +391,8 @@ const rawIndustries = {
     expertise: [
       { title: "Branding & Visual Identity", body: "We create distinctive and trustworthy brands. From sleek logos to cohesive visual systems, we help companies establish authority, build trust, and stand out in a crowded marketplace." },
       { title: "UX/UI Design", body: "We simplify complex solutions, ensuring seamless, intuitive experiences that enhance usability and customer satisfaction." },
-      { title: "Website Design & Webflow Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
-      { title: "Motion Design & Content Creation", body: "We produce captivating motion design and tailored content that effectively communicates your company's solutions." },
+      { title: "Website Design & Development", body: "We craft high-performing websites that convey credibility and drive engagement, blending cutting-edge design with product functionality." },
+      { title: "Content Creation", body: "We produce tailored content that effectively communicates your company's solutions." },
     ],
     projects: [
       { name: "InnrevAI", sector: "AI Platform, US", desc: "InnRevAI \u2014 AI-powered hospitality revenue management platform that optimizes hotel pricing strategies, responds to market changes in real-time, and maximizes occupancy through dynamic pricing algorithms that adjust to seasonal demand.", image: "/assets/industry-projects/hospitality-innrevai-0.avif" },
