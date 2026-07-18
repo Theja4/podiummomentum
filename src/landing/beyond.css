@@ -1,0 +1,281 @@
+/* Beyond — pinned particle-sphere interlude. Scoped under .pm2-beyond.
+   The section is 280vh tall with a sticky stage. Its background is
+   TRANSPARENT: the black arrives via the giant wipe sparkle (.pm2-beyond-wipe),
+   which blooms from the centred carousel card to past the viewport diagonal
+   while the stage rises, then stays as the section's black ground. The
+   typographic overlay pops in once the page is black. */
+
+.pm2-beyond {
+  position: relative;
+  /* above .pm2-carousel (z1): the fixed bloom lives in this stacking context,
+     so the wipe star paints over the carousel while it blooms */
+  z-index: 2;
+  height: 280vh;
+  background: transparent;
+  overflow: clip;
+}
+
+.pm2-beyond-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  /* the page the star opens on: white, continuous with the carousel tail
+     (the film blooms the star on a white page); once the wipe covers, this
+     is invisible. Reduced motion swaps it back to transparent. */
+  background: var(--v-paper);
+}
+
+/* the bloom group — FIXED (viewport-anchored) while the stage rises over the
+   carousel, so the wipe star expands out of the centred card instead of
+   riding up with the incoming panel; JS flips it to absolute once the stage
+   pins (both coincide exactly there). The section's z-index:2 lifts it above
+   the carousel (z1); internally it stacks below the typographic overlay (z5).
+   Hidden until the transition comes in range. */
+.pm2-beyond-bloom {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* black transition sparkle — starts orb-sized over the violet card, JS
+   scales it past the viewport diagonal (the waist swallows the page) */
+.pm2-beyond-wipe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 42vmin;
+  height: 42vmin;
+  transform: translate(-50%, -50%) scale(0.001);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.pm2-beyond-wipe-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* faint static violet glow on the black ground (canvas clears transparent);
+   JS fades it in only once the star nearly covers, so it never tints the
+   carousel peeking around the star's concave edges */
+.pm2-beyond-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: 92vmin;
+  height: 92vmin;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    closest-side,
+    rgba(124, 58, 237, 0.22),
+    rgba(124, 58, 237, 0.05) 55%,
+    transparent 72%
+  );
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.pm2-beyond-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* dead-center white sparkle — carried over from the card, scales in via JS,
+   then the CSS pulse animation owns it */
+.pm2-beyond-star {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+  pointer-events: none;
+  filter: drop-shadow(0 0 16px rgba(240, 171, 252, 0.55));
+}
+
+.pm2-beyond-star-svg {
+  display: block;
+  width: clamp(28px, 3.4vw, 44px);
+  height: clamp(28px, 3.4vw, 44px);
+}
+
+.pm2-beyond-star--on {
+  animation: pm2-beyond-star-in 0.95s var(--v-ease) both,
+    pm2-beyond-star-pulse 3.6s ease-in-out 0.95s infinite;
+}
+
+@keyframes pm2-beyond-star-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(-40deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.12) rotate(6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes pm2-beyond-star-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.82;
+    transform: translate(-50%, -50%) scale(1.16);
+  }
+}
+
+/* —— overlay ———————————————————————————————————————— */
+
+.pm2-beyond-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.pm2-beyond-heading {
+  margin: 0;
+}
+
+.pm2-beyond-word {
+  position: absolute;
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(80px, 12vw, 190px);
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+.pm2-beyond-word--a {
+  top: clamp(18px, 4.5vh, 44px);
+  left: clamp(20px, 4vw, 64px);
+  color: #fff;
+}
+
+.pm2-beyond-word--b {
+  right: clamp(20px, 4vw, 64px);
+  bottom: clamp(24px, 6vh, 60px);
+  color: rgba(233, 213, 255, 0.28);
+  text-align: right;
+}
+
+.pm2-beyond-word-line {
+  display: block;
+  will-change: transform, opacity;
+}
+
+.pm2-beyond-copy {
+  position: absolute;
+  left: clamp(20px, 4vw, 64px);
+  bottom: clamp(24px, 7vh, 68px);
+  max-width: 44ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(233, 213, 255, 0.62);
+  will-change: transform, opacity;
+}
+
+.pm2-beyond-copy p {
+  margin: 0;
+}
+
+.pm2-beyond-copy p + p {
+  margin-top: 1em;
+}
+
+/* —— responsive ———————————————————————————————————————— */
+
+@media (max-width: 900px) {
+  .pm2-beyond {
+    height: 240vh;
+  }
+
+  .pm2-beyond-copy {
+    max-width: 40ch;
+    font-size: 14.5px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pm2-beyond-word {
+    font-size: clamp(64px, 17vw, 110px);
+  }
+
+  .pm2-beyond-word--a {
+    top: 3.5vh;
+    left: 5vw;
+  }
+
+  /* lifted clear of the paragraphs below */
+  .pm2-beyond-word--b {
+    right: 5vw;
+    bottom: 34vh;
+  }
+
+  .pm2-beyond-copy {
+    left: 5vw;
+    right: 5vw;
+    bottom: 6vh;
+    max-width: 34ch;
+    font-size: 14px;
+  }
+
+  .pm2-beyond-glow {
+    width: 125vmin;
+    height: 125vmin;
+    transform: translate(-50%, -44%);
+  }
+}
+
+/* —— reduced motion: static single-frame sphere + visible overlay ———— */
+
+@media (prefers-reduced-motion: reduce) {
+  .pm2-beyond {
+    height: 100vh;
+    height: 100svh;
+    /* no wipe animation — the black ground is simply there */
+    background: var(--v-black);
+  }
+
+  /* no JS scrub in reduced mode — the bloom rejoins the stage, visible */
+  .pm2-beyond-bloom {
+    position: absolute;
+    visibility: visible;
+  }
+
+  /* the section's black ground shows through instead of the white entry page */
+  .pm2-beyond-stage {
+    background: transparent;
+  }
+
+  .pm2-beyond-wipe {
+    display: none;
+  }
+
+  .pm2-beyond-star,
+  .pm2-beyond-star--on {
+    animation: none;
+  }
+}

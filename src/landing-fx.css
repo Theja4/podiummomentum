@@ -921,8 +921,8 @@ html[data-theme='dark'] .fx-proof-card--stat .fx-proof-figure p {
 .fx-momentum-canvas {
   left: 22%;
   right: -8%;
-  top: -16%;
-  bottom: -18%;
+  top: -6%;
+  bottom: -28%;
   z-index: 3;
 }
 
@@ -975,27 +975,25 @@ html[data-theme='dark'] .fx-proof-card--stat .fx-proof-figure p {
   padding-bottom: clamp(90px, 14vh, 180px);
 }
 
+/* The title pins near the top of the viewport for the whole section and
+   floats over whichever card is parked beneath it, as in the reference. */
 .fx-port-head {
-  position: relative;
-  width: min(920px, 88vw);
-  margin: 0 auto;
-  aspect-ratio: 16 / 5.6;
-  min-height: 190px;
-  border-radius: 26px;
-  overflow: hidden;
+  position: sticky;
+  top: clamp(64px, 9vh, 110px);
+  z-index: 6;
   display: grid;
   place-items: center;
-  background: #020d08;
+  padding: 0 24px;
+  pointer-events: none;
 }
 
 .fx-port-head h2 {
-  position: relative;
-  z-index: 2;
   margin: 0;
-  font-size: clamp(38px, 4.6vw, 72px);
+  font-size: clamp(40px, 4.8vw, 76px);
   font-weight: 400;
   letter-spacing: -0.035em;
   color: #fff;
+  text-shadow: 0 2px 26px rgba(1, 10, 6, 0.6), 0 10px 50px rgba(1, 10, 6, 0.45);
 }
 
 .fx-port-body {
@@ -1005,7 +1003,7 @@ html[data-theme='dark'] .fx-proof-card--stat .fx-proof-figure p {
 .fx-port-rails {
   position: absolute;
   inset: 0;
-  z-index: 6;
+  z-index: 7;
   display: flex;
   justify-content: space-between;
   padding: 0 clamp(18px, 3.6vw, 64px);
@@ -1068,19 +1066,30 @@ html[data-theme='dark'] .fx-proof-card--stat .fx-proof-figure p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(90px, 16vh, 200px);
-  padding: clamp(80px, 13vh, 160px) 0 clamp(40px, 6vh, 80px);
+  gap: clamp(110px, 18vh, 230px);
+  padding: clamp(70px, 11vh, 140px) 0 clamp(40px, 6vh, 80px);
 }
 
+/* Each card parks in a sticky slot at the top of the viewport as it exits,
+   so the previous project stays "over your head" (later cards cover older
+   ones), while the signed distance from center drives a smoothed rotateX
+   bend: cards above curl away at the bottom, cards below slant back at the
+   top, and the centered card lies flat. */
 .fx-port-card {
-  position: relative;
+  position: sticky;
+  top: calc(25vh - min(940px, 66vw) * 0.625);
   width: min(940px, 66vw);
   aspect-ratio: 16 / 10;
   max-height: 74vh;
   border-radius: 26px;
   overflow: hidden;
   background: #08140e;
-  transform: scale(calc(1 - var(--d, 0) * 0.055));
+  transform:
+    translate3d(0, var(--lag, 0px), 0)
+    perspective(1400px)
+    rotateX(calc(var(--dsc, 0) * 13deg))
+    scale(calc(1 - var(--d, 0) * 0.06));
+  transform-origin: 50% 40%;
   box-shadow: 0 40px 90px rgba(1, 8, 5, 0.55);
   will-change: transform;
 }
@@ -1091,16 +1100,15 @@ html[data-theme='dark'] .fx-proof-card--stat .fx-proof-figure p {
   width: 100%;
   height: 112%;
   object-fit: cover;
-  transform: translateY(calc(var(--ds, 0) * 3.2%));
+  transform: translateY(calc(var(--dsc, 0) * 3.5%));
   will-change: transform;
 }
 
 .fx-port-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(2, 13, 8, 0.42), rgba(2, 13, 8, 0.12) 40%, rgba(2, 13, 8, 0.5));
-  opacity: calc(0.42 + var(--d, 0) * 0.58);
-  transition: opacity 0.2s linear;
+  background: rgb(2, 13, 8);
+  opacity: calc(var(--d, 0) * 0.85);
 }
 
 .fx-port-meta {
@@ -1122,25 +1130,35 @@ html[data-theme='dark'] .fx-proof-card--stat .fx-proof-figure p {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 130%;
-  height: 90%;
+  width: 92%;
+  height: 62%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(48% 46% at 50% 50%, rgba(2, 13, 8, 0.62), rgba(2, 13, 8, 0) 72%);
+  background: radial-gradient(46% 42% at 50% 50%, rgba(2, 13, 8, 0.52), rgba(2, 13, 8, 0) 70%);
   z-index: -1;
 }
 
+/* The reference keeps the card face quiet: just the project name. Sector
+   and outcome step in on hover. */
 .fx-port-meta small {
   font-size: 13px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.85);
   text-shadow: 0 1px 10px rgba(1, 10, 6, 0.7);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.45s ease, transform 0.55s var(--fx-ease);
+}
+
+.fx-port-card:hover .fx-port-meta small {
+  opacity: 1;
+  transform: none;
 }
 
 .fx-port-meta strong {
-  font-size: clamp(34px, 3.4vw, 54px);
+  font-size: clamp(24px, 2.4vw, 38px);
   font-weight: 400;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   text-shadow: 0 2px 18px rgba(1, 10, 6, 0.75), 0 8px 44px rgba(1, 10, 6, 0.65);
 }
 
@@ -1957,24 +1975,40 @@ body.fx-landing footer .to-top {
     display: none;
   }
 
+  .fx-port-head {
+    top: clamp(56px, 8vh, 90px);
+  }
+
   .fx-port-card {
     width: 88vw;
     aspect-ratio: 4 / 5;
     max-height: 70vh;
+    top: calc(13vh - 88vw * 1.25);
+    transform:
+      translate3d(0, var(--lag, 0px), 0)
+      perspective(1000px)
+      rotateX(calc(var(--dsc, 0) * 9deg))
+      scale(calc(1 - var(--d, 0) * 0.05));
   }
 
   .fx-port-cards {
-    gap: 9vh;
+    gap: 12vh;
     padding-top: 9vh;
   }
 
+  /* Touch has no hover: keep the card face to name + pill, and fade the
+     pill out with distance so parked cards stay quiet under the title. */
   .fx-port-card-cta {
     display: inline-flex;
+    opacity: calc(1.3 - var(--d, 0) * 2.1);
+  }
+
+  .fx-port-meta {
+    opacity: calc(1.1 - var(--d, 0) * 1.9);
   }
 
   .fx-port-meta em {
-    opacity: 1;
-    transform: none;
+    display: none;
   }
 
   .fx-services-head {
@@ -2134,10 +2168,6 @@ body.fx-landing footer .to-top {
   .fx-hero-cta {
     flex-wrap: wrap;
     gap: 18px;
-  }
-
-  .fx-port-head {
-    aspect-ratio: 16 / 8;
   }
 
   .fx-services-sticky {

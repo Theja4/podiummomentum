@@ -1,0 +1,293 @@
+/* Work rail — pinned horizontal scrub of WORKS (see WorkRail.jsx).
+   Scoped under .pm2-work; uses shared tokens from tokens.css. */
+
+.pm2-work {
+  position: relative;
+  background: var(--v-black);
+  overflow: clip;
+}
+
+/* —— sticky stage ——————————————————————————————————— */
+
+.pm2-work__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: clip;
+  display: flex;
+  align-items: center;
+}
+
+/* Violet glow bleeding along the viewport bottom (reference f_042/f_046). */
+.pm2-work__glow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 34vh;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(
+    ellipse 90% 100% at 50% 115%,
+    rgba(124, 58, 237, 0.5),
+    transparent 60%
+  );
+  mix-blend-mode: screen;
+}
+
+/* Faint giant outline word drifting behind the cards. */
+.pm2-work__word {
+  position: absolute;
+  left: 6vw;
+  top: 50%;
+  transform: translate3d(0, -50%, 0);
+  z-index: 1;
+  font-weight: 700;
+  font-size: 16vw;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(233, 213, 255, 0.14);
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+
+/* —— header ———————————————————————————————————————— */
+
+.pm2-work__head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(24px, 4vw, 64px);
+}
+
+.pm2-work__headLeft {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.pm2-work__count {
+  font-family: var(--v-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.pm2-work__cta {
+  flex: 0 0 auto;
+}
+
+/* —— rail —————————————————————————————————————————— */
+
+.pm2-work__track {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 48px);
+  width: max-content;
+  padding-left: 18vw;
+  padding-right: 6vw;
+  will-change: transform;
+}
+
+/* —— card —————————————————————————————————————————— */
+
+.pm2-work__card {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(300px, 56vw, 720px);
+  aspect-ratio: 4 / 3.2;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #0d0718;
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.pm2-work__cardInner {
+  position: absolute;
+  inset: 0;
+  will-change: filter;
+}
+
+.pm2-work__cardImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  will-change: transform;
+}
+
+/* Permanent bottom gradient for legibility. */
+.pm2-work__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(4, 2, 10, 0.88) 0%,
+    rgba(4, 2, 10, 0.28) 42%,
+    transparent 78%
+  );
+}
+
+.pm2-work__meta {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 22px;
+  font-family: var(--v-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pm2-work__name {
+  position: absolute;
+  left: 24px;
+  bottom: 20px;
+  margin: 0;
+  max-width: 70%;
+  font-size: clamp(38px, 4.6vw, 68px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #fff;
+}
+
+.pm2-work__result {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  max-width: 44%;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(168, 85, 247, 0.16);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #e9d5ff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  text-align: center;
+}
+
+/* —— simple mode (≤ 900px or reduced motion): native snap row ———————————— */
+
+.pm2-work--simple {
+  height: auto;
+  padding: clamp(48px, 8vw, 96px) 0;
+}
+
+.pm2-work--simple .pm2-work__stage {
+  position: relative;
+  height: auto;
+  overflow: visible;
+  display: block;
+}
+
+.pm2-work--simple .pm2-work__head {
+  position: relative;
+  padding-top: 0;
+  padding-bottom: clamp(24px, 4vw, 40px);
+}
+
+.pm2-work--simple .pm2-work__track {
+  width: auto;
+  padding-left: 9vw;
+  padding-right: 9vw;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  will-change: auto;
+}
+
+.pm2-work--simple .pm2-work__track::-webkit-scrollbar {
+  display: none;
+}
+
+.pm2-work--simple .pm2-work__card {
+  width: 82vw;
+  scroll-snap-align: center;
+}
+
+.pm2-work--simple .pm2-work__glow {
+  z-index: 3;
+  height: 26vh;
+}
+
+/* —— responsive ———————————————————————————————————— */
+
+@media (max-width: 900px) {
+  .pm2-work__word {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .pm2-work__head {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .pm2-work__headLeft {
+    gap: 14px;
+  }
+
+  .pm2-work__cta {
+    padding: 11px 20px;
+    font-size: 13px;
+  }
+
+  .pm2-work__card {
+    border-radius: 20px;
+  }
+
+  .pm2-work__meta {
+    padding: 16px;
+    font-size: 10px;
+  }
+
+  .pm2-work__name {
+    left: 18px;
+    bottom: 16px;
+    font-size: clamp(30px, 9vw, 42px);
+    max-width: 62%;
+  }
+
+  .pm2-work__result {
+    right: 14px;
+    bottom: 14px;
+    padding: 6px 11px;
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm2-work__word {
+    transform: translate3d(0, -50%, 0);
+  }
+}

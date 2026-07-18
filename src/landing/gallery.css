@@ -1,0 +1,315 @@
+/* Gallery — fly-through field (scoped to .pm2-gallery).
+   Desktop: the section overlaps only the work rail's tail (negative
+   margin), so its transparent 100vh stage pins right as the last work
+   card settles — then tiles sweep in from the right, a black backdrop
+   fades up beneath them, and the field pans diagonally before scaling
+   about the screen center until the target tile is a framed fullscreen
+   slide; the hold carries it until the footer scrolls in. All tiles sit
+   at (0,0) and are positioned purely via transform.
+   Under 900px and for reduced motion the field is a static stack. */
+
+.pm2-gallery {
+  position: relative;
+  height: 400vh;
+  margin-top: -120vh;
+  background: transparent;
+}
+
+.pm2-gallery-sronly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pm2-gallery-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: clip;
+  /* Transparent over the rail during the hand-off; clicks pass through to
+     it. Interactive children (the copy CTA) re-enable their own events. */
+  pointer-events: none;
+}
+
+/* Black backdrop the loop fades up as tiles sweep in over the rail. */
+.pm2-gallery-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(40% 28% at 82% 88%, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0) 70%),
+    var(--v-black);
+}
+
+.pm2-gallery-field {
+  position: absolute;
+  inset: 0;
+}
+
+/* —— tiles: transform-driven, top-left origin ————————————— */
+
+.pm2-gallery-tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--v-ink);
+  transform: translate3d(-200vw, 0, 0); /* parked offscreen until the loop runs */
+  transform-origin: 0 0;
+  box-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.7);
+  will-change: transform;
+}
+
+.pm2-gallery-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pm2-gallery-tile-label {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+}
+
+.pm2-gallery-tile-name {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+
+.pm2-gallery-tile-sub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* —— quote tile (glass) ——————————————————————————————— */
+
+.pm2-gallery-quote {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: min(300px, 78vw);
+  padding: 22px;
+  border-radius: 14px;
+  background: rgba(6, 22, 15, 0.72);
+  border: 1px solid rgba(52, 211, 153, 0.24);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  transform: translate3d(-200vw, 0, 0);
+  transform-origin: 0 0;
+  box-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.7);
+  will-change: transform;
+}
+
+.pm2-gallery-quote-text {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(220, 252, 231, 0.85);
+}
+
+.pm2-gallery-quote-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pm2-gallery-quote-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.pm2-gallery-quote-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.pm2-gallery-quote-role {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* —— target tile (the slide the camera dives into) ——————————— */
+
+.pm2-gallery-target {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 14px; /* JS counter-scales this every frame */
+  background: #06120c;
+  transform: translate3d(-200vw, 0, 0);
+  transform-origin: 0 0;
+  box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.95);
+  will-change: transform;
+}
+
+.pm2-gallery-target img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* —— copy over the framed slide ————————————————————————— */
+
+.pm2-gallery-copy {
+  position: absolute;
+  /* Mirrors the framed slide: heavier top inset, slim bottom (JS geometry). */
+  inset: calc(clamp(20px, 3vw, 44px) * 1.6) clamp(20px, 3vw, 44px)
+    calc(clamp(20px, 3vw, 44px) * 0.4);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 18px;
+  padding: clamp(28px, 5vw, 72px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pm2-gallery-copy .pm2-gallery-cta {
+  pointer-events: auto;
+  margin-top: 10px;
+}
+
+.pm2-gallery-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(3, 18, 12, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.pm2-gallery-badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #34d399;
+}
+
+.pm2-gallery-line {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-size: clamp(34px, 5.4vw, 72px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: #fff;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.45);
+}
+
+.pm2-gallery-line-dim {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* —— static fallback: small screens and reduced motion ——————— */
+
+@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+  .pm2-gallery {
+    height: auto;
+    margin-top: 0;
+    padding: 76px 20px 88px;
+    background: var(--v-black);
+  }
+
+  .pm2-gallery-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    pointer-events: auto;
+  }
+
+  .pm2-gallery-bg {
+    display: none;
+  }
+
+  .pm2-gallery-field {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .pm2-gallery-tile,
+  .pm2-gallery-quote,
+  .pm2-gallery-target {
+    position: static;
+    width: 100% !important;
+    height: auto !important;
+    max-width: none;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .pm2-gallery-tile {
+    aspect-ratio: 3 / 2;
+  }
+
+  .pm2-gallery-target {
+    aspect-ratio: 3 / 2;
+    border-radius: 18px !important;
+  }
+
+  .pm2-gallery-quote {
+    order: 9; /* after the target card */
+  }
+
+  .pm2-gallery-copy {
+    position: static;
+    margin-top: 22px;
+    border-radius: 18px;
+    background:
+      radial-gradient(120% 100% at 50% 0%, rgba(52, 211, 153, 0.3) 0%, rgba(8, 64, 44, 0.55) 55%, rgba(3, 14, 9, 0.9) 100%),
+      var(--v-ink);
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .pm2-gallery {
+    padding: 64px 16px 72px;
+  }
+
+  .pm2-gallery-tile,
+  .pm2-gallery-quote,
+  .pm2-gallery-target {
+    border-radius: 12px !important;
+  }
+}

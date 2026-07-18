@@ -13,7 +13,8 @@ import { industryList, matchIndustryRoute } from './industries.js'
 import ClientLogo from './ClientLogo.jsx'
 import { heroClientLogos } from './heroClientLogos.js'
 import { submitContactForm } from './contactForm.js'
-import LandingFx from './LandingFx.jsx'
+import LandingFx from './LandingFx.jsx' // kept for rollback
+import Landing2 from './landing/Landing2.jsx'
 import './landing-hero.css'
 import './header-polish.css'
 import './button-system.css'
@@ -1471,9 +1472,10 @@ function CtaBanner() {
 
 // The previous landing composition (Hero/About/Challenge/Solution/Work/
 // Clients/Services/Compare/FAQ/Testimonials/CtaBanner) is preserved above
-// for rollback; the live landing page is the LandingFx redesign.
+// for rollback; the live landing page is the Landing2 violet redesign
+// (src/landing/*), which superseded the LandingFx iteration.
 function HomePage() {
-  return <><Header /><LandingFx navigate={navigate} /><Footer /></>
+  return <><Header /><Landing2 navigate={navigate} /><Footer /></>
 }
 
 function App() {

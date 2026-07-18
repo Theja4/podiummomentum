@@ -1,0 +1,145 @@
+/* Finale — closing CTA panel with the chrome star (scoped to .pm2-finale).
+   Light page band around a violet radial panel (reference frame f_067). */
+
+.pm2-finale {
+  position: relative;
+  overflow: clip;
+  background: var(--v-paper);
+  padding: clamp(10px, 1.6vw, 24px);
+}
+
+.pm2-finale-panel {
+  position: relative;
+  min-height: 82vh;
+  border-radius: var(--v-radius-panel);
+  overflow: hidden;
+  background:
+    radial-gradient(115% 85% at 68% 112%, rgba(168, 85, 247, 0.9) 0%, rgba(124, 58, 237, 0.52) 36%, rgba(124, 58, 237, 0) 66%),
+    radial-gradient(80% 60% at 4% -8%, rgba(233, 213, 255, 0.32) 0%, rgba(233, 213, 255, 0) 58%),
+    radial-gradient(60% 34% at 50% 118%, rgba(139, 92, 246, 0.55) 0%, rgba(139, 92, 246, 0) 70%),
+    var(--v-deep);
+  will-change: transform, clip-path;
+}
+
+/* Starting pose for the entrance scrub — only present when Finale.jsx has
+   armed it (motion allowed); the rAF loop overrides it inline each frame. */
+.pm2-finale-panel.pm2-scrub {
+  clip-path: inset(6% 3% 6% 3% round 40px);
+  transform: translate3d(0, 60px, 0);
+}
+
+.pm2-finale-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.pm2-finale-watermark {
+  position: absolute;
+  left: -4%;
+  top: 4%;
+  z-index: 1;
+  width: min(38vw, 460px);
+  height: auto;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* —— content ———————————————————————————————————— */
+
+.pm2-finale-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  min-height: inherit;
+}
+
+.pm2-finale-copy {
+  padding: clamp(28px, 5vw, 80px);
+}
+
+.pm2-finale-title {
+  margin: 0 0 22px;
+  font-size: clamp(48px, 6.4vw, 96px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  color: #fff;
+}
+
+.pm2-finale-title span {
+  display: block;
+}
+
+.pm2-finale-title .pm2-finale-dim {
+  color: rgba(233, 213, 255, 0.5);
+}
+
+.pm2-finale-text {
+  margin: 0 0 30px;
+  max-width: 36ch;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pm2-finale-star {
+  justify-self: end;
+  align-self: center;
+  width: min(46vw, 640px);
+  aspect-ratio: 1 / 1;
+  margin-right: -5%;
+  margin-bottom: -4%;
+}
+
+/* —— responsive ————————————————————————————————— */
+
+@media (max-width: 900px) {
+  .pm2-finale-panel {
+    min-height: 0;
+  }
+
+  .pm2-finale-grid {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    gap: 4px;
+    padding-bottom: 44px;
+  }
+
+  .pm2-finale-star {
+    justify-self: center;
+    align-self: center;
+    width: 78vw;
+    margin: 12px 0 0;
+  }
+
+  .pm2-finale-watermark {
+    width: 70vw;
+    left: -14%;
+    top: 2%;
+  }
+}
+
+@media (max-width: 600px) {
+  .pm2-finale-title {
+    font-size: clamp(40px, 12vw, 56px);
+  }
+
+  .pm2-finale-text {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm2-finale-panel,
+  .pm2-finale-panel.pm2-scrub {
+    clip-path: none !important;
+    transform: none !important;
+  }
+}

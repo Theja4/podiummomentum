@@ -1,0 +1,805 @@
+/* ============================================================================
+   Hero (pm2) — violet panel that spins ~90° away + lime card that seats into
+   the services coverflow. Scoped under .pm2-hero. Motion values are written
+   inline by Hero.jsx's rAF loop; this file owns layout, resting states, and
+   entrance keyframes.
+   ========================================================================== */
+
+.pm2-hero {
+  --pm2-hero-inset: clamp(10px, 1.6vw, 24px);
+  position: relative;
+  height: 230vh;
+  /* transparent: the landing root (.pm2) provides the white; the carousel's
+     stage rises beneath the hero's tail and must show through */
+  /* no overflow clip here: the ghost card must stay visible while it flies
+     across the seam into the services section — horizontal overflow is
+     contained by .pm2 (the landing root) instead */
+  z-index: 2; /* above .pm2-carousel during the seam handoff */
+}
+
+.pm2-hero-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  /* keep in sync with TILT.perspective in Hero.jsx */
+  perspective: 1600px;
+  perspective-origin: 50% 40%;
+}
+
+/* —— the violet panel ———————————————————————— */
+
+.pm2-hero-panel {
+  position: absolute;
+  inset: var(--pm2-hero-inset);
+  z-index: 2;
+  border-radius: var(--v-radius-panel);
+  background:
+    radial-gradient(130% 105% at 50% 118%, var(--v-glow) 0%, var(--v-core) 34%, rgba(109, 40, 217, 0) 72%),
+    radial-gradient(80% 60% at 50% 112%, rgba(168, 85, 247, 0.6) 0%, rgba(168, 85, 247, 0) 62%),
+    linear-gradient(180deg, #08040f 0%, #12072a 52%, var(--v-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 40px 90px -40px rgba(27, 11, 58, 0.55);
+  transform-origin: 50% 50%; /* flat in-plane spin about the panel's center */
+  will-change: transform, opacity;
+  animation: pm2HeroPanelIn 1s var(--v-ease) backwards;
+}
+
+/* film grain */
+.pm2-hero-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+@keyframes pm2HeroPanelIn {
+  from { opacity: 0; transform: scale(1.03); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.pm2-hero-inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(24px, 4vw, 64px);
+}
+
+/* —— title ———————————————————————— */
+
+.pm2-hero-title {
+  margin: 0;
+  font-size: clamp(56px, 8.5vw, 128px);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+.pm2-hero-line {
+  display: block;
+  padding-bottom: 0.04em;
+}
+
+.pm2-hero-line--dim {
+  color: rgba(233, 213, 255, 0.55);
+}
+
+.pm2-hero-line-in {
+  display: block;
+  will-change: transform, clip-path;
+  animation: pm2HeroRise 1s var(--v-ease) 0.18s backwards;
+}
+
+.pm2-hero-line:nth-child(2) .pm2-hero-line-in {
+  animation-delay: 0.3s;
+}
+
+@keyframes pm2HeroRise {
+  from {
+    clip-path: inset(0 0 105% 0);
+    transform: translate3d(0, 55%, 0);
+  }
+  to {
+    clip-path: inset(0 0 -12% 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* —— middle row: copy + floating card ———————————————————————— */
+
+.pm2-hero-mid {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 48px);
+  min-height: 0;
+}
+
+.pm2-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(16px, 2.2vh, 26px);
+  animation: pm2HeroFade 0.9s var(--v-ease) 0.45s backwards;
+}
+
+.pm2-hero-lead {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 34ch;
+}
+
+.pm2-hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pm2-hero-stats {
+  display: flex;
+  gap: clamp(16px, 2vw, 32px);
+  margin-top: clamp(4px, 1vh, 12px);
+}
+
+.pm2-hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.pm2-hero-stat:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.pm2-hero-stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #fff;
+}
+
+.pm2-hero-stat-label {
+  font-family: var(--v-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* THE hero card — photo face on top, lime face wiping in from the bottom.
+   Stage-level: escapes the panel's spin/fade. Positioning mirrors the panel's
+   card slot; JS measures rest geometry via offsetLeft/offsetTop every frame. */
+.pm2-hero-card {
+  position: absolute;
+  z-index: 3; /* above the panel */
+  right: calc(var(--pm2-hero-inset) + clamp(24px, 4vw, 64px));
+  top: 50%;
+  /* exactly the coverflow card's size — the seat scale lands at 1.0, so the
+     face is pixel-identical at the swap (no stretch, no color shift) */
+  width: min(370px, 80vw);
+  height: min(530px, 74vh);
+  margin-top: calc(min(530px, 74vh) / -2);
+  will-change: transform, opacity;
+}
+
+/* the lime face — hidden behind a bottom-edge clip until the scroll wipe */
+.pm2-hero-card-lime {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #0a0d06; /* = the coverflow's lime face */
+  color: #fff;
+  clip-path: inset(100% 0 0 0 round 26px); /* JS rises this to inset(0) */
+  will-change: clip-path;
+}
+
+/* lime-face accents the scoped coverflow rules would have provided */
+.pm2-hero-card-lime .pm2-carousel-idx {
+  background: var(--v-lime);
+  border-color: transparent;
+  color: #131607;
+  font-weight: 700;
+}
+
+.pm2-hero-card-lime .pm2-carousel-chip {
+  border-color: rgba(201, 246, 45, 0.35);
+}
+
+/* face A — the ghost's own identity, slides/spins OUT as --m rises */
+.pm2-hero-ghost-faceA {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pm2-hero-ghost-sparkle {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  /* gone before the badge arrives — no overlap */
+  opacity: calc(1 - clamp(0, var(--m, 0) / 0.3, 1));
+  transform: scale(calc(1 - 0.8 * clamp(0, var(--m, 0) / 0.3, 1)))
+    rotate(calc(clamp(0, var(--m, 0) / 0.3, 1) * 120deg));
+}
+
+.pm2-hero-ghost-labelMask {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  overflow: hidden;
+}
+
+.pm2-hero-ghost-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(234, 255, 176, 0.85);
+  /* slides down out of its mask — never ghosts through the title */
+  transform: translateY(calc(clamp(0, (var(--m, 0) - 0.3) / 0.35, 1) * 110%));
+}
+
+/* face B — the coverflow card's face, falls INTO place as --m rises */
+.pm2-hero-ghost-faceB {
+  display: contents; /* children join the ghost's own flex flow */
+}
+
+.pm2-hero-ghost-faceB .pm2-carousel-card-top {
+  /* badge + domain drop in as the sparkle finishes spinning out */
+  opacity: clamp(0, calc((var(--m, 0) - 0.35) / 0.3), 1);
+  transform: translateY(
+    calc((1 - clamp(0, (var(--m, 0) - 0.35) / 0.3, 1)) * -10px)
+  );
+}
+
+.pm2-hero-ghost-faceB .pm2-carousel-card-mid {
+  opacity: clamp(0, calc((var(--m, 0) - 0.5) / 0.3, 1));
+  transform: translateY(
+      calc((1 - clamp(0, (var(--m, 0) - 0.5) / 0.3, 1)) * 14px)
+    )
+    scale(calc(0.92 + 0.08 * clamp(0, (var(--m, 0) - 0.5) / 0.3, 1)));
+}
+
+/* the title falls into place from above, clipped by its mask */
+.pm2-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.pm2-mask-in {
+  display: block;
+}
+
+.pm2-hero-ghost-faceB .pm2-carousel-card-bottom .pm2-mask-in {
+  transform: translateY(
+    calc((1 - clamp(0, (var(--m, 0) - 0.45) / 0.4, 1)) * -110%)
+  );
+}
+
+/* load entrance: the card twists and falls into place */
+.pm2-hero-card-enter {
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+  animation: pm2HeroCardEnter 1.15s var(--v-ease) 0.35s backwards;
+}
+
+@keyframes pm2HeroCardEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -9vh, 0) rotate(-16deg) scale(1.07);
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+.pm2-hero-card-float {
+  position: relative;
+  height: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #0d0718;
+  transform: rotate(-4deg);
+  box-shadow:
+    0 30px 80px -20px rgba(13, 7, 24, 0.35),
+    0 20px 55px -18px rgba(109, 40, 217, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  will-change: transform;
+  animation: pm2HeroFloat 7s ease-in-out infinite;
+}
+
+/* sliding image reveal — clip wipe + inner slide/scale, image-agnostic */
+.pm2-hero-card-reveal {
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  will-change: clip-path;
+  animation: pm2HeroCardReveal 1.5s cubic-bezier(0.65, 0, 0.15, 1) 0.5s backwards;
+}
+
+.pm2-hero-card-reveal img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+  animation: pm2HeroCardImg 1.9s cubic-bezier(0.22, 0.8, 0.24, 1) 0.55s backwards;
+}
+
+@keyframes pm2HeroCardReveal {
+  from { clip-path: inset(0 0 100% 0 round 26px); }
+  to { clip-path: inset(0 0 0 0 round 26px); }
+}
+
+@keyframes pm2HeroCardImg {
+  from { transform: translate3d(0, -14%, 0) scale(1.28); }
+  to { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes pm2HeroFloat {
+  0%, 100% { transform: rotate(-4deg) translate3d(0, -10px, 0); }
+  50% { transform: rotate(-4deg) translate3d(0, 10px, 0); }
+}
+
+/* —— bottom row ———————————————————————— */
+
+.pm2-hero-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  animation: pm2HeroFade 0.9s var(--v-ease) 0.55s backwards;
+}
+
+.pm2-hero-trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  padding: 8px 18px 8px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.pm2-hero-avatars {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.pm2-hero-avatars img {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  margin-left: -10px;
+}
+
+.pm2-hero-avatars img:first-child {
+  margin-left: 0;
+}
+
+.pm2-hero-trust-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pm2-hero-caption {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 36ch;
+  text-align: right;
+}
+
+/* —— responsive: stacked static hero ———————————————————————— */
+
+@media (max-width: 900px) {
+  .pm2-hero {
+    height: auto;
+  }
+
+  .pm2-hero-stage {
+    position: relative;
+    height: auto;
+    perspective: none;
+  }
+
+  .pm2-hero-panel {
+    position: relative;
+    inset: auto;
+    margin: 0 10px 10px;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .pm2-hero-inner {
+    height: auto;
+    justify-content: flex-start;
+    gap: 26px;
+    padding: clamp(78px, 13vw, 104px) 22px 26px;
+  }
+
+  .pm2-hero-title {
+    font-size: clamp(40px, 11.5vw, 64px);
+  }
+
+  .pm2-hero-mid {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .pm2-hero-lead {
+    font-size: 15.5px;
+  }
+
+  .pm2-hero-card {
+    position: relative;
+    right: auto;
+    top: auto;
+    width: 100%;
+    height: auto;
+    margin: 0 0 10px;
+    transform: none !important;
+  }
+
+  .pm2-hero-card-lime {
+    display: none; /* no scroll journey on small screens */
+  }
+
+  .pm2-hero-card-float {
+    aspect-ratio: 16 / 10;
+    height: auto;
+    border-radius: 18px;
+    transform: none;
+    animation: none;
+  }
+
+  .pm2-hero-card-reveal {
+    border-radius: 18px;
+  }
+
+  .pm2-hero-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .pm2-hero-caption {
+    text-align: left;
+    max-width: 46ch;
+  }
+}
+
+@media (max-width: 600px) {
+  .pm2-hero-inner {
+    padding: 76px 18px 22px;
+  }
+
+  .pm2-hero-stats {
+    flex-wrap: wrap;
+    gap: 14px 18px;
+  }
+
+  .pm2-hero-stat-value {
+    font-size: 20px;
+  }
+
+  .pm2-hero-trust {
+    gap: 10px;
+    padding-right: 14px;
+  }
+
+  .pm2-hero-trust-text {
+    font-size: 12px;
+  }
+
+  .pm2-hero-caption {
+    font-size: 12.5px;
+  }
+}
+
+/* —— reduced motion: plain full-viewport hero, no pin/tilt/drift ———————— */
+
+@media (prefers-reduced-motion: reduce) {
+  .pm2-hero {
+    height: auto;
+  }
+
+  .pm2-hero-stage {
+    position: relative;
+    height: 100vh;
+    height: 100svh;
+    perspective: none;
+  }
+
+  .pm2-hero-row-drift {
+    animation: none;
+  }
+
+  .pm2-hero-card-float {
+    animation: none;
+    transform: rotate(-4deg);
+  }
+
+  .pm2-hero-card-enter,
+  .pm2-hero-card-reveal,
+  .pm2-hero-card-reveal img,
+  .pm2-hero-card-lime {
+    animation: none !important;
+  }
+
+  .pm2-hero-panel,
+  .pm2-hero-line-in,
+  .pm2-hero-copy,
+  .pm2-hero-card,
+  .pm2-hero-bottom {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 900px) {
+  .pm2-hero-stage {
+    height: auto;
+  }
+}
+
+/* ============================================================================
+   Header restyle — floating white pill, landing only (body.pm2-active).
+   The header markup lives outside <main class="pm2"> (rendered as a sibling
+   in #root), so --v-* tokens are not in scope here: literal values are used
+   instead. Selectors are prefixed `html body.pm2-active` so these rules win
+   specificity ties against the site's existing header sheets — several of
+   which (header-polish.css, button-system.css) use !important throughout.
+   ========================================================================== */
+
+html body.pm2-active .header {
+  position: fixed !important;
+  top: 14px !important;
+  left: 50% !important;
+  right: auto !important;
+  width: max-content !important;
+  max-width: calc(100vw - 24px);
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 6px 8px 6px 18px !important;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86) !important;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(13, 7, 24, 0.08);
+  box-shadow: 0 10px 40px -12px rgba(13, 7, 24, 0.25) !important;
+  z-index: 200;
+  transform: translate3d(-50%, 0, 0) !important;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform;
+}
+
+html body.pm2-active .header:not(.header-hidden) {
+  transform: translate3d(-50%, 0, 0) !important;
+}
+
+html body.pm2-active .header.header-hidden {
+  transform: translate3d(-50%, calc(-100% - 40px), 0) !important;
+}
+
+html body.pm2-active .header.header-scrolled {
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 12px 44px -12px rgba(13, 7, 24, 0.3) !important;
+}
+
+html body.pm2-active .header .header-inner {
+  width: auto;
+  height: auto;
+  justify-content: center;
+  gap: clamp(16px, 2.4vw, 40px);
+}
+
+/* logo lockup — compact mark + wordmark */
+html body.pm2-active .header .logo-link {
+  height: auto;
+  padding: 0;
+}
+
+html body.pm2-active .header .logo-lockup {
+  gap: 8px !important;
+}
+
+html body.pm2-active .header .logo-lockup-mark {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+html body.pm2-active .header .logo-wordmark {
+  font-size: 15px !important;
+  line-height: 1;
+  color: #0b0910 !important;
+}
+
+/* desktop nav: tight pill items */
+@media (min-width: 901px) {
+  html body.pm2-active .header .nav {
+    gap: 4px !important;
+    height: auto !important;
+    font-size: 13.5px;
+  }
+
+  html body.pm2-active .header .nav > a,
+  html body.pm2-active .header .nav > .nav-dropdown {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    padding: 0 13px !important;
+    border-radius: 999px;
+    font-size: 13.5px;
+    color: #0b0910 !important;
+    transition: background-color 0.25s ease;
+  }
+
+  html body.pm2-active .header .nav > a:hover,
+  html body.pm2-active .header .nav > .nav-dropdown:hover,
+  html body.pm2-active .header .nav > .nav-dropdown.is-open {
+    background-color: rgba(13, 7, 24, 0.05);
+  }
+
+  /* retire the old underline + emerald gradient bar */
+  html body.pm2-active .header .nav > a::after,
+  html body.pm2-active .header .nav-dropdown-trigger::after {
+    display: none !important;
+  }
+
+  html body.pm2-active .header .nav .nav-dropdown-trigger {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 !important;
+    font-size: 13.5px !important;
+    color: #0b0910 !important;
+  }
+
+  html body.pm2-active .header .nav .nav-dropdown-trigger:hover,
+  html body.pm2-active .header .nav .nav-dropdown.is-open .nav-dropdown-trigger {
+    color: #0b0910 !important;
+  }
+
+  /* dropdown panels: white card, 16px radius, violet-tinted glow */
+  html body.pm2-active .header .nav-dropdown-panel-card {
+    border-radius: 16px;
+    border: 1px solid rgba(13, 7, 24, 0.08);
+    box-shadow:
+      0 24px 60px -24px rgba(13, 7, 24, 0.28),
+      0 8px 24px -12px rgba(13, 7, 24, 0.1);
+  }
+
+  html body.pm2-active .header .nav-dropdown-panel-card::before {
+    background:
+      radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.12), transparent 45%),
+      radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.08), transparent 40%);
+  }
+}
+
+/* snug pill on small desktops */
+@media (min-width: 901px) and (max-width: 1100px) {
+  html body.pm2-active .header .header-inner {
+    gap: 14px;
+  }
+
+  html body.pm2-active .header .nav > a,
+  html body.pm2-active .header .nav > .nav-dropdown {
+    padding: 0 9px !important;
+    font-size: 12.5px;
+  }
+
+  html body.pm2-active .header .nav .nav-dropdown-trigger {
+    font-size: 12.5px !important;
+  }
+}
+
+/* 'Let's chat' CTA → black pill (#root qualifier outranks the
+   `html[data-theme] body #root .header .pill-light` contrast contract) */
+html body.pm2-active #root .header .header-actions > .pill {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 10px 20px !important;
+  border-radius: 999px !important;
+  background: #0d0718 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  font-size: 13.5px !important;
+  line-height: 1.2;
+}
+
+html body.pm2-active #root .header .header-actions > .pill:hover {
+  background: #6d28d9 !important;
+  color: #fff !important;
+  box-shadow: 0 10px 30px -10px rgba(109, 40, 217, 0.55) !important;
+  transform: none !important;
+}
+
+html body.pm2-active #root .header .header-actions > .pill .pill-icon-shell,
+html body.pm2-active #root .header .header-actions > .pill .pill-wipe,
+html body.pm2-active #root .header .header-actions > .pill .pill-wipe-dark {
+  display: none !important;
+}
+
+html body.pm2-active .header .header-actions {
+  gap: 8px;
+}
+
+/* mobile: pill spans the viewport, burger visible, drawer drops below */
+@media (max-width: 900px) {
+  html body.pm2-active .header {
+    top: 10px !important;
+    width: 94vw !important;
+    max-width: 94vw;
+    padding: 8px 8px 8px 14px !important;
+  }
+
+  html body.pm2-active .header .header-inner {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  html body.pm2-active .header .menu {
+    background: #0d0718;
+    color: #fff;
+    border: 0;
+  }
+
+  /* The drawer opens as a viewport-fixed sheet (see styles.css .nav.open):
+     keep that behavior, just align it under the pill and restyle the card. */
+  html body.pm2-active .header .nav {
+    border: 1px solid rgba(13, 7, 24, 0.08);
+    border-radius: 22px;
+    box-shadow: 0 24px 60px -24px rgba(13, 7, 24, 0.3);
+  }
+
+  html body.pm2-active .header .nav.open {
+    top: 76px; /* pill bottom is ~70px (10px offset + ~60px height) */
+    left: 3vw;
+    right: 3vw;
+    border-radius: 22px;
+    max-height: calc(100dvh - 92px);
+  }
+
+  html body.pm2-active .header .mobile-nav-cta {
+    background: #0d0718;
+    color: #fff !important;
+  }
+}

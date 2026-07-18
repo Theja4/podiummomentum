@@ -363,8 +363,8 @@ function buildPodium(THREE, RoomEnvironment, RoundedBoxGeometry, holder) {
   scene.environment = envTexture
 
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 40)
-  camera.position.set(0, 0.55, 5.4)
-  camera.lookAt(0, -0.1, 0)
+  camera.position.set(0, 0.85, 7.6)
+  camera.lookAt(0, -0.15, 0)
 
   const group = new THREE.Group()
   scene.add(group)
@@ -428,7 +428,9 @@ function buildPodium(THREE, RoomEnvironment, RoundedBoxGeometry, holder) {
     pointer.y += (pointer.ty - pointer.y) * 0.045
     group.rotation.y = Math.sin(t * 0.16) * 0.5 + pointer.x * 0.24 + 0.35
     group.rotation.x = 0.02 - pointer.y * 0.07
-    group.position.y = Math.sin(t * 0.6) * 0.06
+    // Sits low in the frame so the front step overhangs the section edge
+    // below, the way the reference chain crosses into the next surface.
+    group.position.y = -0.62 + Math.sin(t * 0.6) * 0.06
     renderer.render(scene, camera)
   }
   const loop = () => {
@@ -998,8 +1000,13 @@ function FxPortfolio({ navigate }) {
     }
 
     const write = (state, card) => {
+      // Parked cards sit several viewport-heights from center in layout
+      // space; clamp the signed distance that drives the bend and parallax
+      // so they hold a stable pose instead of folding further and further.
+      const clamped = Math.max(-1.15, Math.min(1.15, state.ds))
       card.style.setProperty('--d', state.d.toFixed(4))
       card.style.setProperty('--ds', state.ds.toFixed(4))
+      card.style.setProperty('--dsc', clamped.toFixed(4))
       card.style.setProperty('--lag', `${state.lag.toFixed(2)}px`)
     }
 
@@ -1060,7 +1067,7 @@ function FxPortfolio({ navigate }) {
       <header className="fx-port-head" data-fxr>
         <h2>Recent works</h2>
       </header>
-      <div className="fx-port-body">
+      <div className="fx-port-body" ref={bodyRef}>
         <div className="fx-port-rails" aria-hidden="true">
           <div className="fx-rail fx-rail--count">
             <span className="fx-count">

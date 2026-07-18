@@ -1,0 +1,488 @@
+/* Services 3D coverflow — scoped under .pm2-carousel.
+   White stage, giant marquee behind, violet/onyx/glow cards in front. */
+
+.pm2-carousel {
+  position: relative;
+  z-index: 1; /* below .pm2-hero (z2) so the ghost card can seat across the seam */
+  /* rise beneath the hero's tail: the stage (marquee + side cards) enters
+     while the ghost seats, so there's no dead white scroll between them */
+  margin-top: -70vh;
+  background: var(--v-paper);
+  overflow: clip;
+}
+
+.pm2-carousel-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: clip;
+  background: var(--v-paper);
+}
+
+/* —— giant marquee (z0, behind the cards) ——————————————————— */
+
+.pm2-carousel-marquee {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: clamp(100px, 16vw, 230px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: rgba(11, 9, 16, 0.9);
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+  transform: translate3d(0, -50%, 0);
+}
+
+.pm2-carousel-mseq {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.pm2-carousel-mitem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32em;
+  padding-right: 0.32em;
+  flex: none;
+}
+
+.pm2-carousel-mword.is-outline {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgba(11, 9, 16, 0.9);
+}
+
+.pm2-carousel-mspark {
+  flex: none;
+}
+
+/* —— 3D stage (z1) —————————————————————————————————————————— */
+
+.pm2-carousel-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  perspective: 1500px;
+  transform-style: preserve-3d;
+  outline: none;
+}
+
+.pm2-carousel-stage:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(168, 85, 247, 0.5);
+}
+
+.pm2-carousel-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(370px, 80vw);
+  height: min(530px, 74vh);
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px -20px rgba(13, 7, 24, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  color: #fff;
+  opacity: 0; /* written by the rAF loop on the first frame */
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* optional full-bleed cover image (data.js SERVICE_CARDS[i].image) — sits
+   under every face layer; a scrim keeps the card copy legible */
+.pm2-carousel-card-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.pm2-carousel-card-bg img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pm2-carousel-card-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 3, 14, 0.32) 0%, rgba(7, 3, 14, 0) 34%, rgba(7, 3, 14, 0.72) 100%);
+}
+
+/* shared card anatomy */
+
+.pm2-carousel-card-top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pm2-carousel-idx {
+  font-family: var(--v-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.pm2-carousel-domain {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pm2-carousel-card-mid {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pm2-carousel-card-bottom {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+}
+
+.pm2-carousel-card-title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pm2-carousel-card-line {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pm2-carousel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  padding: 13px 18px;
+  border-radius: 16px;
+  background: rgba(18, 13, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 14.5px;
+  font-weight: 550;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+}
+
+.pm2-carousel-chip-ico {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.94);
+  color: #160b2a;
+}
+
+/* —— theme: violet (radial gradient + black/white sparkle) ————————— */
+
+.pm2-carousel-card--violet {
+  background: radial-gradient(
+    130% 95% at 50% -8%,
+    #c9a8ff 0%,
+    #8b5cf6 34%,
+    #7c3aed 58%,
+    #3b1470 100%
+  );
+}
+
+.pm2-carousel-orb {
+  position: relative;
+  width: 45%;
+  aspect-ratio: 1 / 1;
+}
+
+.pm2-carousel-orb .pm2-sparkle {
+  display: block;
+}
+
+.pm2-carousel-orb-core {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+
+/* —— theme: onyx / lime (near-black + cover image top half) ———————— */
+
+.pm2-carousel-card--onyx {
+  background: #0a0a0c;
+}
+
+.pm2-carousel-card--lime {
+  background: #0a0d06;
+}
+
+.pm2-carousel-card--lime .pm2-carousel-idx {
+  background: var(--v-lime);
+  border-color: transparent;
+  color: #131607;
+  font-weight: 700;
+}
+
+.pm2-carousel-card--lime .pm2-carousel-chip {
+  border-color: rgba(201, 246, 45, 0.35);
+}
+
+.pm2-carousel-cover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 58%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.pm2-carousel-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 97%);
+  mask-image: linear-gradient(180deg, #000 50%, transparent 97%);
+}
+
+/* —— theme: glow (deep card, violet glow rising from the bottom) ——— */
+
+.pm2-carousel-card--glow {
+  background: #0d0718;
+}
+
+.pm2-carousel-card--glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    85% 62% at 50% 112%,
+    rgba(168, 85, 247, 0.6) 0%,
+    rgba(109, 40, 217, 0.28) 42%,
+    rgba(13, 7, 24, 0) 72%
+  );
+  pointer-events: none;
+}
+
+.pm2-carousel-prog {
+  display: block;
+  height: 2px;
+  margin-top: 14px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.pm2-carousel-prog i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--v-glow);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
+}
+
+/* —— footer (kicker + CTA) and prev/next ——————————————————— */
+
+.pm2-carousel-foot {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.pm2-carousel-nav {
+  position: absolute;
+  z-index: 2;
+  right: 30px;
+  bottom: 26px;
+  display: flex;
+  gap: 10px;
+}
+
+.pm2-carousel-nav button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: var(--v-ink);
+  cursor: pointer;
+  box-shadow: 0 10px 30px -10px rgba(13, 7, 24, 0.35),
+    inset 0 0 0 1px rgba(13, 7, 24, 0.06);
+  transition: transform 0.4s var(--v-ease), box-shadow 0.4s var(--v-ease),
+    color 0.3s ease;
+}
+
+.pm2-carousel-nav button:hover {
+  transform: translateY(-2px);
+  color: var(--v-core);
+  box-shadow: 0 16px 40px -12px rgba(13, 7, 24, 0.45),
+    inset 0 0 0 1px rgba(13, 7, 24, 0.08);
+}
+
+.pm2-carousel-nav button:focus-visible,
+.pm2-carousel-card:focus-visible {
+  outline: 2px solid var(--v-glow);
+  outline-offset: 3px;
+}
+
+/* —— reduced motion: flat scroll-snap row —————————————————— */
+
+.pm2-carousel--flat {
+  height: auto;
+  padding: 90px 0 80px;
+}
+
+.pm2-carousel-flat-head {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 34px;
+}
+
+.pm2-carousel-flat-row {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 10px max(24px, calc(50vw - 185px)) 44px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.pm2-carousel-flat-row::-webkit-scrollbar {
+  display: none;
+}
+
+.pm2-carousel-flat-row .pm2-carousel-card {
+  position: relative;
+  left: auto;
+  top: auto;
+  flex: none;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  scroll-snap-align: center;
+  text-decoration: none;
+}
+
+.pm2-carousel-flat-foot {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+/* —— responsive ———————————————————————————————————————————— */
+
+@media (max-width: 900px) {
+  .pm2-carousel-card {
+    width: 78vw;
+    height: min(470px, 66vh);
+    padding: 18px;
+  }
+
+  .pm2-carousel-card-title {
+    font-size: 27px;
+  }
+
+  .pm2-carousel-marquee {
+    font-size: clamp(88px, 22vw, 170px);
+  }
+
+  .pm2-carousel-nav {
+    right: 18px;
+    bottom: 18px;
+  }
+
+  .pm2-carousel-foot {
+    bottom: 18px;
+  }
+
+  .pm2-carousel-flat-row {
+    padding-inline: 11vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .pm2-carousel-card {
+    border-radius: 22px;
+  }
+
+  .pm2-carousel-card-title {
+    font-size: 24px;
+  }
+
+  .pm2-carousel-chip {
+    font-size: 13px;
+    padding: 11px 15px;
+  }
+
+  .pm2-carousel-nav button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pm2-carousel-foot .pm2-kicker {
+    display: none;
+  }
+
+  .pm2-carousel--flat {
+    padding: 70px 0 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm2-carousel-nav button,
+  .pm2-carousel-nav button:hover {
+    transition: none;
+    transform: none;
+  }
+}
