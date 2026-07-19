@@ -929,6 +929,17 @@ body.cu-active .header.header-contact.header-scrolled{
   background:transparent!important;
   box-shadow:none!important;
 }
+body.cu-active .header-contact .header-inner{
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+body.cu-active .header-contact .header-inner::before,
+body.cu-active .header-contact .header-inner::after{
+  display:none!important;
+}
 body.cu-active .header-contact .logo-link{
   padding:.55rem .95rem .55rem .6rem;
   border:1px solid rgba(255,255,255,.14);

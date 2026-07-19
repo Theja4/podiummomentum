@@ -168,8 +168,6 @@ export default function WorkRail({ navigate }) {
     }
   }
 
-  const ctaHref = WORKS[active]?.href || '/'
-
   return (
     <section
       ref={sectionRef}
@@ -190,16 +188,6 @@ export default function WorkRail({ navigate }) {
               {pad2(active + 1)} / {pad2(WORKS.length)}
             </span>
           </div>
-          <a
-            className="pm2-pill pm2-pill--ghost pm2-work__cta"
-            href={ctaHref}
-            onClick={e => {
-              e.preventDefault()
-              navigate?.(ctaHref)
-            }}
-          >
-            {WORK_RAIL.cta}
-          </a>
         </header>
 
         <div className="pm2-work__track" ref={trackRef} onScroll={onTrackScroll}>
@@ -208,6 +196,7 @@ export default function WorkRail({ navigate }) {
               key={work.name}
               className="pm2-work__card"
               href={work.href}
+              draggable="false"
               ref={el => (cardsRef.current[i] = el)}
               onClick={e => {
                 e.preventDefault()

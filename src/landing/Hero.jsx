@@ -580,10 +580,10 @@ export default function Hero({ navigate }) {
                 {HERO.eyebrow}
               </span>
               <h1 className="pm2-hero-title">
-                <span className="pm2-hero-line pm2-hero-line--accent">
+                <span className="pm2-hero-line">
                   <span className="pm2-hero-line-in">{HERO.line1}</span>
                 </span>
-                <span className="pm2-hero-line">
+                <span className="pm2-hero-line pm2-hero-line--accent">
                   <span className="pm2-hero-line-in">{HERO.line2}</span>
                 </span>
                 <span className="pm2-hero-line">

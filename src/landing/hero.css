@@ -130,7 +130,7 @@
     5.8vw,
     96px
   );
-  font-family: var(--v-serif);
+  font-family: var(--v-font);
   font-weight: 400;
   line-height: 0.94;
   letter-spacing: -0.047em;
@@ -143,9 +143,14 @@
   white-space: nowrap;
 }
 
+.pm2-hero-line--bold {
+  font-weight: 700;
+}
+
 .pm2-hero-line--accent {
   color: var(--v-bright);
-  font-style: italic;
+  font-weight: 700;
+  font-style: normal;
 }
 
 .pm2-hero-line-in {
