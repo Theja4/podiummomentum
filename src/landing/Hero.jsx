@@ -592,33 +592,33 @@ export default function Hero({ navigate }) {
               </h1>
             </div>
 
+            <div className="pm2-hero-copy" ref={copyBlockRef}>
+              <p className="pm2-hero-lead">{HERO.lead}</p>
+            </div>
+
             <div className="pm2-hero-mid">
-              <div className="pm2-hero-copy" ref={copyBlockRef}>
-                <p className="pm2-hero-lead">{HERO.lead}</p>
-                <p className="pm2-hero-detail">{HERO.caption}</p>
-                <div className="pm2-hero-ctas">
-                  <a
-                    className="pm2-pill pm2-pill--white"
-                    href={HERO.primaryCta.href}
-                    onClick={e => {
-                      e.preventDefault()
-                      navigate?.(HERO.primaryCta.href)
-                    }}
-                  >
-                    <span>{HERO.primaryCta.label}</span>
-                    <span className="pm2-hero-cta-icon" aria-hidden="true">
-                      <svg viewBox="0 0 20 20">
-                        <path d="M4 10h11M11 6l4 4-4 4" />
-                      </svg>
-                    </span>
-                  </a>
-                  <a className="pm2-hero-text-link" href={HERO.secondaryCta.href}>
-                    <span>{HERO.secondaryCta.label}</span>
-                    <svg viewBox="0 0 18 18" aria-hidden="true">
-                      <path d="M4 14 14 4M7 4h7v7" />
+              <div className="pm2-hero-ctas">
+                <a
+                  className="pm2-pill pm2-pill--white"
+                  href={HERO.primaryCta.href}
+                  onClick={e => {
+                    e.preventDefault()
+                    navigate?.(HERO.primaryCta.href)
+                  }}
+                >
+                  <span>{HERO.primaryCta.label}</span>
+                  <span className="pm2-hero-cta-icon" aria-hidden="true">
+                    <svg viewBox="0 0 20 20">
+                      <path d="M4 10h11M11 6l4 4-4 4" />
                     </svg>
-                  </a>
-                </div>
+                  </span>
+                </a>
+                <a className="pm2-hero-text-link" href={HERO.secondaryCta.href}>
+                  <span>{HERO.secondaryCta.label}</span>
+                  <svg viewBox="0 0 18 18" aria-hidden="true">
+                    <path d="M4 14 14 4M7 4h7v7" />
+                  </svg>
+                </a>
               </div>
             </div>
 

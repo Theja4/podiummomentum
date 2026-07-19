@@ -8,8 +8,6 @@ export const HERO = {
   line3: 'win more customers.',
   eyebrow: 'Branding and digital growth partner',
   lead: 'We build strong brands and websites that turn more visitors into customers.',
-  caption:
-    'Then we help you reach more people and keep growing with focused marketing and practical AI.',
   primaryCta: { label: 'Book a call', href: '/contact-us' },
   secondaryCta: { label: 'View selected work', href: '#work' },
   trust: 'Trusted by 40+ ambitious teams in technology, healthcare, and B2B',

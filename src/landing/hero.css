@@ -12,7 +12,7 @@
   --pm2-hero-boxw: min(calc(100vw - 2 * var(--pm2-hero-inset)), 1760px);
   --pm2-hero-boxl: calc((100vw - var(--pm2-hero-boxw)) / 2);
   /* the card column — mirrors the coverflow card width (Hero.jsx cw) */
-  --pm2-hero-cardw: clamp(400px, 29vw, 540px);
+  --pm2-hero-cardw: clamp(440px, 32vw, 580px);
   --pm2-hero-cardoff: clamp(48px, calc(10vw - 56px), 128px);
   --pm2-hero-colgap: clamp(48px, 4vw, 72px);
   --pm2-hero-padx: clamp(24px, 4vw, 64px);
@@ -92,6 +92,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin-bottom: clamp(20px, 2.5vh, 36px);
 }
 
 .pm2-hero-eyebrow {
@@ -125,9 +126,9 @@
       var(--pm2-hero-cardw) - var(--pm2-hero-colgap)
   );
   font-size: clamp(
-    56px,
-    min(5.25vw, 11.5vh),
-    92px
+    62px,
+    5.8vw,
+    96px
   );
   font-family: var(--v-serif);
   font-weight: 400;
@@ -179,6 +180,7 @@
   align-items: center;
   gap: clamp(20px, 3vw, 48px);
   min-height: 0;
+  padding: clamp(8px, 1.2vh, 16px) 0;
 }
 
 .pm2-hero-copy {
@@ -186,7 +188,10 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
-  max-width: min(620px, calc(100vw - var(--pm2-hero-cardw) - 112px));
+  max-width: calc(
+    var(--pm2-hero-boxw) - var(--pm2-hero-padx) - var(--pm2-hero-cardoff) -
+      var(--pm2-hero-cardw) - var(--pm2-hero-colgap)
+  );
   animation: pm2HeroFade 0.9s var(--v-ease) 0.45s backwards;
 }
 
@@ -197,21 +202,11 @@
   line-height: 1.35;
   letter-spacing: -0.02em;
   color: #f6fff9;
-  max-width: 49ch;
+  max-width: none;
 }
 
-.pm2-hero-detail {
-  margin: 0;
-  max-width: 54ch;
-  font-size: clamp(13px, 0.95vw, 15px);
-  line-height: 1.55;
-  letter-spacing: -0.01em;
-  color: rgba(246, 255, 249, 0.58);
-}
-
-/* On wide screens, use the full text column instead of leaving a hollow band
-   between the supporting copy and the card. The whole block still exits as
-   one ref-driven unit, so this rearrangement does not touch scroll timing. */
+/* On wide screens, the copy column stays single-column. The CTAs have moved
+   out of the copy block into their own row below the mid section. */
 @media (min-width: 1281px) {
   .pm2-hero-mid {
     width: calc(
@@ -221,37 +216,21 @@
   }
 
   .pm2-hero-copy {
-    display: grid;
-    grid-template-columns: minmax(320px, 1fr) auto;
-    grid-template-rows: auto auto;
-    align-items: end;
-    column-gap: clamp(30px, 3vw, 52px);
-    width: 100%;
-    max-width: none;
-  }
-
-  .pm2-hero-lead,
-  .pm2-hero-detail {
-    grid-column: 1;
-  }
-
-  .pm2-hero-ctas {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: end;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    margin-top: 0;
+    max-width: calc(
+      var(--pm2-hero-boxw) - var(--pm2-hero-padx) - var(--pm2-hero-cardoff) -
+        var(--pm2-hero-cardw) - var(--pm2-hero-colgap)
+    );
   }
 }
 
 .pm2-hero-ctas {
   display: flex;
+  flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
-  gap: 22px;
-  margin-top: clamp(22px, 3vh, 34px);
+  gap: 24px;
+  margin-top: 0;
+  animation: pm2HeroFade 0.9s var(--v-ease) 0.5s backwards;
 }
 
 .pm2-hero-ctas .pm2-pill {
@@ -651,7 +630,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: clamp(12px, 1.6vh, 18px);
   max-width: 100%;
 }
 
@@ -744,13 +723,8 @@
     font-size: 16px;
   }
 
-  .pm2-hero-detail {
-    font-size: 12.5px;
-    line-height: 1.5;
-  }
-
   .pm2-hero-ctas {
-    margin-top: 18px;
+    margin-top: 0;
   }
 
   .pm2-hero-ctas .pm2-pill {
@@ -775,7 +749,7 @@
   }
 
   .pm2-hero-title {
-    font-size: clamp(48px, 5vw, 55px);
+    font-size: clamp(48px, 5.2vw, 68px);
   }
 }
 
@@ -822,7 +796,7 @@
 
   .pm2-hero-title {
     max-width: none;
-    font-size: clamp(40px, 11.5vw, 62px);
+    font-size: clamp(34px, 9vw, 50px);
     line-height: 0.94;
     letter-spacing: -0.05em;
   }
@@ -842,6 +816,7 @@
     flex: 0 0 auto;
     flex-direction: column;
     align-items: stretch;
+    margin-top: -6px; /* Bring buttons closer to subtext */
   }
 
   .pm2-hero-copy {
@@ -854,31 +829,29 @@
     max-width: 34ch;
   }
 
-  .pm2-hero-detail {
-    font-size: 12.5px;
-    line-height: 1.5;
-  }
-
   .pm2-hero-ctas {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 16px;
-    margin-top: 18px;
+    margin-top: 0;
   }
 
   .pm2-hero-ctas .pm2-pill {
-    min-height: 50px;
-    padding: 6px 7px 6px 18px;
-    border-radius: 15px;
-    font-size: 13px;
+    min-height: 54px;
+    padding: 7px 8px 7px 20px;
+    border-radius: 16px;
+    font-size: 13.5px;
   }
 
   .pm2-hero-cta-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 11px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
   }
 
   .pm2-hero-text-link {
-    font-size: 12.5px;
+    font-size: 13px;
   }
 
   .pm2-hero-stats {
@@ -940,6 +913,10 @@
 
   .pm2-hero-trust-label {
     white-space: normal;
+  }
+
+  .pm2-hero-trust {
+    gap: 10px;
   }
 
 }
