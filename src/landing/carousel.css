@@ -1,10 +1,11 @@
 /* Services 3D coverflow — scoped under .pm2-carousel.
-   White stage, giant marquee behind, violet/onyx/glow cards in front. */
+   Original editorial artwork does the storytelling; live type, restrained
+   image motion and a pointer-led light treatment keep every card clear. */
 
 .pm2-carousel {
   position: relative;
   z-index: 1; /* below .pm2-hero (z2) so the ghost card can seat across the seam */
-  /* rise beneath the hero's tail: the stage (marquee + side cards) enters
+  /* rise beneath the hero's tail: the stage (spotlight + side cards) enters
      while the ghost seats, so there's no dead white scroll between them */
   margin-top: -70vh;
   background: var(--v-paper);
@@ -19,49 +20,21 @@
   background: var(--v-paper);
 }
 
-/* —— giant marquee (z0, behind the cards) ——————————————————— */
-
-.pm2-carousel-marquee {
+/* —— ambient backdrop (z0, behind the cards) ———————————————————
+   What the giant marquee used to do — depth — but quiet: a mint spotlight
+   pooled behind the centre slot over a faint blueprint dot field. */
+.pm2-carousel-sticky::before {
+  content: '';
   position: absolute;
-  top: 50%;
-  left: 0;
+  inset: 0;
   z-index: 0;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  font-size: clamp(100px, 16vw, 230px);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  color: rgba(11, 9, 16, 0.9);
+  background:
+    radial-gradient(circle, rgba(10, 20, 15, 0.055) 1px, transparent 1.6px),
+    radial-gradient(42% 40% at 50% 52%, rgba(103, 224, 163, 0.16), rgba(103, 224, 163, 0) 72%),
+    radial-gradient(90% 55% at 50% 118%, rgba(13, 43, 28, 0.07), rgba(13, 43, 28, 0) 62%);
+  background-size: 26px 26px, 100% 100%, 100% 100%;
+  background-position: center;
   pointer-events: none;
-  user-select: none;
-  will-change: transform;
-  transform: translate3d(0, -50%, 0);
-}
-
-.pm2-carousel-mseq {
-  display: flex;
-  align-items: center;
-  flex: none;
-}
-
-.pm2-carousel-mitem {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.32em;
-  padding-right: 0.32em;
-  flex: none;
-}
-
-.pm2-carousel-mword.is-outline {
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 1px rgba(11, 9, 16, 0.9);
-}
-
-.pm2-carousel-mspark {
-  flex: none;
 }
 
 /* —— 3D stage (z1) —————————————————————————————————————————— */
@@ -73,40 +46,57 @@
   perspective: 1500px;
   transform-style: preserve-3d;
   outline: none;
+  /* The stage is a viewport-sized plane at z=0 while side cards sit behind
+     it in 3D. Let pointer hit-testing pass through that transparent plane;
+     visible cards opt back in via their rAF-owned pointer-events value. */
+  pointer-events: none;
 }
 
 .pm2-carousel-stage:focus-visible {
-  box-shadow: inset 0 0 0 2px rgba(168, 85, 247, 0.5);
+  box-shadow: inset 0 0 0 2px rgba(47, 191, 127, 0.5);
+}
+
+.pm2-carousel-stage.is-cursor-on,
+.pm2-carousel-stage.is-cursor-on .pm2-carousel-card {
+  cursor: none;
 }
 
 .pm2-carousel-card {
+  --card-shine-x: 50%;
+  --card-shine-y: 50%;
+  --card-shift-x: 0px;
+  --card-shift-y: 0px;
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(370px, 80vw);
-  height: min(530px, 74vh);
-  border-radius: 26px;
+  width: min(430px, 84vw);
+  height: min(560px, 74vh);
+  border-radius: var(--pm2-card-radius, 26px);
   overflow: hidden;
-  box-shadow: 0 30px 80px -20px rgba(13, 7, 24, 0.35),
+  box-shadow: 0 30px 80px -20px rgba(8, 19, 13, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  padding: 22px;
+  padding: var(--pm2-card-pad, 22px);
   color: #fff;
+  text-decoration: none;
   opacity: 0; /* written by the rAF loop on the first frame */
   pointer-events: none;
   transform: translate(-50%, -50%);
   will-change: transform;
+  isolation: isolate;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* optional full-bleed cover image (data.js SERVICE_CARDS[i].image) — sits
-   under every face layer; a scrim keeps the card copy legible */
+/* Full-bleed generated artwork. The scrim is deliberately strongest behind
+   the live type, leaving the central material study untouched. */
 .pm2-carousel-card-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
+  background: #070c09;
 }
 
 .pm2-carousel-card-bg img {
@@ -114,43 +104,96 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  transform: scale(1.015);
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+  will-change: transform;
+}
+
+.pm2-carousel-card-bg--video {
+  display: grid;
+  place-items: center;
+  background: #000;
+}
+
+.pm2-carousel-card-bg--video video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.pm2-carousel-card-bg picture {
+  display: contents;
 }
 
 .pm2-carousel-card-bg::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(7, 3, 14, 0.32) 0%, rgba(7, 3, 14, 0) 34%, rgba(7, 3, 14, 0.72) 100%);
+  background:
+    linear-gradient(180deg, rgba(2, 6, 4, 0.82) 0%, rgba(2, 6, 4, 0.28) 24%, rgba(2, 6, 4, 0.02) 48%),
+    linear-gradient(0deg, rgba(2, 6, 4, 0.92) 0%, rgba(2, 6, 4, 0.48) 24%, rgba(2, 6, 4, 0) 51%),
+    linear-gradient(90deg, rgba(2, 6, 4, 0.16), transparent 26%, transparent 72%, rgba(2, 6, 4, 0.1));
+  pointer-events: none;
+}
+
+.pm2-carousel-card-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+.pm2-carousel-card-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      260px circle at var(--card-shine-x) var(--card-shine-y),
+      rgba(255, 255, 255, 0.2),
+      rgba(124, 240, 189, 0.08) 28%,
+      transparent 68%
+    );
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s ease;
 }
 
 /* shared card anatomy */
 
-.pm2-carousel-card-top {
+.pm2-carousel-card-top,
+.pm2-carousel-card-bottom {
   position: relative;
   z-index: 2;
+}
+
+.pm2-carousel-card-top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.pm2-carousel-card-meta {
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.pm2-carousel-idx {
+  justify-content: flex-start;
+  gap: 16px;
   font-family: var(--v-mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  padding: 7px 13px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.pm2-carousel-domain {
-  font-size: 12.5px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.66);
 }
 
 .pm2-carousel-card-mid {
@@ -164,17 +207,31 @@
 }
 
 .pm2-carousel-card-bottom {
-  position: relative;
-  z-index: 2;
   margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 16px;
+}
+
+/* The first card arrives from the hero as an artwork-only surface. Its live
+   title, number, support line, and action rise in only after the card has
+   settled in the services stage; Carousel.jsx eases the custom properties
+   over one second and resets them when reverse-scroll re-enters the handoff. */
+.pm2-carousel-card--handoff .pm2-carousel-card-top,
+.pm2-carousel-card--handoff .pm2-carousel-card-bottom {
+  opacity: var(--pm2-card-content-reveal, 0);
+  transform: translate3d(0, var(--pm2-card-content-offset, 18px), 0);
+  will-change: opacity, transform;
 }
 
 .pm2-carousel-card-title {
-  margin: 0;
-  font-size: 32px;
-  line-height: 1.12;
+  max-width: 12ch;
+  margin: 18px 0 0;
+  font-size: var(--pm2-card-title, clamp(30px, 2.4vw, 36px));
+  line-height: 1.03;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
   color: #fff;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -183,50 +240,848 @@
 }
 
 .pm2-carousel-card-line {
-  margin: 8px 0 0;
-  font-size: 14px;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.7);
+  max-width: 34ch;
+  margin: 0;
+  font-size: var(--pm2-card-copy, 14px);
+  line-height: 1.36;
+  color: rgba(255, 255, 255, 0.76);
 }
 
-.pm2-carousel-chip {
+.pm2-carousel-card-explore {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  max-width: 100%;
-  padding: 13px 18px;
-  border-radius: 16px;
-  background: rgba(18, 13, 28, 0.55);
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 999px;
+  background: rgba(4, 10, 7, 0.34);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background 0.45s ease,
+    border-color 0.45s ease,
+    color 0.45s ease;
+}
+
+.pm2-carousel-card-explore svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pm2-carousel-card--image,
+.pm2-carousel-card--hero-video,
+.pm2-carousel-card--image .pm2-carousel-card-title,
+.pm2-carousel-card--hero-video .pm2-carousel-card-title,
+.pm2-carousel-card--image .pm2-carousel-card-line {
+  color: #fff;
+}
+
+.pm2-carousel-card--image .pm2-carousel-card-line,
+.pm2-carousel-card--hero-video .pm2-carousel-card-line {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.pm2-carousel-card.is-live:not(:hover) .pm2-carousel-card-bg img {
+  animation: pm2ServiceArtworkDrift 7.5s ease-in-out infinite alternate;
+}
+
+.pm2-carousel-card:hover {
+  cursor: pointer;
+}
+
+.pm2-carousel-card:hover .pm2-carousel-card-bg img {
+  animation: none;
+  filter: saturate(1.06) contrast(1.025);
+  transform:
+    translate3d(var(--card-shift-x), var(--card-shift-y), 0)
+    scale(1.065);
+}
+
+.pm2-carousel-card:hover .pm2-carousel-card-sheen {
+  opacity: 0.84;
+}
+
+.pm2-carousel-card:hover .pm2-carousel-card-explore {
+  border-color: rgba(227, 252, 237, 0.8);
+  background: rgba(227, 252, 237, 0.92);
+  color: #07110c;
+}
+
+.pm2-carousel-card:hover .pm2-carousel-card-explore svg {
+  transform: translate(2px, -2px);
+}
+
+@keyframes pm2ServiceArtworkDrift {
+  0% {
+    transform: translate3d(-2px, 3px, 0) scale(1.025);
+  }
+  100% {
+    transform: translate3d(3px, -3px, 0) scale(1.055);
+  }
+}
+
+/* —— theme: ice — the signature light card (mint gradient, dark ink) ——— */
+
+.pm2-carousel-card--ice {
+  background:
+    radial-gradient(120% 70% at 85% -10%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 46%),
+    linear-gradient(160deg, #f0fcf5 0%, #d9f7e7 48%, #a9f4c6 100%);
+  color: #0a140f;
+}
+
+.pm2-carousel-card--ice:not(.pm2-carousel-card--image) .pm2-carousel-card-title {
+  color: #0a140f;
+}
+
+.pm2-carousel-card--ice:not(.pm2-carousel-card--image) .pm2-carousel-card-line {
+  color: rgba(10, 20, 15, 0.62);
+}
+
+/* Website Design follows the Branding card's editorial anatomy: live copy
+   above and below a contained, glass-framed visual. The cool mist surface
+   is sampled from the AirSide artwork's pale sky and blue-violet shadows. */
+.pm2-carousel-card--website {
+  background:
+    radial-gradient(72% 52% at 8% 78%, rgba(87, 136, 207, 0.14), transparent 70%),
+    radial-gradient(62% 48% at 94% 18%, rgba(41, 87, 157, 0.1), transparent 72%),
+    linear-gradient(160deg, #f6f9ff 0%, #e9f0fb 56%, #dce7f7 100%);
+  color: #071b3f;
+  box-shadow:
+    0 30px 80px -24px rgba(7, 27, 63, 0.22),
+    inset 0 0 0 1px rgba(7, 27, 63, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.pm2-carousel-card--website .pm2-carousel-card-meta {
+  color: rgba(7, 27, 63, 0.48);
+}
+
+.pm2-carousel-card--website .pm2-carousel-card-title {
+  color: #071b3f;
+}
+
+.pm2-carousel-card--website .pm2-carousel-card-line {
+  color: rgba(7, 27, 63, 0.66);
+}
+
+.pm2-website-image-frame {
+  border-color: rgba(255, 255, 255, 0.94);
+  background: rgba(226, 235, 249, 0.66);
+  box-shadow:
+    0 18px 44px -22px rgba(7, 27, 63, 0.48),
+    0 5px 16px -10px rgba(41, 87, 157, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 0 0 1px rgba(7, 27, 63, 0.06);
+}
+
+.pm2-website-image-frame picture {
+  display: contents;
+}
+
+.pm2-website-image-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: clamp(15px, 1.55vw, 21px);
+  object-fit: cover;
+  object-position: center;
+  background: #0b3477;
+  transition:
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.8s ease;
+}
+
+.pm2-carousel-card--website.is-live:not(:hover) .pm2-website-image-frame img {
+  animation: pm2ServiceArtworkDrift 7.5s ease-in-out infinite alternate;
+}
+
+.pm2-carousel-card--website:hover .pm2-website-image-frame img {
+  animation: none;
+  filter: saturate(1.04) contrast(1.02);
+  transform:
+    translate3d(var(--card-shift-x), var(--card-shift-y), 0)
+    scale(1.035);
+}
+
+.pm2-carousel-card--website .pm2-carousel-card-sheen {
+  background:
+    radial-gradient(
+      280px circle at var(--card-shine-x) var(--card-shine-y),
+      rgba(255, 255, 255, 0.24),
+      rgba(116, 174, 242, 0.14) 30%,
+      transparent 68%
+    );
+}
+
+.pm2-carousel-card--website .pm2-carousel-card-explore {
+  border-color: rgba(7, 27, 63, 0.14);
+  background: rgba(255, 255, 255, 0.58);
+  color: #071b3f;
+  box-shadow: 0 7px 20px -12px rgba(7, 27, 63, 0.34);
+}
+
+.pm2-carousel-card--website:hover .pm2-carousel-card-explore {
+  border-color: rgba(7, 27, 63, 0.22);
+  background: #071b3f;
+  color: #fff;
+}
+
+/* —— theme: onyx — near-black forest, emerald glow rising —————————————— */
+
+.pm2-carousel-card--onyx {
+  background:
+    radial-gradient(90% 58% at 50% -8%, rgba(47, 191, 127, 0.22) 0%, rgba(47, 191, 127, 0) 58%),
+    #060d09;
+}
+
+/* —— AI Agent call scene — live voice orb with rotating conversations ——— */
+
+.pm2-carousel-card--agent {
+  background:
+    radial-gradient(70% 68% at 50% 51%, rgba(30, 64, 175, 0.24), transparent 64%),
+    radial-gradient(46% 42% at 82% 18%, rgba(139, 92, 246, 0.16), transparent 72%),
+    linear-gradient(155deg, #05060a 0%, #070b14 54%, #050807 100%);
+}
+
+.pm2-carousel-card--agent::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.34;
+  background-image: radial-gradient(rgba(196, 181, 253, 0.32) 0.65px, transparent 0.8px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(circle at center, #000 0%, transparent 74%);
+  pointer-events: none;
+}
+
+.pm2-carousel-card--agent .pm2-carousel-card-top,
+.pm2-carousel-card--agent .pm2-carousel-card-bottom {
+  z-index: 5;
+}
+
+.pm2-carousel-card--agent .pm2-carousel-card-mid {
+  z-index: 3;
+  margin: 8px 0 6px;
+  overflow: visible;
+}
+
+.pm2-agent-scene {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+}
+
+.pm2-agent-industries {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(5, 7, 13, 0.72);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.pm2-agent-industry {
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.42);
+  font-family: var(--v-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.055em;
+}
+
+.pm2-agent-orbit {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  z-index: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.pm2-agent-orbit--outer {
+  width: min(66%, 430px);
+  aspect-ratio: 1.55 / 1;
+  border: 1px solid rgba(129, 140, 248, 0.13);
+  transform: translate(-50%, -50%) rotate(-7deg);
+}
+
+.pm2-agent-orbit--inner {
+  width: min(54%, 350px);
+  aspect-ratio: 1.42 / 1;
+  border: 1px dashed rgba(167, 139, 250, 0.2);
+  transform: translate(-50%, -50%) rotate(8deg);
+}
+
+.pm2-agent-video-shell {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  z-index: 2;
+  width: clamp(196px, 48%, 330px);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid rgba(196, 181, 253, 0.2);
+  border-radius: 34px;
+  background: #000;
+  box-shadow:
+    0 38px 90px rgba(2, 6, 23, 0.64),
+    0 0 80px rgba(79, 70, 229, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transform: translate(-50%, -50%);
+}
+
+.pm2-agent-video-shell video,
+.pm2-agent-video-glass {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pm2-agent-video-shell video {
+  display: block;
+  object-fit: cover;
+}
+
+.pm2-agent-video-glass {
+  z-index: 1;
+  background:
+    radial-gradient(circle at 50% 48%, transparent 35%, rgba(3, 5, 12, 0.12) 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 30%, rgba(2, 4, 10, 0.16));
+  pointer-events: none;
+}
+
+.pm2-agent-video-pulse {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  z-index: 2;
+  width: 45%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(167, 139, 250, 0.38);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.pm2-agent-live {
+  position: absolute;
+  top: 13px;
+  left: 14px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
   border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(3, 6, 12, 0.64);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--v-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.pm2-agent-live i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #67e0a3;
+  box-shadow: 0 0 12px rgba(103, 224, 163, 0.9);
+}
+
+.pm2-agent-wave {
+  position: absolute;
+  left: 50%;
+  bottom: 15px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(3, 6, 12, 0.48);
+  transform: translateX(-50%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  font-size: 14.5px;
-  font-weight: 550;
-  line-height: 1.3;
-  color: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
 }
 
-.pm2-carousel-chip-ico {
-  width: 26px;
-  height: 26px;
-  flex: none;
-  border-radius: 50%;
+.pm2-agent-wave i {
+  width: 2px;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #c4b5fd, #60a5fa);
+  transform-origin: center;
+}
+
+.pm2-agent-cases,
+.pm2-agent-case {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.pm2-agent-case {
+  opacity: 0;
+}
+
+.pm2-agent-case--0 {
+  opacity: 1;
+}
+
+.pm2-agent-bubble {
+  --bubble-x: -14px;
+  --bubble-y: 8px;
+  position: absolute;
+  width: min(39%, 262px);
+  padding: 13px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 16px;
+  opacity: 0;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+  transform: translate3d(var(--bubble-x), var(--bubble-y), 0) scale(0.97);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.pm2-agent-bubble span {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--v-mono);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.pm2-agent-bubble p {
+  margin: 0;
+  font-size: clamp(12px, 1.18vw, 14px);
+  line-height: 1.34;
+  letter-spacing: -0.005em;
+}
+
+.pm2-agent-bubble--agent {
+  left: 0;
+  background: linear-gradient(145deg, rgba(24, 24, 50, 0.91), rgba(9, 12, 27, 0.83));
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.pm2-agent-bubble--agent span {
+  color: #c4b5fd;
+}
+
+.pm2-agent-bubble--person {
+  --bubble-x: 14px;
+  right: 0;
+  background: linear-gradient(145deg, rgba(12, 37, 31, 0.91), rgba(7, 20, 18, 0.84));
+  color: rgba(239, 255, 247, 0.92);
+}
+
+.pm2-agent-bubble--person span {
+  color: #67e0a3;
+}
+
+.pm2-agent-bubble--one {
+  top: 14%;
+}
+
+.pm2-agent-bubble--two {
+  top: 34%;
+}
+
+.pm2-agent-bubble--three {
+  --bubble-y: -8px;
+  bottom: 17%;
+}
+
+.pm2-agent-bubble--four {
+  --bubble-x: 14px;
+  --bubble-y: -8px;
+  bottom: 6%;
+}
+
+.pm2-agent-result {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: 72%;
+  margin-inline: auto;
+  padding: 9px 13px 9px 9px;
+  border: 1px solid rgba(103, 224, 163, 0.52);
+  border-radius: 999px;
+  background: #092319;
+  color: #f0fff6;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(103, 224, 163, 0.08);
+  -webkit-font-smoothing: antialiased;
+}
+
+.pm2-agent-result i {
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.94);
-  color: #160b2a;
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #67e0a3;
+  color: #06110b;
+  font-style: normal;
 }
 
-/* —— theme: violet (radial gradient + black/white sparkle) ————————— */
+.pm2-agent-result i svg {
+  display: block;
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
-.pm2-carousel-card--violet {
+/* Parked cards hold one useful, composed state. */
+.pm2-carousel-card--agent:not(.is-live) .pm2-agent-case--0 .pm2-agent-bubble--one,
+.pm2-carousel-card--agent:not(.is-live) .pm2-agent-case--0 .pm2-agent-result {
+  opacity: 1;
+}
+
+.pm2-carousel-card--agent:not(.is-live) .pm2-agent-case--0 .pm2-agent-bubble--one {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.pm2-carousel-card--agent:not(.is-live) .pm2-agent-industry--0 {
+  background: rgba(139, 92, 246, 0.2);
+  color: #ddd6fe;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-case--0 {
+  animation: pm2AgentCaseOne 18s linear infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-case--1 {
+  animation: pm2AgentCaseTwo 18s linear infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-case--2 {
+  animation: pm2AgentCaseThree 18s linear infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-industry--0 {
+  animation: pm2AgentIndustryOne 18s linear infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-industry--1 {
+  animation: pm2AgentIndustryTwo 18s linear infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-industry--2 {
+  animation: pm2AgentIndustryThree 18s linear infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-bubble--one {
+  animation: pm2AgentBubbleOne 6s var(--v-ease) infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-bubble--two {
+  animation: pm2AgentBubbleTwo 6s var(--v-ease) infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-bubble--three {
+  animation: pm2AgentBubbleThree 6s var(--v-ease) infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-bubble--four {
+  animation: pm2AgentBubbleFour 6s var(--v-ease) infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-result {
+  animation: pm2AgentResult 6s var(--v-ease) infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-orbit--outer {
+  animation: pm2AgentOrbitOuter 16s linear infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-orbit--inner {
+  animation: pm2AgentOrbitInner 12s linear infinite reverse;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-video-pulse {
+  animation: pm2AgentVideoPulse 3s ease-out infinite;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-video-pulse--two {
+  animation-delay: 1.5s;
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-wave i {
+  animation: pm2AgentWave 0.9s ease-in-out infinite alternate;
+  animation-delay: calc(var(--wave-index) * -0.075s);
+}
+
+.pm2-carousel-card--agent.is-live .pm2-agent-live i {
+  animation: pm2AgentLiveDot 1.6s ease-out infinite;
+}
+
+@keyframes pm2AgentCaseOne {
+  0%, 31.5% { opacity: 1; }
+  33%, 98.5% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes pm2AgentCaseTwo {
+  0%, 31.5% { opacity: 0; }
+  33%, 64.5% { opacity: 1; }
+  66%, 100% { opacity: 0; }
+}
+
+@keyframes pm2AgentCaseThree {
+  0%, 64.5% { opacity: 0; }
+  66%, 98.5% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes pm2AgentIndustryOne {
+  0%, 31.5%, 100% { background: rgba(139, 92, 246, 0.2); color: #ddd6fe; }
+  33%, 98.5% { background: transparent; color: rgba(255, 255, 255, 0.42); }
+}
+
+@keyframes pm2AgentIndustryTwo {
+  0%, 31.5%, 66%, 100% { background: transparent; color: rgba(255, 255, 255, 0.42); }
+  33%, 64.5% { background: rgba(139, 92, 246, 0.2); color: #ddd6fe; }
+}
+
+@keyframes pm2AgentIndustryThree {
+  0%, 64.5%, 100% { background: transparent; color: rgba(255, 255, 255, 0.42); }
+  66%, 98.5% { background: rgba(139, 92, 246, 0.2); color: #ddd6fe; }
+}
+
+@keyframes pm2AgentBubbleOne {
+  0%, 4%, 24%, 100% { opacity: 0; transform: translate3d(var(--bubble-x), var(--bubble-y), 0) scale(0.97); }
+  8%, 20% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes pm2AgentBubbleTwo {
+  0%, 19%, 40%, 100% { opacity: 0; transform: translate3d(var(--bubble-x), var(--bubble-y), 0) scale(0.97); }
+  23%, 36% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes pm2AgentBubbleThree {
+  0%, 35%, 57%, 100% { opacity: 0; transform: translate3d(var(--bubble-x), var(--bubble-y), 0) scale(0.97); }
+  39%, 53% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes pm2AgentBubbleFour {
+  0%, 52%, 72%, 100% { opacity: 0; transform: translate3d(var(--bubble-x), var(--bubble-y), 0) scale(0.97); }
+  56%, 68% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes pm2AgentResult {
+  0%, 67%, 97%, 100% { opacity: 0; }
+  72%, 92% { opacity: 1; }
+}
+
+@keyframes pm2AgentOrbitOuter {
+  from { transform: translate(-50%, -50%) rotate(-7deg); }
+  to { transform: translate(-50%, -50%) rotate(353deg); }
+}
+
+@keyframes pm2AgentOrbitInner {
+  from { transform: translate(-50%, -50%) rotate(8deg); }
+  to { transform: translate(-50%, -50%) rotate(368deg); }
+}
+
+@keyframes pm2AgentVideoPulse {
+  0% { opacity: 0.34; transform: translate(-50%, -50%) scale(0.82); }
+  75%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.85); }
+}
+
+@keyframes pm2AgentWave {
+  0% { transform: scaleY(0.55); }
+  100% { transform: scaleY(2.2); }
+}
+
+@keyframes pm2AgentLiveDot {
+  0% { box-shadow: 0 0 0 0 rgba(103, 224, 163, 0.5), 0 0 12px rgba(103, 224, 163, 0.9); }
+  70%, 100% { box-shadow: 0 0 0 7px rgba(103, 224, 163, 0), 0 0 12px rgba(103, 224, 163, 0.9); }
+}
+
+/* —— theme: deep — deep forest gradient (marketing curve sits on it) ——— */
+
+.pm2-carousel-card--deep {
+  background:
+    radial-gradient(100% 62% at 50% 112%, rgba(47, 191, 127, 0.30) 0%, rgba(47, 191, 127, 0) 62%),
+    linear-gradient(180deg, #08130d 0%, #0d2b1c 100%);
+}
+
+/* —— theme: glow — dark card, mint glow pooled at the bottom ——————————— */
+
+.pm2-carousel-card--glow {
+  background: #08130d;
+}
+
+.pm2-carousel-card--glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    85% 62% at 50% 112%,
+    rgba(103, 224, 163, 0.5) 0%,
+    rgba(47, 191, 127, 0.22) 42%,
+    rgba(8, 19, 13, 0) 72%
+  );
+  pointer-events: none;
+}
+
+/* —— Branding: white editorial card + slim glass-framed motion hero ——— */
+
+.pm2-carousel-card--framed-video {
+  background:
+    radial-gradient(78% 50% at 8% 70%, rgba(246, 72, 111, 0.07), transparent 68%),
+    radial-gradient(68% 46% at 92% 26%, rgba(138, 72, 246, 0.07), transparent 70%),
+    linear-gradient(165deg, #ffffff 0%, #fbfbfd 58%, #f4f5f7 100%);
+  color: #130d1c;
+  box-shadow:
+    0 30px 80px -24px rgba(22, 13, 34, 0.2),
+    inset 0 0 0 1px rgba(20, 13, 30, 0.06),
+    inset 0 1px 0 #fff;
+}
+
+.pm2-carousel-card--framed-video::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(118deg, transparent 18%, rgba(255, 255, 255, 0.72) 43%, transparent 66%),
+    radial-gradient(circle at 76% 64%, rgba(251, 146, 60, 0.08), transparent 32%);
+  pointer-events: none;
+}
+
+.pm2-carousel-card--framed-video .pm2-carousel-card-meta {
+  color: rgba(19, 13, 28, 0.48);
+}
+
+.pm2-carousel-card--framed-video .pm2-carousel-card-title {
+  color: #130d1c;
+}
+
+.pm2-carousel-card--framed-video .pm2-carousel-card-line {
+  color: rgba(19, 13, 28, 0.66);
+}
+
+.pm2-carousel-card--framed-video .pm2-carousel-card-explore {
+  border-color: rgba(19, 13, 28, 0.13);
+  background: rgba(255, 255, 255, 0.58);
+  color: #130d1c;
+  box-shadow: 0 7px 20px -12px rgba(20, 13, 30, 0.34);
+}
+
+.pm2-carousel-card--framed-video:hover .pm2-carousel-card-explore {
+  border-color: rgba(19, 13, 28, 0.2);
+  background: #130d1c;
+  color: #fff;
+}
+
+.pm2-branding-visual {
+  position: absolute;
+  inset: clamp(10px, 1.2vw, 16px) 0;
+  display: grid;
+  place-items: center;
+}
+
+.pm2-branding-video-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: clamp(5px, 0.55vw, 7px);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  border-radius: clamp(20px, 2vw, 27px);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow:
+    0 18px 44px -22px rgba(26, 14, 38, 0.42),
+    0 5px 16px -10px rgba(85, 44, 112, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 0 0 0 1px rgba(22, 13, 34, 0.045);
+  backdrop-filter: blur(16px) saturate(1.18);
+  -webkit-backdrop-filter: blur(16px) saturate(1.18);
+}
+
+.pm2-branding-video-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(126deg, rgba(255, 255, 255, 0.3), transparent 28% 72%, rgba(255, 255, 255, 0.12));
+  pointer-events: none;
+}
+
+.pm2-branding-video-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: clamp(15px, 1.55vw, 21px);
+  object-fit: cover;
+  object-position: center;
+  background: #211032;
+}
+
+/* —— theme: brand — closing card: mint radial + dark sparkle orb ———————— */
+
+.pm2-carousel-card--brand {
   background: radial-gradient(
     130% 95% at 50% -8%,
-    #c9a8ff 0%,
-    #8b5cf6 34%,
-    #7c3aed 58%,
-    #3b1470 100%
+    #d9f7e7 0%,
+    #7cf0bd 34%,
+    #2fbf7f 62%,
+    #0d2b1c 100%
   );
 }
 
@@ -240,100 +1095,67 @@
   display: block;
 }
 
+/* slow dashed halo around the orb — the 'system' mark */
+.pm2-carousel-orb::after {
+  content: '';
+  position: absolute;
+  inset: -17%;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(4, 10, 7, 0.4);
+  animation: pm2CarouselOrbSpin 26s linear infinite;
+}
+
 .pm2-carousel-orb-core {
   position: absolute;
   inset: 0;
   margin: auto;
 }
 
-/* —— theme: onyx / lime (near-black + cover image top half) ———————— */
-
-.pm2-carousel-card--onyx {
-  background: #0a0a0c;
+@keyframes pm2CarouselOrbSpin {
+  to { transform: rotate(360deg); }
 }
 
-.pm2-carousel-card--lime {
-  background: #0a0d06;
+/* —— section title (above the focus card), CTA foot and prev/next ————— */
+
+/* the section heading sits centred just above the focused card — anchored to
+   the card's top edge (50% − half the card height) so it never overlaps */
+.pm2-carousel-title {
+  margin: 0;
+  font-size: clamp(30px, 3.6vw, 48px);
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--v-ink);
+  white-space: nowrap;
 }
 
-.pm2-carousel-card--lime .pm2-carousel-idx {
-  background: var(--v-lime);
-  border-color: transparent;
-  color: #131607;
-  font-weight: 700;
-}
-
-.pm2-carousel-card--lime .pm2-carousel-chip {
-  border-color: rgba(201, 246, 45, 0.35);
-}
-
-.pm2-carousel-cover {
+.pm2-carousel-title--stage {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 58%;
-  z-index: 0;
+  z-index: 2;
+  left: 50%;
+  top: calc(50% - var(--pm2-stage-card-half, min(280px, 37vh)) - clamp(16px, 2.4vh, 30px));
+  transform: translate(-50%, -100%);
   pointer-events: none;
 }
-
-.pm2-carousel-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 97%);
-  mask-image: linear-gradient(180deg, #000 50%, transparent 97%);
-}
-
-/* —— theme: glow (deep card, violet glow rising from the bottom) ——— */
-
-.pm2-carousel-card--glow {
-  background: #0d0718;
-}
-
-.pm2-carousel-card--glow::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: radial-gradient(
-    85% 62% at 50% 112%,
-    rgba(168, 85, 247, 0.6) 0%,
-    rgba(109, 40, 217, 0.28) 42%,
-    rgba(13, 7, 24, 0) 72%
-  );
-  pointer-events: none;
-}
-
-.pm2-carousel-prog {
-  display: block;
-  height: 2px;
-  margin-top: 14px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-}
-
-.pm2-carousel-prog i {
-  display: block;
-  height: 100%;
-  border-radius: 2px;
-  background: var(--v-glow);
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
-}
-
-/* —— footer (kicker + CTA) and prev/next ——————————————————— */
 
 .pm2-carousel-foot {
   position: absolute;
   z-index: 2;
   left: 50%;
-  bottom: 26px;
+  top: calc(
+    50% + var(--pm2-stage-card-half, min(280px, 37vh)) +
+      clamp(46px, 5vh, 72px)
+  );
   transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
+  justify-content: center;
+}
+
+/* the CTA is the section's single action — larger than the standard pill */
+.pm2-carousel-cta {
+  padding: 18px 40px;
+  font-size: 17px;
+  box-shadow: 0 18px 44px -16px rgba(8, 19, 13, 0.5);
 }
 
 .pm2-carousel-nav {
@@ -355,8 +1177,8 @@
   background: #fff;
   color: var(--v-ink);
   cursor: pointer;
-  box-shadow: 0 10px 30px -10px rgba(13, 7, 24, 0.35),
-    inset 0 0 0 1px rgba(13, 7, 24, 0.06);
+  box-shadow: 0 10px 30px -10px rgba(8, 19, 13, 0.35),
+    inset 0 0 0 1px rgba(8, 19, 13, 0.06);
   transition: transform 0.4s var(--v-ease), box-shadow 0.4s var(--v-ease),
     color 0.3s ease;
 }
@@ -364,13 +1186,13 @@
 .pm2-carousel-nav button:hover {
   transform: translateY(-2px);
   color: var(--v-core);
-  box-shadow: 0 16px 40px -12px rgba(13, 7, 24, 0.45),
-    inset 0 0 0 1px rgba(13, 7, 24, 0.08);
+  box-shadow: 0 16px 40px -12px rgba(8, 19, 13, 0.45),
+    inset 0 0 0 1px rgba(8, 19, 13, 0.08);
 }
 
 .pm2-carousel-nav button:focus-visible,
 .pm2-carousel-card:focus-visible {
-  outline: 2px solid var(--v-glow);
+  outline: 2px solid var(--v-bright);
   outline-offset: 3px;
 }
 
@@ -392,7 +1214,7 @@
   gap: 20px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: 10px max(24px, calc(50vw - 185px)) 44px;
+  padding: 10px max(24px, calc(50vw - 215px)) 44px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -414,6 +1236,17 @@
   text-decoration: none;
 }
 
+@media (min-width: 901px) {
+  .pm2-carousel--flat .pm2-carousel-card {
+    width: min(780px, 66vw);
+    height: min(610px, 70vh);
+    --pm2-card-pad: 30px;
+    --pm2-card-radius: 34px;
+    --pm2-card-title: 46px;
+    --pm2-card-copy: 16px;
+  }
+}
+
 .pm2-carousel-flat-foot {
   display: flex;
   justify-content: center;
@@ -422,19 +1255,143 @@
 
 /* —— responsive ———————————————————————————————————————————— */
 
-@media (max-width: 900px) {
+/* short desktop viewports: nav + title + full-height card + CTA don't all
+   fit — compact the card and nudge it down so the title clears the nav */
+@media (min-width: 901px) and (max-height: 820px) {
   .pm2-carousel-card {
-    width: 78vw;
-    height: min(470px, 66vh);
-    padding: 18px;
+    top: 53.5%;
+    height: min(520px, 68vh);
+  }
+
+  .pm2-carousel-title {
+    font-size: clamp(26px, 4.2vh, 40px);
+  }
+
+  .pm2-carousel-title--stage {
+    top: calc(53.5% - min(260px, 34vh) - 12px);
+  }
+
+  .pm2-carousel-foot {
+    top: auto;
+    bottom: 18px;
+  }
+
+  .pm2-carousel-cta {
+    padding: 16px 34px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  /* no ghost flight on small screens — the section follows the hero
+     normally instead of rising 70vh beneath it (which bled the first card
+     through the hero card above) */
+  .pm2-carousel {
+    margin-top: 0;
+  }
+
+  .pm2-carousel-card {
+    width: 84vw;
+    height: min(510px, 64vh);
+    padding: 20px;
+  }
+
+  .pm2-carousel-card:hover {
+    cursor: pointer;
+  }
+
+  .pm2-carousel-card:hover .pm2-carousel-card-bg img {
+    animation: none;
+    filter: none;
+    transform: scale(1.025);
+  }
+
+  .pm2-carousel-card:hover .pm2-carousel-card-sheen {
+    opacity: 0;
+  }
+
+  .pm2-carousel-card--website:hover .pm2-website-image-frame img {
+    filter: none;
+    transform: none;
   }
 
   .pm2-carousel-card-title {
     font-size: 27px;
   }
 
-  .pm2-carousel-marquee {
-    font-size: clamp(88px, 22vw, 170px);
+  .pm2-agent-industries {
+    gap: 4px;
+    padding: 5px;
+  }
+
+  .pm2-agent-industry {
+    padding: 7px 10px;
+    font-size: 9.5px;
+  }
+
+  .pm2-agent-video-shell {
+    top: 51%;
+    width: min(74%, 238px);
+    border-radius: 26px;
+  }
+
+  .pm2-agent-orbit--outer {
+    width: 92%;
+  }
+
+  .pm2-agent-orbit--inner {
+    width: 78%;
+  }
+
+  .pm2-agent-bubble {
+    width: min(74%, 215px);
+    padding: 11px 12px;
+    border-radius: 15px;
+  }
+
+  .pm2-agent-bubble p {
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+
+  .pm2-agent-bubble--one {
+    top: 13%;
+  }
+
+  .pm2-agent-bubble--two {
+    top: 32%;
+  }
+
+  .pm2-agent-bubble--three {
+    bottom: 19%;
+  }
+
+  .pm2-agent-bubble--four {
+    bottom: 5%;
+  }
+
+  .pm2-agent-result {
+    bottom: -2px;
+    max-width: 96%;
+    padding: 8px 11px 8px 8px;
+    font-size: 10.5px;
+  }
+
+  .pm2-agent-result i {
+    width: 19px;
+    height: 19px;
+    font-size: 10px;
+  }
+
+  .pm2-agent-live {
+    top: 10px;
+    left: 10px;
+    padding: 6px 8px;
+    font-size: 7px;
+  }
+
+  .pm2-agent-wave {
+    bottom: 10px;
   }
 
   .pm2-carousel-nav {
@@ -443,7 +1400,13 @@
   }
 
   .pm2-carousel-foot {
+    top: auto;
     bottom: 18px;
+  }
+
+  /* mobile cards are min(510px, 64vh) tall — re-anchor the heading */
+  .pm2-carousel-title--stage {
+    top: calc(50% - min(255px, 32vh) - clamp(12px, 2vh, 22px));
   }
 
   .pm2-carousel-flat-row {
@@ -460,9 +1423,8 @@
     font-size: 24px;
   }
 
-  .pm2-carousel-chip {
-    font-size: 13px;
-    padding: 11px 15px;
+  .pm2-carousel-card--agent .pm2-carousel-card-line {
+    max-width: 20ch;
   }
 
   .pm2-carousel-nav button {
@@ -470,8 +1432,21 @@
     height: 40px;
   }
 
-  .pm2-carousel-foot .pm2-kicker {
-    display: none;
+  /* the wider CTA reaches the chevrons' row on phones — stack them upright
+     against the right edge instead */
+  .pm2-carousel-nav {
+    flex-direction: column;
+    right: 12px;
+    gap: 8px;
+  }
+
+  .pm2-carousel-title {
+    font-size: clamp(26px, 7vw, 32px);
+  }
+
+  .pm2-carousel-cta {
+    padding: 16px 32px;
+    font-size: 15.5px;
   }
 
   .pm2-carousel--flat {
@@ -484,5 +1459,43 @@
   .pm2-carousel-nav button:hover {
     transition: none;
     transform: none;
+  }
+
+  .pm2-carousel-orb::after {
+    animation: none;
+  }
+
+  .pm2-carousel-card-bg img,
+  .pm2-carousel-card.is-live:not(:hover) .pm2-carousel-card-bg img,
+  .pm2-carousel-card:hover .pm2-carousel-card-bg img,
+  .pm2-carousel-card--website.is-live:not(:hover) .pm2-website-image-frame img,
+  .pm2-carousel-card--website:hover .pm2-website-image-frame img {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+
+  .pm2-carousel-card-sheen,
+  .pm2-carousel-card-explore,
+  .pm2-carousel-card-explore svg {
+    transition: none;
+  }
+
+  .pm2-agent-orbit,
+  .pm2-agent-video-pulse,
+  .pm2-agent-wave i,
+  .pm2-agent-live i,
+  .pm2-agent-case,
+  .pm2-agent-industry,
+  .pm2-agent-bubble,
+  .pm2-agent-result {
+    animation: none !important;
+  }
+}
+
+@media (hover: none), (max-width: 900px) {
+  .pm2-carousel-stage.is-cursor-on,
+  .pm2-carousel-stage.is-cursor-on .pm2-carousel-card {
+    cursor: pointer;
   }
 }

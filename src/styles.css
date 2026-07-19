@@ -361,6 +361,12 @@ body{overflow-x:hidden}.header{position:fixed;z-index:100;transition:transform .
 ::-moz-selection{background:#67e0a3;color:#06120b;text-shadow:none}
 body,main{background:var(--paper)}
 .logo-lockup{display:inline-flex;align-items:center;gap:12px;width:auto;max-width:none;line-height:1;white-space:nowrap}
+/* Brand lockup — single transparent PNG (brand-lockup.png on light surfaces,
+   brand-lockup-dark.png on dark). Replaces the old mark+text lockup. */
+.logo-lockup-img{display:block;width:auto;max-width:100%;object-fit:contain}
+.header .logo-lockup-img{height:30px}
+.who-brand-thumb .logo-lockup-img{height:clamp(28px,4.6vw,46px);width:auto;max-width:82%}
+.tcx-cmp-brand-logo{display:block;height:1.5rem;width:auto;max-width:100%;object-fit:contain}
 .logo-lockup-mark{width:48px;height:48px;object-fit:contain;flex:0 0 auto}
 .logo-wordmark{display:flex;align-items:baseline;gap:.28em;font-family:Mazzard,Arial,sans-serif;font-size:25px;letter-spacing:-.055em;color:var(--ink)}
 .logo-wordmark b{font-weight:600}.logo-wordmark em{font-style:normal;font-weight:400}
@@ -3565,8 +3571,6 @@ html[data-theme="dark"] .header .logo-wordmark em{
   align-items:center;
   gap:.55rem 1rem;
   margin-top:clamp(1.5rem,4vw,3.75rem);
-  padding-top:1rem;
-  border-top:1px solid rgba(103,224,163,.18);
   color:#7f8a84;
   font-size:clamp(.72rem,.82vw,.9rem);
   line-height:1.35;
@@ -3607,34 +3611,17 @@ html[data-theme="dark"] .header .logo-wordmark em{
   min-width:0;
 }
 .footer-bottom .logo-footer{
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr);
-  align-items:center;
-  gap:clamp(1rem,2vw,2.5rem);
-  width:100%;
-}
-.footer-bottom .logo-footer .logo-lockup-mark{
-  width:clamp(5rem,8.2vw,9.5rem)!important;
-  height:clamp(5rem,8.2vw,9.5rem)!important;
-}
-.footer-bottom .logo-footer .logo-wordmark{
-  display:flex;
-  justify-content:center;
-  gap:clamp(.65rem,1vw,1.5rem);
-  width:100%;
-  /* Sized against the footer row, not the viewport: the landing page's gutter is
-     narrower than every other page's, so a vw-based size overflowed this track
-     elsewhere and ran the wordmark into the back-to-top button. */
-  font-size:min(10cqw,7.5rem)!important;
-  line-height:.82;
-  letter-spacing:-.075em;
+  display:block;
+  /* The lockup owns the sign-off row; width drives the height via aspect. */
+  width:min(68rem,100%);
+  height:auto;
+  margin-inline:auto;
 }
 .footer-bottom .to-top{
   position:static;
   align-self:flex-end;
 }
 html[data-theme="dark"] .footer-legal{
-  border-top-color:rgba(103,224,163,.18);
   color:#7d8982;
 }
 html[data-theme="dark"] .footer-legal b,
@@ -3652,18 +3639,6 @@ html[data-theme] body #root footer .footer-bottom .to-top:hover{
   }
   .footer-bottom{
     margin-top:2.5rem;
-  }
-  .footer-bottom .logo-footer{
-    gap:.75rem;
-  }
-  .footer-bottom .logo-footer .logo-lockup-mark{
-    width:clamp(2.8rem,12vw,4.5rem)!important;
-    height:clamp(2.8rem,12vw,4.5rem)!important;
-  }
-  .footer-bottom .logo-footer .logo-wordmark{
-    gap:.55rem;
-    font-size:clamp(1.75rem,8.7vw,3.8rem)!important;
-    line-height:.9;
   }
 }
 
@@ -3695,18 +3670,6 @@ html[data-theme] body #root footer .footer-bottom .to-top:hover{
   }
   .footer-legal span:before{
     display:none;
-  }
-  .footer-bottom .logo-footer{
-    grid-template-columns:2.25rem minmax(0,1fr);
-    gap:.5rem;
-  }
-  .footer-bottom .logo-footer .logo-lockup-mark{
-    width:2.25rem!important;
-    height:2.25rem!important;
-  }
-  .footer-bottom .logo-footer .logo-wordmark{
-    gap:.35rem;
-    font-size:clamp(1.15rem,7vw,2rem)!important;
   }
 }
 

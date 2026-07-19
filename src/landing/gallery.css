@@ -6,13 +6,22 @@
    about the screen center until the target tile is a framed fullscreen
    slide; the hold carries it until the footer scrolls in. All tiles sit
    at (0,0) and are positioned purely via transform.
-   Under 900px and for reduced motion the field is a static stack. */
+   Phones run the same sequence with a portrait-aware field. Reduced-motion
+   users receive the static stack. */
 
 .pm2-gallery {
   position: relative;
   height: 400vh;
   margin-top: -120vh;
-  background: transparent;
+  /* Transparent across the 120vh work-rail overlap so the rail shows
+     through the hand-off; solid black below it so the page's light body
+     background can never peek out at the viewport bottom mid-transition. */
+  background: linear-gradient(
+    to bottom,
+    rgba(4, 10, 7, 0) 0,
+    rgba(4, 10, 7, 0) 120vh,
+    var(--v-black) 120vh
+  );
 }
 
 .pm2-gallery-sronly {
@@ -65,6 +74,9 @@
   transform-origin: 0 0;
   box-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.7);
   will-change: transform;
+  width: var(--gallery-w);
+  aspect-ratio: var(--gallery-ratio);
+  opacity: var(--gallery-opacity);
 }
 
 .pm2-gallery-tile img {
@@ -73,6 +85,22 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* top scrim so the label reads on bright tiles (Spark, Flow) without
+   dulling dark ones */
+.pm2-gallery-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 10, 7, 0.52) 0%,
+    rgba(4, 10, 7, 0.12) 32%,
+    rgba(4, 10, 7, 0) 52%
+  );
+  pointer-events: none;
 }
 
 .pm2-gallery-tile-label {
@@ -98,7 +126,7 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* —— quote tile (glass) ——————————————————————————————— */
+/* —— quote tile —————————————————————————————————————— */
 
 .pm2-gallery-quote {
   position: absolute;
@@ -108,10 +136,8 @@
   width: min(300px, 78vw);
   padding: 22px;
   border-radius: 14px;
-  background: rgba(6, 22, 15, 0.72);
+  background: rgba(6, 22, 15, 0.94);
   border: 1px solid rgba(52, 211, 153, 0.24);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
   transform: translate3d(-200vw, 0, 0);
   transform-origin: 0 0;
   box-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.7);
@@ -164,14 +190,77 @@
   transform-origin: 0 0;
   box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.95);
   will-change: transform;
+  --gallery-media-x: 0px;
+  --gallery-spring-x: 0px;
+  --gallery-spring-y: 0px;
+  --gallery-shine-x: 50%;
+  --gallery-shine-y: 50%;
 }
 
-.pm2-gallery-target img {
+.pm2-gallery-target-spring {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(var(--gallery-spring-x), var(--gallery-spring-y), 0)
+    scale(1.015);
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.pm2-gallery-target:hover .pm2-gallery-target-spring {
+  transform: translate3d(var(--gallery-spring-x), var(--gallery-spring-y), 0)
+    scale(1.045);
+}
+
+.pm2-gallery-target-spring img,
+.pm2-gallery-target-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: translate3d(var(--gallery-media-x), 0, 0);
+  will-change: transform;
+}
+
+.pm2-gallery-target-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  background: radial-gradient(
+    340px circle at var(--gallery-shine-x) var(--gallery-shine-y),
+    rgba(255, 255, 255, 0.16),
+    rgba(124, 240, 189, 0.07) 30%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s ease;
+}
+
+.pm2-gallery-target:hover .pm2-gallery-target-sheen {
+  opacity: 0.82;
+}
+
+/* A reference-inspired contrast field: the left side reads as a deliberate
+   editorial canvas while the emerald artwork remains vivid on the right. */
+.pm2-gallery-target::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(2, 8, 5, 0.82) 0%, rgba(2, 8, 5, 0.5) 35%, rgba(2, 8, 5, 0.06) 66%),
+    linear-gradient(180deg, rgba(2, 8, 5, 0.12), transparent 42%, rgba(2, 8, 5, 0.18));
+  pointer-events: none;
+}
+
+/* Ambient video layer — rises over the still once the zoom lands. The
+   poster is the still itself and Kling generated the clip from that frame,
+   so the hand-off reads as the image coming alive. */
+.pm2-gallery-target-video {
+  opacity: 0;
 }
 
 /* —— copy over the framed slide ————————————————————————— */
@@ -182,64 +271,172 @@
   inset: calc(clamp(20px, 3vw, 44px) * 1.6) clamp(20px, 3vw, 44px)
     calc(clamp(20px, 3vw, 44px) * 0.4);
   z-index: 6;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
   align-items: flex-start;
-  justify-content: center;
-  gap: 18px;
-  padding: clamp(28px, 5vw, 72px);
+  align-content: start;
+  gap: 0;
+  padding: clamp(44px, 5.25vw, 80px);
   opacity: 0;
   pointer-events: none;
 }
 
 .pm2-gallery-copy .pm2-gallery-cta {
   pointer-events: auto;
-  margin-top: 10px;
-}
-
-.pm2-gallery-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: rgba(3, 18, 12, 0.42);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  color: #fff;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.pm2-gallery-badge::before {
-  content: '';
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #34d399;
 }
 
 .pm2-gallery-line {
   display: flex;
   flex-direction: column;
   margin: 0;
-  font-size: clamp(34px, 5.4vw, 72px);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  max-width: 8.5ch;
+  font-size: clamp(58px, 6.65vw, 100px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
   color: #fff;
   text-shadow: 0 4px 30px rgba(0, 0, 0, 0.45);
 }
 
 .pm2-gallery-line-dim {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.68);
 }
 
-/* —— static fallback: small screens and reduced motion ——————— */
+.pm2-gallery-description {
+  max-width: 35ch;
+  margin: clamp(28px, 4vh, 44px) 0 0;
+  font-size: clamp(16px, 1.3vw, 20px);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.62);
+  text-wrap: balance;
+}
 
-@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+.pm2-gallery-actions {
+  align-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: clamp(2px, 1.2vh, 14px);
+}
+
+.pm2-gallery-actions .pm2-pill {
+  gap: 14px;
+  min-height: 56px;
+  padding: 16px 30px;
+  font-size: 15.5px;
+}
+
+.pm2-gallery-actions .pm2-pill span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* —— mobile fly-through: same camera move, tighter portrait field ————— */
+
+@media (max-width: 900px) {
+  .pm2-gallery {
+    height: 400svh;
+    margin-top: 0;
+    background: var(--v-black);
+  }
+
+  .pm2-gallery-stage {
+    position: sticky;
+    height: 100svh;
+    overflow: clip;
+  }
+
+  .pm2-gallery-tile {
+    width: var(--gallery-mobile-w);
+    aspect-ratio: var(--gallery-mobile-ratio);
+    opacity: var(--gallery-mobile-opacity);
+  }
+
+  .pm2-gallery-quote {
+    width: min(232px, 60vw);
+    padding: 16px;
+  }
+
+  .pm2-gallery-quote-text {
+    margin-bottom: 12px;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .pm2-gallery-quote-avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .pm2-gallery-quote-name {
+    font-size: 10.5px;
+  }
+
+  .pm2-gallery-quote-role {
+    font-size: 9.5px;
+  }
+
+  .pm2-gallery-copy {
+    inset: 32px 20px 8px;
+    grid-template-rows: auto auto 1fr;
+    align-content: end;
+    padding: max(90px, calc(env(safe-area-inset-top) + 82px)) 24px 42px;
+  }
+
+  .pm2-gallery-line {
+    max-width: 8.2ch;
+    font-size: clamp(42px, 12.6vw, 58px);
+    line-height: 0.96;
+  }
+
+  .pm2-gallery-description {
+    max-width: 29ch;
+    margin-top: 20px;
+    font-size: clamp(14px, 4vw, 16px);
+    line-height: 1.45;
+  }
+
+  .pm2-gallery-actions {
+    align-self: end;
+    flex-direction: column;
+    align-items: stretch;
+    width: min(100%, 255px);
+    gap: 10px;
+    padding-bottom: 0;
+  }
+
+  .pm2-gallery-actions .pm2-pill {
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 14px 22px;
+    font-size: 14.5px;
+  }
+
+  .pm2-gallery-target::after {
+    background:
+      linear-gradient(180deg, rgba(2, 8, 5, 0.05) 20%, rgba(2, 8, 5, 0.38) 53%, rgba(2, 8, 5, 0.92) 100%),
+      linear-gradient(90deg, rgba(2, 8, 5, 0.54) 0%, rgba(2, 8, 5, 0.05) 76%);
+  }
+}
+
+@media (max-width: 600px) {
+  .pm2-gallery-tile-label {
+    top: 8px;
+    left: 9px;
+  }
+
+  .pm2-gallery-tile-name {
+    font-size: 10px;
+  }
+
+  .pm2-gallery-tile-sub {
+    display: none;
+  }
+}
+
+/* —— accessible static fallback ——————————————————————— */
+
+@media (prefers-reduced-motion: reduce) {
   .pm2-gallery {
     height: auto;
     margin-top: 0;
@@ -254,7 +451,8 @@
     pointer-events: auto;
   }
 
-  .pm2-gallery-bg {
+  .pm2-gallery-bg,
+  .pm2-gallery-target-video {
     display: none;
   }
 
@@ -276,17 +474,26 @@
     opacity: 1 !important;
   }
 
-  .pm2-gallery-tile {
+  .pm2-gallery-tile,
+  .pm2-gallery-target {
     aspect-ratio: 3 / 2;
   }
 
   .pm2-gallery-target {
-    aspect-ratio: 3 / 2;
     border-radius: 18px !important;
   }
 
+  .pm2-gallery-target-spring {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .pm2-gallery-target-sheen {
+    display: none;
+  }
+
   .pm2-gallery-quote {
-    order: 9; /* after the target card */
+    order: 9;
   }
 
   .pm2-gallery-copy {
@@ -300,16 +507,8 @@
     transform: none !important;
     pointer-events: auto;
   }
-}
 
-@media (max-width: 600px) {
-  .pm2-gallery {
-    padding: 64px 16px 72px;
-  }
-
-  .pm2-gallery-tile,
-  .pm2-gallery-quote,
-  .pm2-gallery-target {
-    border-radius: 12px !important;
+  .pm2-gallery-actions {
+    margin-top: 28px;
   }
 }

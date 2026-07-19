@@ -1,45 +1,67 @@
 // Services 3D coverflow — a tall section whose sticky stage is scrubbed by
-// scroll. Behind (z0): one row of giant marquee text drifting with progress.
-// Front (z1): the 7 service cards fanned in 3D (perspective + rotateY).
-// All motion runs in one rAF loop writing transforms imperatively — no
-// per-frame state. prefers-reduced-motion swaps in a flat scroll-snap row.
-import { useRef, useState } from 'react'
+// scroll. A soft mint spotlight sits behind the stage; the 5 service cards
+// fan in 3D (perspective + rotateY) with an original editorial image series on
+// their faces, and the centred card takes full focus — side cards
+// recede and dim with distance while every face stays crisp. All motion runs in one rAF loop writing
+// transforms imperatively — no per-frame state. prefers-reduced-motion swaps
+// in a flat scroll-snap row.
+import { useEffect, useRef, useState } from 'react'
 import {
   useProgress,
   useRafLoop,
   useVisible,
   clamp,
   clamp01,
+  easeInOutCubic,
+  lerp,
   reducedMotion,
 } from './motion.js'
-import Sparkle from './Sparkle.jsx'
-import { SERVICE_CARDS, MARQUEE_ITEMS, CAROUSEL } from './data.js'
+import { SERVICE_CARDS, CAROUSEL } from './data.js'
 import { heroHandoff } from './handoff.js'
+import TrailCursor from './TrailCursor.jsx'
 import './carousel.css'
 
 // —— tunables ————————————————————————————————————————————————
 const N = SERVICE_CARDS.length
 const VH_PER_CARD = 55 // section height = 100vh + N * this
 const SMOOTH = 0.1 // heavy lerp on scroll progress — butter motion
-const SPACING_X = 300 // px between card centres on desktop …
-const SPACING_VW = 0.3 // … never wider than 30vw
-const SPACING_VW_MOBILE = 0.46 // tighter fan on small screens
-const DEPTH_Z = 230 // px pushed back per step from centre
+const SPACING_X = 335 // portrait handoff spacing …
+const SPACING_VW = 0.3 // … before the deck opens
+const SPACING_WIDE_X = 540
+const SPACING_WIDE_VW = 0.43
+const SPACING_VW_MOBILE = 0.67 // phone fan: matches the desktop overlap ratio
+const DEPTH_Z = 220 // restrained desktop depth; mobile stays on a flat plane
 const MAX_DEPTH_STEPS = 3
-const ROT_DEG = 36 // rotateY per step from centre
-const ROT_MAX = 64
-const ROT_MAX_MOBILE = 28
+const ROT_DEG = 24 // enough depth to stage the deck without softening live type
+const ROT_MAX = 42
 const MOBILE_BP = 900
 const OPACITY_FULL = 0.35 // |d| fully opaque inside this
-const OPACITY_GONE = 2.4 // |d| invisible beyond this
+const OPACITY_GONE = 1.85 // |d| invisible beyond this — neighbours fade fast …
 const ACTIVE_D = 0.5 // |d| below which a card counts as centred/clickable
-const MARQUEE_FROM = -12 // marquee x at p=0, % of one sequence width
-const MARQUEE_TO = -55 // marquee x at p=1
-const MARQUEE_DRIFT = 14 // px/s constant drift on top of the scrub
-const LIME_ART = '/assets/pm2/art-lime.jpg'
+const SNAP_IDLE_MS = 180 // scroll quiet time before the deck glides to a slot
+const SNAP_MIN_OFF = 0.02 // dead zone: already close enough to a slot
+const FIRST_CARD_COPY_REVEAL_MS = 1050
+const WIDE_CARD_MAX = 780
+const WIDE_CARD_VW = 0.66
+const WIDE_CARD_H_MAX = 610
+const WIDE_CARD_VH = 0.7
 
-const FACE_THEMES = new Set(['violet', 'onyx', 'glow', 'lime'])
-const faceTheme = card => (FACE_THEMES.has(card.theme) ? card.theme : 'onyx')
+const desktopCardGeometry = (vw, vh, expansion) => {
+  const compact = vh <= 820
+  const portraitW = Math.min(430, vw * 0.84)
+  const portraitH = compact ? Math.min(520, vh * 0.68) : Math.min(560, vh * 0.74)
+  const wideW = Math.min(WIDE_CARD_MAX, vw * WIDE_CARD_VW)
+  const wideH = compact
+    ? Math.min(560, vh * 0.69)
+    : Math.min(WIDE_CARD_H_MAX, vh * WIDE_CARD_VH)
+  return {
+    width: lerp(portraitW, wideW, expansion),
+    height: lerp(portraitH, wideH, expansion),
+  }
+}
+
+const FACE_THEMES = new Set(['ice', 'onyx', 'deep', 'glow', 'brand'])
+export const faceTheme = card => (FACE_THEMES.has(card.theme) ? card.theme : 'onyx')
 
 const chevron = dir => (
   <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true">
@@ -54,75 +76,314 @@ const chevron = dir => (
   </svg>
 )
 
-// Card face layouts per theme (violet / onyx / glow / lime) — markup only;
-// all positioning comes from carousel.css.
-function CardFace({ card }) {
-  const theme = faceTheme(card)
-  return (
-    <>
-      {card.image && (
-        <div className="pm2-carousel-card-bg" aria-hidden="true">
-          <img src={card.image} alt="" loading="lazy" decoding="async" draggable="false" />
-        </div>
-      )}
+const exploreArrow = (
+  <svg viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M4 12 12 4M6 4h6v6" />
+  </svg>
+)
 
-      <div className="pm2-carousel-card-top">
-        <span className="pm2-carousel-idx">{String(card.index).padStart(2, '0')}</span>
-        <span className="pm2-carousel-domain">{card.domain}</span>
+const AGENT_CALLS = [
+  {
+    industry: 'Healthcare',
+    mode: 'Inbound',
+    person: 'Priya',
+    opener: 'Thank you for calling Northside Clinic. How can I help?',
+    reply: 'I need to see a doctor this week.',
+    action: 'Thursday at 2 is available. Would you like me to book it?',
+    approval: 'Yes, that works.',
+    result: 'Appointment booked · Thursday at 2',
+  },
+  {
+    industry: 'Real estate',
+    mode: 'Outbound',
+    person: 'Maya',
+    opener: 'Hi Maya, I’m calling about the Parkview homes you viewed.',
+    reply: 'I’m still interested in a two bedroom.',
+    action: 'I can arrange a private visit Saturday at 11. Would that suit you?',
+    approval: 'Yes, please book it.',
+    result: 'Visit booked · Saturday at 11',
+  },
+  {
+    industry: 'Hospitality',
+    mode: 'Outbound',
+    person: 'Nina',
+    opener: 'Hi Nina, I’m following up on your event dining inquiry.',
+    reply: 'I need a table for twelve.',
+    action: 'Friday at 8 is available. Would you like me to secure it?',
+    approval: 'Yes, please.',
+    result: 'Event reserved · Friday at 8',
+  },
+]
+
+function AgentCallScene({ card }) {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    const host = video?.closest('.pm2-carousel-card')
+    if (!video || !host || typeof MutationObserver === 'undefined') return undefined
+
+    const syncPlayback = () => {
+      if (host.classList.contains('is-live')) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+        if (video.readyState >= HTMLMediaElement.HAVE_METADATA) video.currentTime = 0
+      }
+    }
+
+    const observer = new MutationObserver(syncPlayback)
+    observer.observe(host, { attributes: true, attributeFilter: ['class'] })
+    syncPlayback()
+
+    return () => {
+      observer.disconnect()
+      video.pause()
+    }
+  }, [])
+
+  return (
+    <div className="pm2-agent-scene" aria-hidden="true">
+      <div className="pm2-agent-industries">
+        {AGENT_CALLS.map((call, i) => (
+          <span key={call.industry} className={`pm2-agent-industry pm2-agent-industry--${i}`}>
+            {call.industry}
+          </span>
+        ))}
       </div>
 
-      {theme === 'violet' && (
-        <div className="pm2-carousel-card-mid">
-          <div className="pm2-carousel-orb">
-            <Sparkle size={200} color="#0a0512" style={{ width: '100%', height: '100%' }} />
-            <Sparkle
-              size={80}
-              color="#ffffff"
-              className="pm2-carousel-orb-core"
-              style={{ width: '38%', height: '38%' }}
+      <div className="pm2-agent-orbit pm2-agent-orbit--outer" />
+      <div className="pm2-agent-orbit pm2-agent-orbit--inner" />
+
+      <div className="pm2-agent-video-shell">
+        <video
+          ref={videoRef}
+          src={card.video}
+          poster={card.poster}
+          muted
+          playsInline
+          loop
+          preload="metadata"
+          disablePictureInPicture
+        />
+        <span className="pm2-agent-video-glass" />
+        <span className="pm2-agent-video-pulse pm2-agent-video-pulse--one" />
+        <span className="pm2-agent-video-pulse pm2-agent-video-pulse--two" />
+        <span className="pm2-agent-live">
+          <i />
+          Live call
+        </span>
+        <span className="pm2-agent-wave">
+          {Array.from({ length: 9 }, (_, i) => (
+            <i key={i} style={{ '--wave-index': i }} />
+          ))}
+        </span>
+      </div>
+
+      <div className="pm2-agent-cases">
+        {AGENT_CALLS.map((call, i) => (
+          <div key={call.industry} className={`pm2-agent-case pm2-agent-case--${i}`}>
+            <div className="pm2-agent-bubble pm2-agent-bubble--agent pm2-agent-bubble--one">
+              <span>Agent · {call.mode}</span>
+              <p>{call.opener}</p>
+            </div>
+            <div className="pm2-agent-bubble pm2-agent-bubble--person pm2-agent-bubble--two">
+              <span>{call.person}</span>
+              <p>{call.reply}</p>
+            </div>
+            <div className="pm2-agent-bubble pm2-agent-bubble--agent pm2-agent-bubble--three">
+              <span>Agent · {call.mode}</span>
+              <p>{call.action}</p>
+            </div>
+            <div className="pm2-agent-bubble pm2-agent-bubble--person pm2-agent-bubble--four">
+              <span>{call.person}</span>
+              <p>{call.approval}</p>
+            </div>
+            <div className="pm2-agent-result">
+              <i>
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="m3.25 8.15 3.05 3.1 6.45-6.5" />
+                </svg>
+              </i>
+              <span>{call.result}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function CardHeroVideo({ card }) {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    const host = video?.closest('.pm2-carousel-card')
+    if (!video || !host || typeof MutationObserver === 'undefined') return undefined
+
+    const syncPlayback = () => {
+      if (host.classList.contains('is-live') && !reducedMotion()) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    }
+
+    const observer = new MutationObserver(syncPlayback)
+    observer.observe(host, { attributes: true, attributeFilter: ['class'] })
+    syncPlayback()
+
+    return () => {
+      observer.disconnect()
+      video.pause()
+    }
+  }, [])
+
+  return (
+    <div className="pm2-carousel-card-bg pm2-carousel-card-bg--video" aria-hidden="true">
+      <video
+        ref={videoRef}
+        src={card.heroVideo}
+        poster={card.heroPoster}
+        muted
+        playsInline
+        loop
+        preload="metadata"
+        disablePictureInPicture
+      />
+    </div>
+  )
+}
+
+function CardFramedVideo({ card }) {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    const host = video?.closest('.pm2-carousel-card')
+    if (!video || !host || typeof MutationObserver === 'undefined') return undefined
+
+    const syncPlayback = () => {
+      if (host.classList.contains('is-live') && !reducedMotion()) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    }
+
+    const observer = new MutationObserver(syncPlayback)
+    observer.observe(host, { attributes: true, attributeFilter: ['class'] })
+    syncPlayback()
+
+    return () => {
+      observer.disconnect()
+      video.pause()
+    }
+  }, [])
+
+  return (
+    <div className="pm2-branding-visual" aria-hidden="true">
+      <div className="pm2-branding-video-frame">
+        <video
+          ref={videoRef}
+          poster={card.framedPoster}
+          muted
+          playsInline
+          loop
+          preload="metadata"
+          disablePictureInPicture
+        >
+          {card.mobileVideo && (
+            <source media="(max-width: 600px)" src={card.mobileVideo} type="video/mp4" />
+          )}
+          <source src={card.framedVideo} type="video/mp4" />
+        </video>
+      </div>
+    </div>
+  )
+}
+
+function CardFramedImage({ card }) {
+  return (
+    <div className="pm2-branding-visual pm2-website-visual" aria-hidden="true">
+      <div className="pm2-branding-video-frame pm2-website-image-frame">
+        <picture>
+          {card.mobileImage && (
+            <source media="(max-width: 900px)" srcSet={card.mobileImage} />
+          )}
+          <img
+            src={card.image}
+            alt=""
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            draggable="false"
+          />
+        </picture>
+      </div>
+    </div>
+  )
+}
+
+const cardVisualClass = card =>
+  `${card.image ? ' pm2-carousel-card--image' : ''}${
+    card.video ? ' pm2-carousel-card--agent' : ''
+  }${card.heroVideo ? ' pm2-carousel-card--hero-video' : ''}${
+    card.framedVideo ? ' pm2-carousel-card--framed-video' : ''
+  }${card.slug === 'website-design' ? ' pm2-carousel-card--website' : ''}`
+
+// Card face: original image art carries the metaphor while every
+// communication-critical word stays live, legible HTML. Shared verbatim by
+// the hero's ghost face so the handoff swap remains pixel-identical.
+export function CardFace({ card }) {
+  const isFramedWebsite = card.slug === 'website-design'
+
+  return (
+    <>
+      {card.image && !isFramedWebsite && (
+        <div className="pm2-carousel-card-bg" aria-hidden="true">
+          <picture>
+            {card.mobileImage && (
+              <source media="(max-width: 900px)" srcSet={card.mobileImage} />
+            )}
+            <img
+              src={card.image}
+              alt=""
+              loading={card.slug === 'website-design' ? 'eager' : 'lazy'}
+              fetchpriority={card.slug === 'website-design' ? 'high' : 'auto'}
+              decoding="async"
+              draggable="false"
             />
-          </div>
+          </picture>
         </div>
       )}
+      {card.heroVideo && <CardHeroVideo card={card} />}
+      <span className="pm2-carousel-card-sheen" aria-hidden="true" />
 
-      {(theme === 'onyx' || theme === 'lime') && (
-        <>
-          <div className="pm2-carousel-cover">
-            <img src={LIME_ART} alt="" loading="lazy" decoding="async" draggable="false" />
-          </div>
-          <div className="pm2-carousel-card-mid">
-            <span className="pm2-carousel-chip">{card.line}</span>
-          </div>
-        </>
-      )}
-
-      {theme === 'glow' && (
-        <div className="pm2-carousel-card-mid">
-          <span className="pm2-carousel-chip pm2-carousel-chip--icon">
-            <span className="pm2-carousel-chip-txt">{card.line}</span>
-            <span className="pm2-carousel-chip-ico" aria-hidden="true">
-              <svg width="11" height="11" viewBox="0 0 12 12">
-                <path
-                  d="M6 1v10M1 6h10"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
-          </span>
+      <div className="pm2-carousel-card-top">
+        <div className="pm2-carousel-card-meta">
+          <span>{card.number}</span>
         </div>
-      )}
+        <div className="pm2-mask">
+          <div className="pm2-mask-in">
+            <h3 className="pm2-carousel-card-title">{card.title}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div className="pm2-carousel-card-mid" aria-hidden="true">
+        {isFramedWebsite && <CardFramedImage card={card} />}
+        {card.video && <AgentCallScene card={card} />}
+        {card.framedVideo && <CardFramedVideo card={card} />}
+      </div>
 
       <div className="pm2-carousel-card-bottom">
-        <h3 className="pm2-carousel-card-title">{card.title}</h3>
-        {theme === 'violet' && <p className="pm2-carousel-card-line">{card.line}</p>}
-        {theme === 'glow' && (
-          <span className="pm2-carousel-prog" aria-hidden="true">
-            <i style={{ width: `${(card.index / N) * 100}%` }} />
-          </span>
-        )}
+        <p className="pm2-carousel-card-line">{card.line}</p>
+        <span className="pm2-carousel-card-explore">
+          Explore
+          {exploreArrow}
+        </span>
       </div>
     </>
   )
@@ -130,12 +391,49 @@ function CardFace({ card }) {
 
 export default function Carousel({ navigate }) {
   const sectionRef = useRef(null)
-  const marqueeRef = useRef(null)
   const cardRefs = useRef([])
   const fRef = useRef(0) // live float index for click/key handlers
+  const liveRef = useRef(-1) // centred card index — its scene plays; others hold
+  const firstCardCopyRef = useRef(0)
+  // Per-frame write dedupe: geometry (width/height) writes dirty layout, so
+  // they only run when the measured values actually changed; the cursor
+  // hit-test (elementFromPoint forces layout) only re-runs when the pointer
+  // or the deck actually moved.
+  const geomKeyRef = useRef('')
+  const stageVarRef = useRef('')
+  const copyVarRef = useRef('')
+  const interactiveRef = useRef([])
+  const cursorSyncRef = useRef({ x: -1, y: -1, f: -1 })
+  const cursorMoveRef = useRef({ x: 0, y: 0 })
+  const cursorInsideStageRef = useRef(false)
+  const [cursorAction, setCursorAction] = useState(null)
   const [isReduced] = useState(reducedMotion)
   const progress = useProgress(sectionRef, { mode: 'sticky', smooth: SMOOTH })
   const visible = useVisible(sectionRef)
+
+  // —— idle snap: any scroll (user or our own glide) stamps this; once the
+  // page has been quiet for SNAP_IDLE_MS and the deck rests between slots,
+  // the rAF loop glides it to the nearest card. Stamping on our own smooth
+  // scroll keeps the snap from re-arming mid-glide, and user input cancels
+  // a browser smooth scroll natively — no flags needed.
+  const lastScrollAt = useRef(0)
+  useEffect(() => {
+    const onScroll = () => {
+      lastScrollAt.current = performance.now()
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Off-screen, the centred card would otherwise keep its `is-live` class and
+  // its video decoding for the whole session. Drop the class while the deck
+  // is out of view; the loop re-applies it on the next visible frame, which
+  // resumes playback exactly where the MutationObserver left it.
+  useEffect(() => {
+    if (visible) return
+    cardRefs.current[liveRef.current]?.classList.remove('is-live')
+    liveRef.current = -1
+  }, [visible])
 
   const linkProps = href => ({
     href,
@@ -167,9 +465,103 @@ export default function Carousel({ navigate }) {
     }
   }
 
-  const onCardClick = (card, i) => {
+  const findVisibleSideCardAtPoint = (clientX, clientY) =>
+    cardRefs.current.findIndex((card, index) => {
+      if (!card || Math.abs(index - fRef.current) < ACTIVE_D) return false
+      const style = window.getComputedStyle(card)
+      if (style.visibility === 'hidden' || Number(style.opacity) <= 0.08) return false
+      const rect = card.getBoundingClientRect()
+      return (
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom
+      )
+    })
+
+  const cursorActionForIndex = index => {
+    if (index < 0) return null
+    const distance = index - fRef.current
+    if (Math.abs(distance) < ACTIVE_D) return 'Explore'
+    return distance < 0 ? 'Previous' : 'Next'
+  }
+
+  const cardIndexAtPoint = (clientX, clientY, directTarget) => {
+    const directCard =
+      directTarget instanceof Element
+        ? directTarget.closest('.pm2-carousel-card')
+        : null
+    const directIndex = directCard ? cardRefs.current.indexOf(directCard) : -1
+    if (directIndex >= 0) return directIndex
+    return findVisibleSideCardAtPoint(clientX, clientY)
+  }
+
+  const syncCursorAction = (clientX, clientY, directTarget) => {
+    const nextAction = cursorActionForIndex(
+      cardIndexAtPoint(clientX, clientY, directTarget),
+    )
+    setCursorAction(current => (current === nextAction ? current : nextAction))
+  }
+
+  const onStageClickCapture = event => {
+    const clickedCard =
+      event.target instanceof Element
+        ? event.target.closest('.pm2-carousel-card')
+        : null
+    const clickedIndex = clickedCard ? cardRefs.current.indexOf(clickedCard) : -1
+
+    // Resolve side-card clicks before the nested anchor can attempt to
+    // navigate. The centred card is allowed through to its normal handler.
+    if (clickedIndex >= 0 && Math.abs(clickedIndex - fRef.current) >= ACTIVE_D) {
+      event.preventDefault()
+      event.stopPropagation()
+      scrollToIndex(clickedIndex)
+      return
+    }
+    if (clickedIndex >= 0) return
+
+    // Perspective-transformed side cards can paint beyond the browser's
+    // pointer hit plane. If the stage receives a click inside one of those
+    // visible card bounds, treat it exactly like a background-card click.
+    const targetIndex = findVisibleSideCardAtPoint(event.clientX, event.clientY)
+    if (targetIndex >= 0) {
+      event.preventDefault()
+      event.stopPropagation()
+      scrollToIndex(targetIndex)
+    }
+  }
+
+  const onStagePointerMove = event => {
+    cursorInsideStageRef.current = true
+    cursorMoveRef.current.x = event.clientX
+    cursorMoveRef.current.y = event.clientY
+    syncCursorAction(event.clientX, event.clientY, event.target)
+  }
+
+  const clearCursorAction = () => {
+    cursorInsideStageRef.current = false
+    setCursorAction(null)
+  }
+
+  const onCardClick = (event, card, i) => {
+    event.preventDefault()
     if (Math.abs(i - fRef.current) < ACTIVE_D) navigate?.(card.href)
     else scrollToIndex(i)
+  }
+
+  const onCardMove = event => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const x = clamp((event.clientX - rect.left) / Math.max(1, rect.width), 0, 1)
+    const y = clamp((event.clientY - rect.top) / Math.max(1, rect.height), 0, 1)
+    event.currentTarget.style.setProperty('--card-shine-x', `${(x * 100).toFixed(1)}%`)
+    event.currentTarget.style.setProperty('--card-shine-y', `${(y * 100).toFixed(1)}%`)
+    event.currentTarget.style.setProperty('--card-shift-x', `${((x - 0.5) * -8).toFixed(2)}px`)
+    event.currentTarget.style.setProperty('--card-shift-y', `${((y - 0.5) * -8).toFixed(2)}px`)
+  }
+
+  const onCardLeave = event => {
+    event.currentTarget.style.removeProperty('--card-shift-x')
+    event.currentTarget.style.removeProperty('--card-shift-y')
   }
 
   useRafLoop((dt, now) => {
@@ -179,37 +571,163 @@ export default function Carousel({ navigate }) {
     const p = progress.current
     const f = p * (N - 1)
     fRef.current = f
+    // The hero handoff is intentionally artwork-only. Once its ghost has
+    // disappeared into the first real card, reveal the live title and support
+    // copy over a quiet one-second beat. Reset immediately when reverse-scroll
+    // re-enters the handoff so no clipped type can reappear on the moving card.
+    const sectionTop = sectionRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+    const handoffIsMoving = heroHandoff.ghostOpacity > 0.01
+    const handoffIsSeated = !handoffIsMoving && sectionTop <= (window.innerHeight || 1) * 0.08
+    if (handoffIsSeated) {
+      firstCardCopyRef.current = clamp01(
+        firstCardCopyRef.current + dt / FIRST_CARD_COPY_REVEAL_MS,
+      )
+    } else {
+      firstCardCopyRef.current = 0
+    }
+    const firstCardCopyReveal = easeInOutCubic(firstCardCopyRef.current)
+    // The incoming hero card remains portrait through the familiar opening
+    // beat. As its ghost reaches the services stage, the shared handoff value
+    // opens both copies into a wider canvas. The local driver keeps the deck
+    // fully open after the first card begins moving toward card two.
+    const localOpen = mobile ? 0 : easeInOutCubic(clamp01(f / 0.36))
+    const expansion = mobile ? 0 : Math.max(heroHandoff.cardExpansion || 0, localOpen)
+    const geometry = mobile ? null : desktopCardGeometry(vw, window.innerHeight || 1, expansion)
+    if (geometry) {
+      const half = `${(geometry.height / 2).toFixed(1)}px`
+      if (stageVarRef.current !== half) {
+        stageVarRef.current = half
+        sectionRef.current?.style.setProperty('--pm2-stage-card-half', half)
+      }
+    }
+    const geomKey = geometry
+      ? `${geometry.width.toFixed(1)}|${geometry.height.toFixed(1)}|${expansion.toFixed(4)}`
+      : 'mobile'
+    const geomChanged = geomKeyRef.current !== geomKey
+    if (geomChanged) geomKeyRef.current = geomKey
 
-    // Giant marquee: scrubbed -12% -> -55% of one sequence + constant drift.
-    const mq = marqueeRef.current
-    if (mq) {
-      const unit = (mq.firstElementChild && mq.firstElementChild.offsetWidth) || 1
-      const base = ((MARQUEE_FROM + (MARQUEE_TO - MARQUEE_FROM) * p) / 100) * unit
-      const drift = ((now / 1000) * MARQUEE_DRIFT) % unit
-      mq.style.transform = `translate3d(${(base - drift).toFixed(1)}px, -50%, 0)`
+    // the centred card's scene builds in; off-centre cards hold their
+    // composed final state (base styles) — no replay seams while parked
+    const centered = Math.round(f)
+    if (centered !== liveRef.current) {
+      cardRefs.current[liveRef.current]?.classList.remove('is-live')
+      cardRefs.current[centered]?.classList.add('is-live')
+      liveRef.current = centered
     }
 
-    const spacing = mobile ? vw * SPACING_VW_MOBILE : Math.min(SPACING_X, vw * SPACING_VW)
-    const rotMax = mobile ? ROT_MAX_MOBILE : ROT_MAX
+    const spacing = mobile
+      ? vw * SPACING_VW_MOBILE
+      : lerp(
+          Math.min(SPACING_X, vw * SPACING_VW),
+          Math.min(SPACING_WIDE_X, vw * SPACING_WIDE_VW),
+          expansion,
+        )
+    const rotMax = ROT_MAX
     for (let i = 0; i < N; i++) {
       const el = cardRefs.current[i]
       if (!el) continue
-      const d = i - f
+      if (geomChanged) {
+        if (geometry) {
+          el.style.width = `${geometry.width.toFixed(1)}px`
+          el.style.height = `${geometry.height.toFixed(1)}px`
+          el.style.setProperty('--pm2-card-pad', `${lerp(22, 30, expansion).toFixed(1)}px`)
+          el.style.setProperty('--pm2-card-radius', `${lerp(26, 34, expansion).toFixed(1)}px`)
+          el.style.setProperty('--pm2-card-title', `${lerp(36, 46, expansion).toFixed(1)}px`)
+          el.style.setProperty('--pm2-card-copy', `${lerp(14, 16, expansion).toFixed(1)}px`)
+        } else {
+          el.style.removeProperty('width')
+          el.style.removeProperty('height')
+          el.style.removeProperty('--pm2-card-pad')
+          el.style.removeProperty('--pm2-card-radius')
+          el.style.removeProperty('--pm2-card-title')
+          el.style.removeProperty('--pm2-card-copy')
+        }
+      }
+      if (i === 0) {
+        const reveal = firstCardCopyReveal.toFixed(4)
+        if (copyVarRef.current !== reveal) {
+          copyVarRef.current = reveal
+          el.style.setProperty('--pm2-card-content-reveal', reveal)
+          el.style.setProperty(
+            '--pm2-card-content-offset',
+            `${((1 - firstCardCopyReveal) * 18).toFixed(2)}px`,
+          )
+        }
+      }
+      const rawD = i - f
+      // Once a card is effectively centred, land it on the exact 3D origin.
+      // Tiny residual rotations force the browser to rasterize SVGs and type
+      // on fractional planes, which reads as softness after the scroll stops.
+      const d = Math.abs(rawD) < 0.02 ? 0 : rawD
       const ad = Math.abs(d)
-      const x = d * spacing
-      const z = -Math.min(ad, MAX_DEPTH_STEPS) * DEPTH_Z
-      const ry = clamp(-d * ROT_DEG, -rotMax, rotMax)
+      // On phones, 3D rotation rasterizes the entire card (including live
+      // type) onto an angled texture. Keep the deck flat and pixel-aligned;
+      // position and opacity still communicate which card is next.
+      const x = mobile ? Math.round(d * spacing) : d * spacing
+      const z = mobile ? 0 : -Math.min(ad, MAX_DEPTH_STEPS) * DEPTH_Z
+      const ry = mobile ? 0 : clamp(-d * ROT_DEG, -rotMax, rotMax)
       let op = clamp01((OPACITY_GONE - ad) / (OPACITY_GONE - OPACITY_FULL))
       // the hero's ghost card becomes this card — keep the real one hidden
       // until the ghost has landed in the slot (complementary cross-fade)
       if (i === 0) op = Math.min(op, 1 - clamp01(heroHandoff.ghostOpacity))
-      el.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(
-        1,
-      )}px, 0, ${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg)`
+      // Keep side-card artwork and SVG text sharp at every point in the
+      // coverflow; distance is communicated by depth and opacity.
+      el.style.transform = mobile
+        ? `translate(-50%, -50%) translateX(${x}px)`
+        : `translate(-50%, -50%) translate3d(${x.toFixed(
+            1,
+          )}px, 0, ${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg)`
       el.style.opacity = op.toFixed(3)
+      el.style.filter = ''
       el.style.zIndex = String(100 - Math.round(ad * 10))
-      el.style.pointerEvents = ad < ACTIVE_D ? 'auto' : 'none'
+      const isInteractive = ad < ACTIVE_D
+      // Keep every visible side card pointer-clickable. `onCardClick` uses
+      // the same active threshold to either open the centred service or
+      // bring a background card into the centre slot.
+      const isPointerClickable = op > 0.08
+      el.style.pointerEvents = isPointerClickable ? 'auto' : 'none'
       el.style.visibility = op <= 0.001 ? 'hidden' : 'visible'
+      // Attribute writes churn the DOM even when the value is identical —
+      // only touch them when a card actually crosses the interactive line.
+      if (interactiveRef.current[i] !== isInteractive) {
+        interactiveRef.current[i] = isInteractive
+        el.tabIndex = isInteractive ? 0 : -1
+        el.setAttribute('aria-hidden', isInteractive ? 'false' : 'true')
+      }
+    }
+
+    // Cards continue moving beneath a stationary pointer while the page
+    // scrolls, so keep the cursor label in sync without requiring a mouse
+    // nudge after a new card reaches the centre slot. elementFromPoint
+    // forces a hit-test (layout) — only re-run it when the pointer or the
+    // deck has actually moved since the last sync.
+    if (cursorInsideStageRef.current) {
+      const { x, y } = cursorMoveRef.current
+      const sync = cursorSyncRef.current
+      if (sync.x !== x || sync.y !== y || Math.abs(sync.f - f) > 0.001) {
+        sync.x = x
+        sync.y = y
+        sync.f = f
+        syncCursorAction(x, y, document.elementFromPoint(x, y))
+      }
+    }
+
+    // —— idle snap: glide to the nearest slot once scrolling rests off-slot.
+    // Raw scroll position (not the lerped f) decides the target, so the snap
+    // aims where the page actually stopped, not where the lag is passing.
+    if (now - lastScrollAt.current > SNAP_IDLE_MS) {
+      const el = sectionRef.current
+      if (el) {
+        const vh = window.innerHeight || 1
+        const rangePx = Math.max(1, el.offsetHeight - vh)
+        const rawP = clamp01(-el.getBoundingClientRect().top / rangePx)
+        const rawF = rawP * (N - 1)
+        const target = Math.round(rawF)
+        if (rawP > 0.001 && rawP < 0.999 && Math.abs(rawF - target) > SNAP_MIN_OFF) {
+          lastScrollAt.current = now // re-arm only after the glide + next idle
+          scrollToIndex(target)
+        }
+      }
     }
   })
 
@@ -218,14 +736,14 @@ export default function Carousel({ navigate }) {
     return (
       <section className="pm2-carousel pm2-carousel--flat" id="services" ref={sectionRef}>
         <div className="pm2-carousel-flat-head">
-          <span className="pm2-kicker">{CAROUSEL.kicker}</span>
+          <h2 className="pm2-carousel-title">{CAROUSEL.heading}</h2>
         </div>
         <div className="pm2-carousel-flat-row" role="list">
           {SERVICE_CARDS.map(card => (
             <a
               key={card.slug}
               role="listitem"
-              className={`pm2-carousel-card pm2-carousel-card--${faceTheme(card)}`}
+              className={`pm2-carousel-card pm2-carousel-card--${faceTheme(card)}${cardVisualClass(card)}`}
               aria-label={`${card.title}: ${card.line}`}
               {...linkProps(card.href)}
             >
@@ -234,29 +752,16 @@ export default function Carousel({ navigate }) {
           ))}
         </div>
         <div className="pm2-carousel-flat-foot">
-          <a className="pm2-pill pm2-pill--solid" {...linkProps(CAROUSEL.cta.href)}>
+          <a
+            className="pm2-pill pm2-pill--solid pm2-carousel-cta"
+            {...linkProps(CAROUSEL.cta.href)}
+          >
             {CAROUSEL.cta.label}
           </a>
         </div>
       </section>
     )
   }
-
-  const marqueeSeq = copy => (
-    <span className="pm2-carousel-mseq" key={copy}>
-      {MARQUEE_ITEMS.map((item, i) => (
-        <span className="pm2-carousel-mitem" key={i}>
-          <span className={`pm2-carousel-mword${i % 2 ? ' is-outline' : ''}`}>{item}</span>
-          <Sparkle
-            size={70}
-            color="#6d28d9"
-            className="pm2-carousel-mspark"
-            style={{ width: '0.34em', height: '0.34em' }}
-          />
-        </span>
-      ))}
-    </span>
-  )
 
   return (
     <section
@@ -266,35 +771,42 @@ export default function Carousel({ navigate }) {
       style={{ height: `${100 + N * VH_PER_CARD}vh` }}
     >
       <div className="pm2-carousel-sticky">
-        <div className="pm2-carousel-marquee" ref={marqueeRef} aria-hidden="true">
-          {[0, 1].map(marqueeSeq)}
-        </div>
+        <h2 className="pm2-carousel-title pm2-carousel-title--stage">{CAROUSEL.heading}</h2>
 
         <div
-          className="pm2-carousel-stage"
+          className={`pm2-carousel-stage${cursorAction ? ' is-cursor-on' : ''}`}
           tabIndex={0}
           role="group"
           aria-label="Services carousel — use arrow keys to browse"
           onKeyDown={onStageKey}
+          onClickCapture={onStageClickCapture}
+          onPointerMove={onStagePointerMove}
+          onPointerLeave={clearCursorAction}
         >
           {SERVICE_CARDS.map((card, i) => (
-            <article
+            <a
               key={card.slug}
               ref={el => {
                 cardRefs.current[i] = el
               }}
-              className={`pm2-carousel-card pm2-carousel-card--${faceTheme(card)}`}
+              className={`pm2-carousel-card pm2-carousel-card--${faceTheme(card)}${i === 0 ? ' pm2-carousel-card--handoff' : ''}${cardVisualClass(card)}`}
+              href={card.href}
               aria-label={`${card.title}: ${card.line}`}
-              onClick={() => onCardClick(card, i)}
+              tabIndex={i === 0 ? 0 : -1}
+              onMouseMove={onCardMove}
+              onMouseLeave={onCardLeave}
+              onClick={event => onCardClick(event, card, i)}
             >
               <CardFace card={card} />
-            </article>
+            </a>
           ))}
         </div>
 
         <div className="pm2-carousel-foot">
-          <span className="pm2-kicker">{CAROUSEL.kicker}</span>
-          <a className="pm2-pill pm2-pill--solid" {...linkProps(CAROUSEL.cta.href)}>
+          <a
+            className="pm2-pill pm2-pill--solid pm2-carousel-cta"
+            {...linkProps(CAROUSEL.cta.href)}
+          >
             {CAROUSEL.cta.label}
           </a>
         </div>
@@ -308,6 +820,18 @@ export default function Carousel({ navigate }) {
           </button>
         </div>
       </div>
+      <TrailCursor
+        label={cursorAction || ''}
+        show={Boolean(cursorAction)}
+        moveRef={cursorMoveRef}
+        arrow={
+          cursorAction === 'Previous'
+            ? 'left'
+            : cursorAction === 'Next'
+              ? 'right'
+              : 'up-right'
+        }
+      />
     </section>
   )
 }

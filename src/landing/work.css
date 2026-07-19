@@ -19,7 +19,7 @@
   align-items: center;
 }
 
-/* Violet glow bleeding along the viewport bottom (reference f_042/f_046). */
+/* Emerald glow bleeding along the viewport bottom (reference f_042/f_046). */
 .pm2-work__glow {
   position: absolute;
   left: 0;
@@ -30,7 +30,7 @@
   z-index: 3;
   background: radial-gradient(
     ellipse 90% 100% at 50% 115%,
-    rgba(124, 58, 237, 0.5),
+    rgba(47, 191, 127, 0.45),
     transparent 60%
   );
   mix-blend-mode: screen;
@@ -49,7 +49,7 @@
   letter-spacing: -0.03em;
   white-space: nowrap;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(233, 213, 255, 0.14);
+  -webkit-text-stroke: 1px rgba(175, 249, 201, 0.14);
   pointer-events: none;
   user-select: none;
   will-change: transform;
@@ -102,26 +102,109 @@
   will-change: transform;
 }
 
-/* —— card —————————————————————————————————————————— */
+/* —— card ——————————————————————————————————————————
+   Light structured card (reference anatomy): eyebrow + index, big title,
+   the artwork inside a rounded frame, then tag pills. Width is derived from
+   the viewport HEIGHT so the whole stack always fits the pinned stage —
+   the frame keeps its 16/10 shape and the card grows as far as the stage
+   allows, capped for very tall windows. */
 
 .pm2-work__card {
   position: relative;
   flex: 0 0 auto;
-  width: clamp(300px, 56vw, 720px);
-  aspect-ratio: 4 / 3.2;
-  border-radius: 24px;
-  overflow: hidden;
-  background: #0d0718;
+  width: min(78vw, calc((100svh - 340px) * 1.6), 1120px);
+  border-radius: 28px;
+  background: #eef0f2;
   text-decoration: none;
-  color: #fff;
-  cursor: pointer;
+  color: #14171a;
+  cursor: none; /* the trailing "View" chip replaces the cursor */
   will-change: transform;
 }
 
+/* Simple mode covers touch, small screens, and reduced motion — the chip
+   never shows there, so the native cursor stays. */
+.pm2-work--simple .pm2-work__card {
+  cursor: pointer;
+}
+
+@media (hover: none) {
+  .pm2-work__card {
+    cursor: pointer;
+  }
+}
+
 .pm2-work__cardInner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: clamp(18px, 1.8vw, 28px);
+}
+
+.pm2-work__cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.pm2-work__sector {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(20, 23, 26, 0.45);
+}
+
+.pm2-work__sector::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(20, 23, 26, 0.35);
+}
+
+.pm2-work__index {
+  font-size: 17px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgba(20, 23, 26, 0.45);
+}
+
+.pm2-work__name {
+  margin: 0 0 6px;
+  font-size: clamp(30px, 2.8vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: #101315;
+}
+
+/* The framed artwork. Default: the image is a finished composition and
+   fills the frame edge to edge. --inset: the image is a clean screenshot
+   floating as a rounded, shadowed shot on the frame's solid ground. */
+.pm2-work__frame {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  overflow: hidden;
+  transform: translateZ(0); /* keep the radius clipping during the scrub */
+}
+
+.pm2-work__shot {
   position: absolute;
   inset: 0;
-  will-change: filter;
+  display: block;
+  overflow: hidden;
+}
+
+.pm2-work__frame--inset .pm2-work__shot {
+  inset: 7% 8%;
+  border-radius: 12px;
+  box-shadow:
+    0 30px 70px rgba(10, 12, 18, 0.32),
+    0 8px 22px rgba(10, 12, 18, 0.16);
 }
 
 .pm2-work__cardImg {
@@ -130,67 +213,34 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.06);
+  transform: scale(1.03);
   will-change: transform;
 }
 
-/* Permanent bottom gradient for legibility. */
-.pm2-work__shade {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to top,
-    rgba(4, 2, 10, 0.88) 0%,
-    rgba(4, 2, 10, 0.28) 42%,
-    transparent 78%
-  );
+/* —— tag pills ————————————————————————————————————— */
+
+.pm2-work__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.pm2-work__meta {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: 22px;
-  font-family: var(--v-mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.65);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pm2-work__name {
-  position: absolute;
-  left: 24px;
-  bottom: 20px;
-  margin: 0;
-  max-width: 70%;
-  font-size: clamp(38px, 4.6vw, 68px);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: #fff;
-}
-
-.pm2-work__result {
-  position: absolute;
-  right: 22px;
-  bottom: 22px;
-  max-width: 44%;
-  padding: 8px 14px;
+.pm2-work__tag {
+  padding: 10px 18px;
   border-radius: 999px;
-  background: rgba(168, 85, 247, 0.16);
-  border: 1px solid rgba(168, 85, 247, 0.4);
-  color: #e9d5ff;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  line-height: 1.25;
-  text-align: center;
+  background: #fff;
+  border: 1px solid rgba(16, 19, 21, 0.05);
+  color: #24282b;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  line-height: 1.2;
+}
+
+.pm2-work__tag--result {
+  background: rgba(47, 191, 127, 0.12);
+  border-color: rgba(47, 191, 127, 0.35);
+  color: #157a4d;
 }
 
 /* —— simple mode (≤ 900px or reduced motion): native snap row ———————————— */
@@ -230,13 +280,18 @@
 }
 
 .pm2-work--simple .pm2-work__card {
-  width: 82vw;
+  width: 86vw;
   scroll-snap-align: center;
 }
 
 .pm2-work--simple .pm2-work__glow {
   z-index: 3;
   height: 26vh;
+}
+
+.pm2-work--simple .pm2-work__cardImg {
+  transform: none;
+  will-change: auto;
 }
 
 /* —— responsive ———————————————————————————————————— */
@@ -263,26 +318,35 @@
   }
 
   .pm2-work__card {
-    border-radius: 20px;
+    border-radius: 22px;
   }
 
-  .pm2-work__meta {
-    padding: 16px;
-    font-size: 10px;
+  .pm2-work__cardInner {
+    gap: 11px;
+    padding: 14px;
+  }
+
+  .pm2-work__sector {
+    font-size: 13px;
+  }
+
+  .pm2-work__index {
+    font-size: 14px;
   }
 
   .pm2-work__name {
-    left: 18px;
-    bottom: 16px;
-    font-size: clamp(30px, 9vw, 42px);
-    max-width: 62%;
+    margin-bottom: 2px;
+    font-size: clamp(26px, 7.4vw, 34px);
   }
 
-  .pm2-work__result {
-    right: 14px;
-    bottom: 14px;
-    padding: 6px 11px;
-    font-size: 11px;
+  .pm2-work__frame {
+    aspect-ratio: 16 / 10;
+    border-radius: 14px;
+  }
+
+  .pm2-work__tag {
+    padding: 8px 14px;
+    font-size: 12px;
   }
 }
 

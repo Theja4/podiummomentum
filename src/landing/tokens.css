@@ -1,25 +1,28 @@
 /* Design tokens + shared utilities for the landing revamp (src/landing/*).
-   Aesthetic target: deep violet / chrome / near-black, per the reference film.
+   Aesthetic target: the Podium Momentum brand — signature mint/emerald
+   (#67e0a3 family, from the logo mark + --emerald site accent) over deep
+   forest near-black.
    Every section stylesheet scopes itself under its own `.pm2-<name>` class. */
 
 .pm2 {
-  --v-black: #07030e;
-  --v-ink: #0d0718;
-  --v-deep: #1b0b3a;
-  --v-core: #6d28d9;
-  --v-bright: #8b5cf6;
-  --v-glow: #a855f7;
-  --v-haze: #c084fc;
-  --v-pale: #e9d5ff;
-  --v-lime: #c9f62d;
+  --v-black: #040a07;
+  --v-ink: #08130d;
+  --v-deep: #0d2b1c;
+  --v-core: #2fbf7f;
+  --v-bright: #67e0a3;
+  --v-glow: #7cf0bd;
+  --v-haze: #aff9c9;
+  --v-pale: #e3fced;
+  --v-ice: #aff9c9;
   --v-paper: #ffffff;
   --v-text: #0b0910;
   --v-muted: rgba(11, 9, 16, 0.56);
-  --v-muted-dark: rgba(233, 213, 255, 0.55);
+  --v-muted-dark: rgba(175, 249, 201, 0.55);
   --v-radius-panel: clamp(20px, 2.6vw, 34px);
   --v-radius-card: clamp(16px, 1.8vw, 26px);
   --v-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --v-font: 'Mazzard', 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --v-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --v-mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   position: relative;
@@ -40,6 +43,16 @@
   box-sizing: border-box;
 }
 
+/* The landing deliberately avoids backdrop blur. This also protects the
+   shared header and footer, which sit outside .pm2 while this route is live,
+   from older site-wide glass effects. */
+body.pm2-active *,
+body.pm2-active *::before,
+body.pm2-active *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 .pm2 img {
   user-select: none;
   -webkit-user-drag: none;
@@ -48,7 +61,7 @@
 
 .pm2 ::selection {
   background: var(--v-glow);
-  color: #fff;
+  color: #040a07;
 }
 
 /* —— shared atoms ———————————————————————————————— */
@@ -110,7 +123,7 @@
 
 .pm2-pill--solid:hover {
   background: var(--v-core);
-  box-shadow: 0 12px 40px -8px rgba(109, 40, 217, 0.55);
+  box-shadow: 0 12px 40px -8px rgba(47, 191, 127, 0.5);
 }
 
 .pm2-pill--white {
@@ -119,14 +132,15 @@
 }
 
 .pm2-pill--white:hover {
-  box-shadow: 0 12px 44px -10px rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 16px 38px -12px rgba(103, 224, 163, 0.78),
+    0 5px 18px rgba(103, 224, 163, 0.22);
 }
 
 .pm2-pill--ghost {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   color: #fff;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(8px);
 }
 
 .pm2-pill--ghost:hover {
@@ -165,22 +179,28 @@
    dark sections below the carousel must touch, with no grey bars between
    them or at their sides. */
 main.pm2 {
+  background: #fff !important;
   padding: 0 !important;
   gap: 0 !important;
 }
 
+html:has(body.pm2-active),
+body.pm2-active {
+  background: #fff !important;
+}
+
 /* The shared footer stays a light card on every other route; on the landing
-   it closes the dark run (work rail → gallery → footer) in the same violet
+   it closes the dark run (work rail → gallery → footer) in the same forest
    near-black, full width — no card inset, no rounded top, same layout.
    NOTE: the footer sits outside .pm2, so the --v-* tokens don't resolve
-   here — use literals (#07030e = --v-black, #a855f7 = --v-glow). */
+   here — use literals (#040a07 = --v-black, #7cf0bd = --v-glow). */
 body.pm2-active footer {
   max-width: none !important;
   margin: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
-  background: #07030e !important;
-  color: rgba(233, 213, 255, 0.62);
+  background: #040a07 !important;
+  color: rgba(175, 249, 201, 0.62);
 }
 
 body.pm2-active footer .footer-col b,
@@ -189,7 +209,7 @@ body.pm2-active footer .subscribe > b {
 }
 
 body.pm2-active footer .footer-col a {
-  color: rgba(233, 213, 255, 0.62);
+  color: rgba(175, 249, 201, 0.62);
 }
 
 body.pm2-active footer .footer-col a:hover {
@@ -202,17 +222,27 @@ body.pm2-active footer .footer-col a:after {
 
 body.pm2-active footer .subscribe input {
   color: #fff;
-  border-bottom-color: rgba(233, 213, 255, 0.28);
+  border-bottom-color: rgba(175, 249, 201, 0.28);
 }
 
 body.pm2-active footer .subscribe input::placeholder {
-  color: rgba(233, 213, 255, 0.4);
+  color: rgba(175, 249, 201, 0.4);
 }
 
 body.pm2-active footer .subscribe label:focus-within input {
-  border-bottom-color: #a855f7;
+  border-bottom-color: #7cf0bd;
 }
 
 body.pm2-active footer .logo-wordmark {
   color: #fff !important;
+}
+
+/* The legal row inherits the dark surface too: keep the policy label bright
+   and the copyright line dimmed in the same mint ramp as the link copy. */
+body.pm2-active footer .footer-legal {
+  color: rgba(175, 249, 201, 0.5);
+}
+
+body.pm2-active footer .footer-legal b {
+  color: #fff;
 }

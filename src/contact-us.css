@@ -939,9 +939,7 @@ body.cu-active .header-contact .logo-link{
   -webkit-backdrop-filter:blur(18px);
   backdrop-filter:blur(18px);
 }
-body.cu-active .header-contact .logo-wordmark,
-body.cu-active .header-contact .logo-wordmark b,
-body.cu-active .header-contact .logo-wordmark em{color:#fff!important}
+body.cu-active .header-contact .logo-lockup-img{height:24px}
 body.cu-active .header-contact .header-actions{
   gap:.45rem;
   padding:.3rem;
@@ -1015,7 +1013,7 @@ body.cu-active .header-contact .header-actions>.pill{
 }
 
 @media(max-width:440px){
-  body.cu-active .header-contact .logo-wordmark{display:none!important}
+  body.cu-active .header-contact .logo-lockup-img{height:20px}
   body.cu-active .header-contact .logo-link{padding:.35rem}
 }
 

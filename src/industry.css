@@ -124,6 +124,10 @@
   margin: 0 clamp(0.75rem, 2vw, 1.25rem) clamp(0.75rem, 2vw, 1.25rem);
   border-radius: 1.75rem;
   overflow: hidden;
+  /* clip-path lives in local space, so the rounded clip follows the entrance
+     transform — overflow+border-radius alone lets the accelerated video
+     escape the corner clip mid-animation (corners render sharp). */
+  clip-path: inset(0 round 1.75rem);
   background: #111;
   transform: translateY(40px) scale(0.98);
   opacity: 0;
@@ -646,14 +650,21 @@ html[data-theme="dark"] .ind-clients-testimonial {
   cursor: pointer;
   transition: color 0.35s ease, opacity 0.35s ease, transform 0.35s ease;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html[data-theme="dark"] .ind-clients-item {
   color: #fff;
 }
 
-/* Dim items on list hover */
-.ind-clients-list:hover .ind-clients-item {
+/* Dim the other names while one is hovered or tapped */
+@media (hover: hover) {
+  .ind-clients-list:hover .ind-clients-item {
+    opacity: 0.3;
+  }
+}
+
+.ind-clients-list.has-active .ind-clients-item:not(.is-active) {
   opacity: 0.3;
 }
 
@@ -980,22 +991,45 @@ html[data-theme="dark"] .ind-hero-shell {
   }
 
   .ind-hero-head {
-    padding: 5.5rem 1.1rem 1rem;
+    padding: 4.5rem 1.1rem 1rem;
   }
 
   .ind-h1 {
     max-width: none;
+    /* mobile font-size lives in eloqwnt-fidelity.css (its global rule is !important) */
+  }
+
+  .ind-hero-tag {
+    font-size: 0.85rem;
+  }
+
+  .ind-hero-cta .pill {
+    min-height: 2.3rem !important;
+    padding: 0.4rem 0.5rem 0.4rem 0.95rem !important;
+    gap: 0.4rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .ind-hero-cta .pill-icon-shell {
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+  }
+
+  .ind-hero-cta .pill-icon-shell .pill-icon {
+    width: 0.8rem !important;
+    height: 0.8rem !important;
   }
 
   .ind-video-wrap {
     margin: 0 0.75rem 0.75rem;
     border-radius: 1.1rem;
-    min-height: 14rem;
+    clip-path: inset(0 round 1.1rem);
+    min-height: 16.5rem;
   }
 
   .ind-video,
   .ind-video-fallback {
-    min-height: 14rem;
+    min-height: 16.5rem;
   }
 
   .ind-section-head-row {
@@ -1035,67 +1069,83 @@ html[data-theme="dark"] .ind-hero-shell {
 
   .ind-clients-sec {
     min-height: auto;
-    padding: 4rem 0;
+    padding: 56px 0;
   }
 
   .ind-clients-container {
     position: relative;
   }
 
+  /* The watermark collides with the copy at this size */
   .ind-clients-bg-text {
-    font-size: clamp(3.5rem, 10vw, 6rem);
-    transform: translate(-50%, -45%) scale(0.96);
-  }
-
-  .ind-clients-bg-text.is-visible {
-    transform: translate(-50%, -50%) scale(1);
+    display: none;
   }
 
   .ind-clients-grid {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
+    gap: 0;
     text-align: center;
   }
 
+  /* Split the left column so the label can sit above the list while the
+     testimonial slots in below it */
   .ind-clients-left {
-    order: 2;
-    align-items: center;
-    min-height: auto;
+    display: contents;
+  }
+
+  .ind-clients-left .ind-dot-label {
+    order: 0;
+    justify-self: center;
+    margin-bottom: 20px;
   }
 
   .ind-clients-testimonial-wrap {
-    margin-top: 1rem;
+    order: 2;
+    margin: 20px auto 0;
     display: flex;
     justify-content: center;
   }
 
+  /* px-based type: the site scales the root font-size up on phones, which is
+     exactly what made the rem-based names oversized here */
   .ind-clients-testimonial {
-    font-size: 1.1rem;
-    max-width: 45ch;
+    font-size: clamp(15px, 4vw, 17px);
+    line-height: 1.5;
+    max-width: 46ch;
   }
 
   .ind-clients-center {
     order: 1;
   }
 
+  .ind-clients-list {
+    gap: 8px;
+  }
+
   .ind-clients-item {
-    font-size: clamp(1.8rem, 6vw, 2.5rem);
+    font-size: clamp(20px, 5.5vw, 27px);
   }
 
   .ind-clients-right {
     order: 3;
     justify-content: center;
     min-height: auto;
+    margin-top: 16px;
   }
 
   .ind-clients-thumbnail-wrap {
-    max-width: 200px;
+    max-width: 180px;
     margin: 0 auto;
-    transform: translateY(15px) scale(0.96);
+    transform: translateY(12px) scale(0.96);
   }
 
   .ind-clients-thumbnail-wrap.is-visible {
     transform: none;
+  }
+
+  /* Industries without client imagery skip the reserved image box */
+  .ind-clients-thumbnail-wrap:not(.is-visible) {
+    display: none;
   }
 
   .ind-who-grid {
@@ -1166,7 +1216,7 @@ html[data-theme="dark"] .ind-hero-shell {
   .ind-exp-item .ind-exp-title {
     font-size: 1.5rem;
     letter-spacing: -0.035em;
-    transform: none;
+    /* no transform reset: the scroll-driven focus scale runs on mobile too */
   }
 
   .ind-exp-desc {
@@ -1174,8 +1224,7 @@ html[data-theme="dark"] .ind-hero-shell {
     max-width: 30ch;
     font-size: 1rem;
     line-height: 1.35;
-    opacity: 1;
-    transform: none;
+    /* opacity/transform stay var-driven for the mobile focus effect */
   }
 }
 

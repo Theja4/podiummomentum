@@ -1,0 +1,212 @@
+/* Enterprise sharpness pass
+   -------------------------
+   Content surfaces should read as solid, precisely edged UI. Atmospheric
+   softness is reserved for decorative backgrounds, never text-bearing cards,
+   navigation, controls, or reveal motion. */
+
+:root {
+  --pm-sharp-surface: #fbfdfc;
+  --pm-sharp-surface-strong: #ffffff;
+  --pm-sharp-line: rgba(7, 17, 11, 0.14);
+  --pm-sharp-line-soft: rgba(7, 17, 11, 0.09);
+  --pm-sharp-shadow: 0 10px 28px -22px rgba(8, 30, 18, 0.28);
+}
+
+/* Navigation: retain the floating silhouette, but use a dependable opaque
+   surface instead of layering large backdrop blurs over page content. */
+.header .header-inner,
+.header.header-scrolled .header-inner,
+html body.pm2-active #root .header .header-inner {
+  background: var(--pm-sharp-surface) !important;
+  border-color: var(--pm-sharp-line) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow:
+    var(--pm-sharp-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
+}
+
+.header .header-inner::before,
+.header .header-inner::after {
+  display: none !important;
+}
+
+.header .nav-dropdown-panel-card,
+html body.pm2-active #root .header .nav-dropdown-panel-card {
+  background: var(--pm-sharp-surface-strong) !important;
+  border-color: var(--pm-sharp-line) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 18px 42px -28px rgba(7, 25, 15, 0.34) !important;
+}
+
+.header .nav-dropdown-panel-card::before,
+.header .nav-dropdown-panel-card::after {
+  display: none !important;
+}
+
+html[data-theme='dark'] .header .header-inner,
+html[data-theme='dark'] .header.header-scrolled .header-inner {
+  background: #080d0a !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 10px 28px -20px rgba(0, 0, 0, 0.72) !important;
+}
+
+html[data-theme='dark'] .header .nav-dropdown-panel-card {
+  background: #0b110d !important;
+  border-color: rgba(255, 255, 255, 0.13) !important;
+  box-shadow: 0 18px 42px -24px rgba(0, 0, 0, 0.78) !important;
+}
+
+/* Route-level bars and text-bearing media labels. */
+.svc-topbar,
+.cu-nav {
+  background: rgba(255, 255, 255, 0.97) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.svc-page.is-detail .svc-work-strip-scroll .svc-featured-media::after,
+.ind-project-card [class*='tag'],
+.ind-project-card [class*='label'] {
+  background: #d6f7e4 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Reveal motion must never blur content. This important declaration also
+   wins over legacy keyframes while keeping their opacity/position motion. */
+[data-reveal],
+[data-reveal] *,
+.reveal,
+.reveal * {
+  filter: none !important;
+}
+
+/* Cards get a fine edge and compact elevation instead of a large soft halo. */
+.svc-featured-card,
+.svc-page.is-detail .svc-stats-grid article,
+.svc-page.is-detail .svc-cap-list li,
+.svc-testimonial-track article,
+.svc-related-grid article {
+  border: 1px solid var(--pm-sharp-line-soft);
+  box-shadow: var(--pm-sharp-shadow);
+}
+
+.pm2-carousel-card {
+  filter: none !important;
+}
+
+@media (max-width: 900px) {
+  /* Mobile GPUs are especially prone to softening text behind backdrop-filter.
+     Keep every interactive surface fully composited from solid colors. */
+  .header *,
+  .svc-page *,
+  .cu-page *,
+  .ind-page *,
+  .pm2 * {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .header .header-inner,
+  html body.pm2-active #root .header .header-inner {
+    background: #fbfdfc !important;
+    border: 1px solid rgba(7, 17, 11, 0.16) !important;
+    box-shadow: 0 8px 20px -16px rgba(8, 30, 18, 0.32) !important;
+  }
+
+  .header .menu {
+    background: #ffffff !important;
+    border-color: rgba(7, 17, 11, 0.16) !important;
+    box-shadow: none !important;
+  }
+
+  .header .nav.open,
+  html body.pm2-active #root .header .nav.open {
+    background: #fbfdfc !important;
+    border: 1px solid rgba(7, 17, 11, 0.16) !important;
+    box-shadow: 0 16px 34px -22px rgba(7, 25, 15, 0.42) !important;
+  }
+
+  .header .nav.open::before {
+    background: rgba(5, 12, 8, 0.14) !important;
+  }
+
+  .header .nav-dropdown-panel {
+    background: #f1f5f2 !important;
+    border-color: rgba(7, 17, 11, 0.11) !important;
+    box-shadow: none !important;
+  }
+
+  html[data-theme='dark'] .header .header-inner,
+  html[data-theme='dark'] .header .nav.open {
+    background: #080d0a !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-panel {
+    background: #101712 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Mobile service cards use flat, opaque surfaces. The JS motion layer also
+     removes rotateY/depth so live type is never rasterized on an angled plane. */
+  .pm2-carousel-card {
+    will-change: auto;
+    transform-style: flat;
+    box-shadow:
+      0 10px 26px -20px rgba(8, 19, 13, 0.38),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  }
+
+  .pm2-carousel-card-bg img,
+  .pm2-carousel-card.is-live:not(:hover) .pm2-carousel-card-bg img,
+  .pm2-carousel-card:hover .pm2-carousel-card-bg img {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+    transform: scale(1.015) !important;
+    will-change: auto;
+  }
+
+  .pm2-carousel-card-explore,
+  .pm2-agent-industries,
+  .pm2-agent-live,
+  .pm2-agent-wave,
+  .pm2-agent-bubble,
+  .pm2-agent-result,
+  .pm2-branding-video-frame {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .pm2-carousel-card-explore {
+    background: rgba(4, 10, 7, 0.82);
+  }
+
+  .pm2-agent-industries,
+  .pm2-agent-wave {
+    background: rgba(5, 7, 13, 0.94);
+  }
+
+  .pm2-agent-bubble,
+  .pm2-agent-result {
+    background: rgba(7, 11, 18, 0.94);
+  }
+
+  .pm2-branding-video-frame {
+    background: #ffffff;
+    border-color: rgba(22, 13, 34, 0.12);
+    box-shadow: 0 8px 22px -18px rgba(26, 14, 38, 0.42);
+  }
+
+  .svc-featured-card,
+  .svc-page.is-detail .svc-stats-grid article,
+  .svc-page.is-detail .svc-cap-list li,
+  .svc-testimonial-track article,
+  .svc-related-grid article {
+    box-shadow: 0 7px 20px -17px rgba(8, 30, 18, 0.3);
+  }
+}
+

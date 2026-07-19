@@ -12,7 +12,7 @@ export default function Sparkle({
   className = '',
   style,
   color = 'currentColor',
-  gradient = null, // [from, to] — diagonal violet gradient when set
+  gradient = null, // [from, to] — diagonal brand gradient when set
   stroke = null,
 }) {
   const id = useId()

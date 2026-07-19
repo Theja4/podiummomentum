@@ -3,12 +3,12 @@
 // inside a rAF loop; React state only tracks the active index (≤ 5 updates).
 import { useEffect, useRef, useState } from 'react'
 import { WORKS, WORK_RAIL } from './data.js'
+import TrailCursor from './TrailCursor.jsx'
 import {
   clamp,
   clamp01,
   easeOutCubic,
   getScroll,
-  lerp,
   reducedMotion,
   useProgress,
   useRafLoop,
@@ -17,15 +17,10 @@ import './work.css'
 
 // —— tunables ————————————————————————————————————————————————
 const BASE_VH = 100
-const VH_PER_CARD = 88
+const VH_PER_CARD = 100
 const SECTION_VH = BASE_VH + WORKS.length * VH_PER_CARD
 const SMOOTH = 0.12 // progress smoothing for the scrub
-const CARD_LERP = 0.14 // per-frame lerp for distance-based card styling
-const INACTIVE_SCALE = 0.93
-const INACTIVE_BRIGHTNESS = 0.62
-const INACTIVE_SATURATE = 0.8
-const ACTIVE_RADIUS = 0.55 // fraction of viewport width over which a card activates
-const PARALLAX = 24 // px of counter-translate on card images
+const PARALLAX = 12 // px of counter-translate; restrained to keep screenshots crisp
 const WORD_SPEED = 0.35 // counter-scroll speed of the giant outline word
 const pad2 = n => String(n).padStart(2, '0')
 
@@ -35,11 +30,12 @@ export default function WorkRail({ navigate }) {
   const trackRef = useRef(null)
   const wordRef = useRef(null)
   const cardsRef = useRef([])
-  const innersRef = useRef([])
   const imgsRef = useRef([])
-  const animRef = useRef([]) // per-card lerped { s, b, sa }
   const activeRef = useRef(0)
   const [active, setActive] = useState(0)
+  // "View" chip that replaces the cursor while a card is hovered (TrailCursor).
+  const moveRef = useRef({ x: 0, y: 0 })
+  const [hovering, setHovering] = useState(false)
 
   // Simple mode: native overflow-x snap row instead of the pinned scrub.
   const [simple, setSimple] = useState(
@@ -63,14 +59,18 @@ export default function WorkRail({ navigate }) {
   const progress = useProgress(sectionRef, { mode: 'sticky', smooth: SMOOTH })
 
   // —— scrub loop (desktop only) ————————————————————————————————
+  const xPrevRef = useRef(0)
+  const cardResetRef = useRef(false)
   useRafLoop(() => {
     if (simple) return
     const stage = stageRef.current
     const track = trackRef.current
     if (!stage || !track) return
+
+    // —— reads: every layout query happens before any style write, so the
+    // loop never forces a mid-frame reflow. ——
     const vw = stage.clientWidth || 1
     const p = progress.current
-
     // Measure the track every frame — never hardcode travel distance.
     const maxX = Math.max(0, track.offsetWidth - vw)
     // Exit continuation: once the rail unpins, keep drifting the cards left
@@ -79,18 +79,18 @@ export default function WorkRail({ navigate }) {
     const { vh } = getScroll()
     const sr = sectionRef.current.getBoundingClientRect()
     const exit = clamp01((vh - sr.bottom) / vh)
-    const x = -(p * maxX + easeOutCubic(exit) * 0.35 * vw)
-    track.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`
-
-    // Giant outline word drifts the opposite way, slower.
-    const word = wordRef.current
-    if (word) word.style.transform = `translate3d(${(-x * WORD_SPEED).toFixed(2)}px, -50%, 0)`
-
-    // One rect for the track; card centers are derived from offsets.
-    const trackLeft = track.getBoundingClientRect().left
+    // The track rect still carries LAST frame's transform; subtracting the
+    // previous x recovers the untransformed left edge without a post-write
+    // rect read (which forced a reflow every frame).
+    const baseLeft = track.getBoundingClientRect().left - xPrevRef.current
+    // Whole-pixel rail movement keeps the tag-pill type crisp while the
+    // active card is resting in the viewport.
+    const x = Math.round(-(p * maxX + easeOutCubic(exit) * 0.35 * vw))
+    const trackLeft = baseLeft + x
     const mid = vw / 2
     let best = 0
     let bestDist = Infinity
+    const imgX = []
     for (let i = 0; i < WORKS.length; i += 1) {
       const card = cardsRef.current[i]
       if (!card) continue
@@ -101,28 +101,27 @@ export default function WorkRail({ navigate }) {
         bestDist = dist
         best = i
       }
-      const t = clamp01(1 - dist / ACTIVE_RADIUS)
-      const a =
-        animRef.current[i] ||
-        (animRef.current[i] = {
-          s: INACTIVE_SCALE,
-          b: INACTIVE_BRIGHTNESS,
-          sa: INACTIVE_SATURATE,
-        })
-      a.s = lerp(a.s, lerp(INACTIVE_SCALE, 1, t), CARD_LERP)
-      a.b = lerp(a.b, lerp(INACTIVE_BRIGHTNESS, 1, t), CARD_LERP)
-      a.sa = lerp(a.sa, lerp(INACTIVE_SATURATE, 1, t), CARD_LERP)
-      card.style.transform = `translate3d(0, 0, 0) scale(${a.s.toFixed(4)})`
-      const inner = innersRef.current[i]
-      if (inner)
-        inner.style.filter = `brightness(${a.b.toFixed(3)}) saturate(${a.sa.toFixed(3)})`
       // Inner parallax: image drifts opposite the card's viewport position.
-      const img = imgsRef.current[i]
-      if (img)
-        img.style.transform = `translate3d(${(-clamp(rel, -1, 1) * PARALLAX).toFixed(
-          2,
-        )}px, 0, 0) scale(1.06)`
+      imgX[i] = Math.round(-clamp(rel, -1, 1) * PARALLAX)
     }
+
+    // —— writes ——
+    xPrevRef.current = x
+    track.style.transform = `translate3d(${x}px, 0, 0)`
+    // Giant outline word drifts the opposite way, slower.
+    const word = wordRef.current
+    if (word) word.style.transform = `translate3d(${Math.round(-x * WORD_SPEED)}px, -50%, 0)`
+    for (let i = 0; i < WORKS.length; i += 1) {
+      const card = cardsRef.current[i]
+      if (!card) continue
+      // Keep the complete card, including its bottom tag pills, at native
+      // scale with no parent filter so its type remains sharply rasterized.
+      // (One-shot: rewriting 'none' every frame churns style for nothing.)
+      if (!cardResetRef.current) card.style.transform = 'none'
+      const img = imgsRef.current[i]
+      if (img) img.style.transform = `translate3d(${imgX[i]}px, 0, 0) scale(1.03)`
+    }
+    cardResetRef.current = true
     if (best !== activeRef.current) {
       activeRef.current = best
       setActive(best)
@@ -132,11 +131,12 @@ export default function WorkRail({ navigate }) {
   // Clear inline styles when dropping into simple mode.
   useEffect(() => {
     if (!simple) return
+    xPrevRef.current = 0
+    cardResetRef.current = false
     const els = [
       trackRef.current,
       wordRef.current,
       ...cardsRef.current,
-      ...innersRef.current,
       ...imgsRef.current,
     ]
     els.forEach(el => {
@@ -213,26 +213,53 @@ export default function WorkRail({ navigate }) {
                 e.preventDefault()
                 navigate?.(work.href)
               }}
+              onMouseEnter={e => {
+                moveRef.current.x = e.clientX
+                moveRef.current.y = e.clientY
+                setHovering(true)
+              }}
+              onMouseLeave={() => setHovering(false)}
+              onMouseMove={e => {
+                moveRef.current.x = e.clientX
+                moveRef.current.y = e.clientY
+              }}
             >
-              <div className="pm2-work__cardInner" ref={el => (innersRef.current[i] = el)}>
-                <img
-                  className="pm2-work__cardImg"
-                  src={work.image}
-                  alt={`${work.name} — ${work.meta}`}
-                  loading="lazy"
-                  decoding="async"
-                  draggable="false"
-                  ref={el => (imgsRef.current[i] = el)}
-                />
-                <div className="pm2-work__shade" aria-hidden="true" />
-                <div className="pm2-work__meta">{work.meta}</div>
+              <div className="pm2-work__cardInner">
+                <div className="pm2-work__cardHead">
+                  <span className="pm2-work__sector">{work.sector}</span>
+                  <span className="pm2-work__index">{pad2(i + 1)}</span>
+                </div>
                 <h3 className="pm2-work__name">{work.name}</h3>
-                <span className="pm2-work__result">{work.result}</span>
+                <div
+                  className={`pm2-work__frame${work.inset ? ' pm2-work__frame--inset' : ''}`}
+                  style={{ background: work.frame }}
+                >
+                  <span className="pm2-work__shot">
+                    <img
+                      className="pm2-work__cardImg"
+                      src={work.image}
+                      alt={`${work.name} — ${work.meta}`}
+                      loading="lazy"
+                      decoding="async"
+                      draggable="false"
+                      ref={el => (imgsRef.current[i] = el)}
+                    />
+                  </span>
+                </div>
+                <div className="pm2-work__tags">
+                  {work.tags.map(tag => (
+                    <span className="pm2-work__tag" key={tag}>
+                      {tag}
+                    </span>
+                  ))}
+                  <span className="pm2-work__tag pm2-work__tag--result">{work.result}</span>
+                </div>
               </div>
             </a>
           ))}
         </div>
       </div>
+      <TrailCursor label="View" show={hovering && !simple} moveRef={moveRef} />
     </section>
   )
 }

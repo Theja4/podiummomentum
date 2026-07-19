@@ -1,5 +1,5 @@
 // Finale — the closing CTA (reference frame f_067): a light page band holding
-// a violet radial panel with the big chrome star on the right. The panel
+// an emerald radial panel with the big chrome star on the right. The panel
 // enters with a scrubbed clip-path + rise, and the star grows via scaleRef
 // driven by the panel's enter progress.
 import { useEffect, useRef } from 'react'
@@ -69,7 +69,7 @@ export default function Finale({ navigate }) {
           className="pm2-finale-watermark"
           size={460}
           color="none"
-          stroke="#e9d5ff"
+          stroke="#aff9c9"
         />
         <div className="pm2-finale-grid">
           <div className="pm2-finale-copy">

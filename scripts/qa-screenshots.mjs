@@ -23,8 +23,11 @@ page.on('console', m => {
 })
 page.on('pageerror', e => errors.push(`[pageerror] ${e.message}`))
 
-await page.goto(url, { waitUntil: 'networkidle0', timeout: 45000 })
-await new Promise(r => setTimeout(r, 2200))
+// 'load', not 'networkidle0': the hero's looping video + HMR socket keep the
+// network busy forever
+await page.goto(url, { waitUntil: 'load', timeout: 45000 })
+await page.evaluate(() => document.fonts.ready)
+await new Promise(r => setTimeout(r, 2600))
 
 const max = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)
 const stops = [0, 0.06, 0.12, 0.2, 0.28, 0.36, 0.44, 0.52, 0.6, 0.68, 0.76, 0.84, 0.92, 1]

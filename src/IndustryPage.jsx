@@ -201,7 +201,9 @@ export default function IndustryPage({ slug, navigate }) {
       revealFrame = requestAnimationFrame(() => setHeroIn(true))
     })
     window.scrollTo(0, 0)
-    setHoveredIdx(null)
+    // Touch devices have no hover, so the clients section starts with the
+    // first client selected and taps switch between them.
+    setHoveredIdx(window.matchMedia('(hover: none)').matches ? 0 : null)
     return () => {
       cancelAnimationFrame(resetFrame)
       if (revealFrame) cancelAnimationFrame(revealFrame)
@@ -216,7 +218,6 @@ export default function IndustryPage({ slug, navigate }) {
     if (!list) return undefined
 
     const rows = [...list.querySelectorAll('.ind-exp-item')]
-    const desktop = window.matchMedia('(min-width: 768px)')
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     let scrollFrame = 0
 
@@ -232,7 +233,7 @@ export default function IndustryPage({ slug, navigate }) {
     const updateFocus = () => {
       scrollFrame = 0
 
-      if (!desktop.matches || reducedMotion.matches) {
+      if (reducedMotion.matches) {
         rows.forEach(row => {
           row.classList.remove('is-focused')
           setFocus(row, 1, false)
@@ -266,14 +267,12 @@ export default function IndustryPage({ slug, navigate }) {
     updateFocus()
     window.addEventListener('scroll', requestFocusUpdate, { passive: true })
     window.addEventListener('resize', requestFocusUpdate)
-    desktop.addEventListener('change', requestFocusUpdate)
     reducedMotion.addEventListener('change', requestFocusUpdate)
 
     return () => {
       cancelAnimationFrame(scrollFrame)
       window.removeEventListener('scroll', requestFocusUpdate)
       window.removeEventListener('resize', requestFocusUpdate)
-      desktop.removeEventListener('change', requestFocusUpdate)
       reducedMotion.removeEventListener('change', requestFocusUpdate)
       rows.forEach(row => {
         row.style.removeProperty('--exp-title-scale')
@@ -503,14 +502,14 @@ export default function IndustryPage({ slug, navigate }) {
 
             {/* Center Column: List of client names */}
             <div className="ind-clients-center">
-              <ul className="ind-clients-list">
+              <ul className={`ind-clients-list ${hoveredIdx !== null ? 'has-active' : ''}`}>
                 {clientsData.map((client, idx) => (
                   <li
                     key={client.name}
                     className={`ind-clients-item ${hoveredIdx === idx ? 'is-active' : ''}`}
-                    onMouseEnter={() => setHoveredIdx(idx)}
-                    onMouseLeave={() => setHoveredIdx(null)}
-                    onClick={() => setHoveredIdx(hoveredIdx === idx ? null : idx)}
+                    onPointerEnter={e => { if (e.pointerType === 'mouse') setHoveredIdx(idx) }}
+                    onPointerLeave={e => { if (e.pointerType === 'mouse') setHoveredIdx(null) }}
+                    onClick={() => setHoveredIdx(idx)}
                   >
                     {client.name}
                   </li>

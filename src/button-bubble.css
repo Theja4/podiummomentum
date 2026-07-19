@@ -1,0 +1,238 @@
+/*
+ * Cursor-tracking radial fill for button-shaped controls.
+ *
+ * Inspired by a reference animation: a contrasting disc appears at the pointer
+ * entry point, expands to flood the button with the brand hover color, and
+ * collapses back through the pointer exit point. The button's own shape and
+ * the Podium mint/forest/ink color contract are unchanged — the disc simply
+ * paints the same hover color the solid background swap used to apply.
+ *
+ * Everything here is gated behind `html.pm-bubble-fx`, which buttonBubble.js
+ * adds only for fine-pointer, full-motion environments. Touch devices and
+ * reduced-motion users keep the previous static hover states untouched.
+ *
+ * This file is intentionally imported last in main.jsx so its rules win the
+ * cascade against button-system.css (same `!important` + higher specificity
+ * via the extra `html.pm-bubble-fx` class).
+ */
+
+/* —— the expanding disc ——————————————————————————————— */
+
+html.pm-bubble-fx .pm-bubble {
+  position: absolute;
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--pm-bubble-bg, var(--pm-btn-forest));
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+html.pm-bubble-fx .pm-bubble-in > .pm-bubble {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.pm-bubble-fx .pm-bubble {
+    transition: none;
+  }
+}
+
+/* —— geometry: every target clips the disc to its own shape ———————————— */
+
+html.pm-bubble-fx :is(
+  .pm2-pill,
+  .cu-brief-submit,
+  .mobile-nav-cta,
+  .menu,
+  .subscribe-action,
+  .to-top,
+  .elo-footer-bottom > a,
+  .pm2-carousel-nav button,
+  .svc-rail-controls button,
+  .track-control button,
+  .svc-slider-controls button,
+  .svc-pill-link,
+  .svc-all-projects a,
+  .choices button,
+  .tcx-btn,
+  .elo-contact-form button
+) {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate;
+}
+
+/* Labels/icons must sit above the disc. `.pill` already pins its label and
+   icon shell at z-index 2 in button-system.css; these are the remaining
+   content shapes. The subscribe spinner ring keeps its own absolute z-index
+   and is deliberately not matched here. */
+html.pm-bubble-fx :is(.cu-brief-submit, .mobile-nav-cta) > span:not(.pm-bubble),
+html.pm-bubble-fx .pm2-pill > *:not(.pm-bubble),
+html.pm-bubble-fx :is(
+  .pm2-carousel-nav button,
+  .svc-rail-controls button,
+  .track-control button,
+  .svc-slider-controls button
+) > *:not(.pm-bubble),
+html.pm-bubble-fx .subscribe-action > svg,
+html.pm-bubble-fx .pm-bubble-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* JS wraps bare text nodes (e.g. "Let's chat", "↑", service titles) so they
+   can layer above the disc; mirror the host's inline-flex centering. */
+html.pm-bubble-fx .pm-bubble-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: inherit;
+  min-width: 0;
+  line-height: inherit;
+}
+
+/* The subscribe ring lives outside the button edge (inset: -7px), so the
+   disc clipping is released while the submit/success ring is visible. */
+html.pm-bubble-fx .subscribe.is-submitting .subscribe-action,
+html.pm-bubble-fx .subscribe.is-success .subscribe-action {
+  overflow: visible !important;
+}
+
+html.pm-bubble-fx .subscribe.is-submitting .subscribe-action .pm-bubble,
+html.pm-bubble-fx .subscribe.is-success .subscribe-action .pm-bubble {
+  display: none;
+}
+
+/* —— per-family disc colors (the exact color each hover used to apply) —— */
+
+/* Primary CTAs: mint surface → forest disc, label turns white (existing rule). */
+html.pm-bubble-fx :is(
+  .pill-light,
+  .pm-case-cta,
+  .cu-nav-cta,
+  .cu-btn,
+  .submit,
+  .elo-contact-form button,
+  .tcx-btn,
+  .tcx-btn-white,
+  .mobile-nav-cta,
+  .subscribe-action,
+  .to-top,
+  .elo-footer-bottom > a,
+  .track-control button,
+  .svc-slider-controls button
+) {
+  --pm-bubble-bg: var(--pm-btn-forest);
+}
+
+/* Secondary pill: forest surface → mint disc, label turns ink. */
+html.pm-bubble-fx .pill-dark {
+  --pm-bubble-bg: var(--pm-btn-mint);
+}
+
+/* Soft celadon controls: mint disc (their hover used the mint swap). */
+html.pm-bubble-fx .menu,
+html.pm-bubble-fx .pm2-pill--white,
+html.pm-bubble-fx .pm2-pill--ghost,
+html.pm-bubble-fx .pm2-carousel-nav button,
+html.pm-bubble-fx .svc-rail-controls button {
+  --pm-bubble-bg: var(--pm-btn-mint);
+}
+
+/* Soft pills (service nav / choice chips): forest disc. */
+html.pm-bubble-fx :is(.svc-pill-link, .svc-all-projects a, .choices button) {
+  --pm-bubble-bg: var(--pm-btn-forest);
+}
+
+/* Landing solid pill: ink surface → v-core disc (its documented hover color). */
+html.pm-bubble-fx .pm2-pill--solid {
+  --pm-bubble-bg: var(--v-core, #2fbf7f);
+}
+
+/* Brief submit: off-white surface → aqua disc (its documented hover color). */
+html.pm-bubble-fx .cu-brief-submit {
+  --pm-bubble-bg: var(--pm-btn-aqua);
+}
+
+/* Landing header CTA: the design pins this pill to black → v-core green
+   (hero.css), so it gets its own disc color instead of the mint contract. */
+html.pm-bubble-fx body.pm2-active #root .header .header-actions > .pill {
+  --pm-bubble-bg: #2fbf7f;
+}
+
+/* —— neutralize the old solid background swaps ————————————————————————
+   The disc now paints the hover color; the host surface must keep its
+   resting color on :hover or it would cover the disc. Selectors extend the
+   button-system "final authority" rules with the extra html class so these
+   win at equal !important weight. */
+
+html.pm-bubble-fx[data-theme] body #root :is(
+  .pill-light,
+  .pm-case-cta,
+  .cu-nav-cta,
+  .cu-btn,
+  .submit,
+  .elo-contact-form button,
+  .tcx-btn,
+  .tcx-btn-white,
+  .subscribe-action,
+  .to-top,
+  .elo-footer-bottom > a,
+  .track-control button,
+  .svc-slider-controls button
+):hover {
+  background: var(--pm-control-primary-bg) !important;
+}
+
+html.pm-bubble-fx[data-theme] body #root .pill-dark:hover {
+  background: var(--pm-control-secondary-bg) !important;
+}
+
+html.pm-bubble-fx[data-theme] body #root .menu:hover {
+  background: var(--pm-control-soft-bg) !important;
+}
+
+html.pm-bubble-fx[data-theme] body #root :is(
+  .svc-pill-link,
+  .svc-all-projects a,
+  .choices button
+):hover {
+  background: var(--pm-control-soft-bg) !important;
+}
+
+/* Landing + contact sheets use plain specificity; these load after them. */
+html.pm-bubble-fx .pm2-pill--solid:hover {
+  background: var(--v-ink, #08130d);
+}
+
+html.pm-bubble-fx .pm2-pill--ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--pm-btn-ink, #06120b);
+}
+
+html.pm-bubble-fx .pm2-carousel-nav button:hover {
+  color: var(--v-ink, #08130d);
+}
+
+html.pm-bubble-fx .svc-rail-controls button:hover {
+  background: #fff;
+}
+
+html.pm-bubble-fx .cu-brief-submit:hover:not(:disabled) {
+  background: #f7f8fb;
+}
+
+/* Landing header CTA keeps its black surface; the v-core disc does the work. */
+html.pm-bubble-fx body.pm2-active #root .header .header-actions > .pill:hover {
+  background: #08130d !important;
+}
+
+/* Mobile nav CTA has no prior hover state; its forest disc needs a light label. */
+html.pm-bubble-fx .header .mobile-nav-cta:hover {
+  color: #fff !important;
+}

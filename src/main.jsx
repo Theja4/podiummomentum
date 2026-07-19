@@ -20,6 +20,12 @@ import './header-polish.css'
 import './button-system.css'
 import './solution-section.css'
 import './section-card-motion.css'
+import './button-bubble.css'
+import './footer-redesign.css'
+import './enterprise-sharpness.css'
+import { installButtonBubble } from './buttonBubble.js'
+
+installButtonBubble()
 
 const A = '/assets/'
 const BRAND = 'Podium Momentum'
@@ -141,12 +147,10 @@ const compareRows = [
   ['B2B industry expertise', 'B2B-first thinking tailored to evaluation-led buying.', 'Generalist exposure where B2B is one of many.'],
 ]
 
-function Logo({ variant = 'header' }) {
+function Logo({ variant = 'header', tone = 'light' }) {
   if (variant === 'mark') return <img className="logo-mark" src={`${A}brand-mark.svg`} alt={BRAND} />
-  return <span className={`logo-lockup logo-${variant}`} aria-label={BRAND}>
-    <img className="logo-lockup-mark" src={`${A}brand-mark.svg`} alt="" />
-    <span className="logo-wordmark"><b>podium</b><em>momentum</em></span>
-  </span>
+  const src = tone === 'dark' ? `${A}brand-lockup-dark.png` : `${A}brand-lockup.png`
+  return <img className={`logo-lockup logo-lockup-img logo-${variant}`} src={src} alt={BRAND} />
 }
 
 function Button({ children, light = false, href = '#' }) {
@@ -210,7 +214,9 @@ function Header({ industryPage = false, contactPage = false }) {
           setHidden(false)
         } else if (delta > 0) {
           directionDistance = directionDistance < 0 ? delta : directionDistance + delta
-          if (directionDistance > 8) setHidden(true)
+          // the landing's floating pill stays put — mid-hide reads as clipping
+          // over the full-bleed panels (especially on phones)
+          if (directionDistance > 8 && !document.body.classList.contains('pm2-active')) setHidden(true)
         } else if (delta < 0) {
           directionDistance = directionDistance > 0 ? delta : directionDistance + delta
           if (directionDistance < -8) setHidden(false)
@@ -363,7 +369,7 @@ function Header({ industryPage = false, contactPage = false }) {
 
   return <header className={`header ${industryPage ? 'header-industry' : ''} ${industryHeroActive ? 'header-industry-hero' : ''} ${contactPage ? 'header-contact' : ''} ${hidden ? 'header-hidden' : ''} ${scrolled ? 'header-scrolled' : ''}`} style={industryHeroActive && industryHeroBounds ? industryHeroBounds : undefined}>
     <div className="header-inner">
-      <a href="/" className="logo-link" aria-label={BRAND} onClick={e => { e.preventDefault(); navigate('/'); setOpen(false); setSvcOpen(false); setIndOpen(false) }}><Logo /></a>
+      <a href="/" className="logo-link" aria-label={BRAND} onClick={e => { e.preventDefault(); navigate('/'); setOpen(false); setSvcOpen(false); setIndOpen(false) }}><Logo tone={contactPage ? 'dark' : 'light'} /></a>
       {!contactPage && (
       <nav id="primary-navigation" className={open ? 'nav open' : 'nav'}>
       <a href="/" onClick={e => { e.preventDefault(); navigate('/'); setOpen(false) }}>Home</a>
@@ -381,7 +387,11 @@ function Header({ industryPage = false, contactPage = false }) {
           className="nav-dropdown-trigger"
           aria-expanded={svcOpen}
           aria-haspopup="true"
-          onClick={() => { clearLeaveTimers(); setSvcOpen(v => !v); setIndOpen(false) }}
+          onClick={() => {
+            clearLeaveTimers()
+            setIndOpen(false)
+            setSvcOpen(v => window.innerWidth <= 900 ? !v : true)
+          }}
         >
           <span>Services</span>
           <span className="nav-dropdown-chevron" aria-hidden="true" />
@@ -433,7 +443,11 @@ function Header({ industryPage = false, contactPage = false }) {
           className="nav-dropdown-trigger"
           aria-expanded={indOpen}
           aria-haspopup="true"
-          onClick={() => { clearLeaveTimers(); setIndOpen(v => !v); setSvcOpen(false) }}
+          onClick={() => {
+            clearLeaveTimers()
+            setSvcOpen(false)
+            setIndOpen(v => window.innerWidth <= 900 ? !v : true)
+          }}
         >
           <span>Industries</span>
           <span className="nav-dropdown-chevron" aria-hidden="true" />
@@ -937,7 +951,7 @@ function Work() {
         {projects.map((p, i) => <ProjectCase project={p} index={i} key={p.title} />)}
       </div>
       <div className="pm-cases-foot" data-reveal="up">
-        <Button light href={CONTACT_PATH}>Start a project</Button>
+        <Button light href={CONTACT_PATH}>Book a call</Button>
       </div>
     </section>
   )
@@ -1032,6 +1046,11 @@ function Testimonials() {
 }
 
 function Footer() {
+  const path = usePathname()
+  // The landing closes on a dark full-bleed footer (body.pm2-active); every
+  // other route renders the footer as a white card, so the lockup must swap
+  // to the black-wordmark asset to stay visible.
+  const footerTone = path === '/' ? 'dark' : 'light'
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState('idle')
   const [newsletterMessage, setNewsletterMessage] = useState('')
@@ -1180,7 +1199,7 @@ function Footer() {
         </div>
       </form>
       <div className="footer-bottom">
-        <a href="/" onClick={goHomeTop} aria-label={BRAND}><Logo variant="footer" /></a>
+        <a href="/" onClick={goHomeTop} aria-label={BRAND}><Logo variant="footer" tone={footerTone} /></a>
         <a href="#top" className="to-top" onClick={goHomeTop} aria-label="Back to top">↑</a>
       </div>
     </footer>
@@ -1428,7 +1447,7 @@ function Compare() {
         <div className="tcx-cmp-table">
           <div className="tcx-cmp-label tcx-cmp-row-head" aria-hidden="true" />
           <div className="tcx-cmp-us tcx-cmp-row-head tcx-cmp-brand">
-            <span className="logo-wordmark"><b>podium</b><em>momentum</em></span>
+            <img className="tcx-cmp-brand-logo" src={`${A}brand-lockup.png`} alt={BRAND} />
           </div>
           <div className="tcx-cmp-them tcx-cmp-row-head tcx-cmp-them-title">Traditional agencies</div>
           {compareRows.map(([label, us, them]) => (

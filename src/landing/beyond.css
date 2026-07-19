@@ -41,8 +41,13 @@
   visibility: hidden;
 }
 
-/* black transition sparkle — starts orb-sized over the violet card, JS
-   scales it past the viewport diagonal (the waist swallows the page) */
+/* black transition sparkle — starts orb-sized over the brand card, JS
+   scales it past the viewport diagonal (the waist swallows the page).
+   No will-change here: a permanent hint pins the wipe to a composited
+   layer rasterized ONCE at its 42vmin layout size — the GPU then upscales
+   that texture through the bloom and the star's edges go soft. Without
+   the hint the rAF writes force a re-raster at each frame's scale, so
+   the concave waist stays razor sharp through the whole engulf. */
 .pm2-beyond-wipe {
   position: absolute;
   left: 50%;
@@ -52,7 +57,6 @@
   height: 42vmin;
   transform: translate(-50%, -50%) scale(0.001);
   transform-origin: 50% 50%;
-  will-change: transform, opacity;
 }
 
 .pm2-beyond-wipe-svg {
@@ -61,7 +65,7 @@
   height: 100%;
 }
 
-/* faint static violet glow on the black ground (canvas clears transparent);
+/* faint static emerald glow on the black ground (canvas clears transparent);
    JS fades it in only once the star nearly covers, so it never tints the
    carousel peeking around the star's concave edges */
 .pm2-beyond-glow {
@@ -74,8 +78,8 @@
   transform: translate(-50%, -50%);
   background: radial-gradient(
     closest-side,
-    rgba(124, 58, 237, 0.22),
-    rgba(124, 58, 237, 0.05) 55%,
+    rgba(47, 191, 127, 0.22),
+    rgba(47, 191, 127, 0.05) 55%,
     transparent 72%
   );
   pointer-events: none;
@@ -169,32 +173,81 @@
 }
 
 .pm2-beyond-word--a {
-  top: clamp(18px, 4.5vh, 44px);
+  /* clears the fixed pill header (~65px tall) even with the upward drift */
+  top: clamp(96px, 13vh, 140px);
   left: clamp(20px, 4vw, 64px);
   color: #fff;
 }
 
 .pm2-beyond-word--b {
-  right: clamp(20px, 4vw, 64px);
-  bottom: clamp(24px, 6vh, 60px);
-  color: rgba(233, 213, 255, 0.28);
+  right: max(clamp(20px, 4vw, 64px), calc(env(safe-area-inset-right) + 16px));
+  bottom: max(clamp(24px, 5vh, 56px), calc(env(safe-area-inset-bottom) + 18px));
+  color: rgba(201, 255, 220, 0.88);
+  font-weight: 650;
   text-align: right;
+  -webkit-text-stroke: 0.4px rgba(227, 252, 237, 0.22);
+  text-shadow:
+    0 2px 2px rgba(0, 0, 0, 0.55),
+    0 0 30px rgba(4, 10, 7, 0.95),
+    0 0 64px rgba(4, 10, 7, 0.85);
+  will-change: opacity;
+  isolation: isolate;
+}
+
+/* A local dark pool keeps the mint phrase readable when the particle field
+   is brightest without turning the corner into a visible card. */
+.pm2-beyond-word--b::before {
+  content: '';
+  position: absolute;
+  inset: -0.24em -0.14em -0.2em -0.34em;
+  z-index: -1;
+  background: radial-gradient(
+    92% 94% at 100% 100%,
+    rgba(4, 10, 7, 0.9) 0%,
+    rgba(4, 10, 7, 0.68) 48%,
+    rgba(4, 10, 7, 0) 78%
+  );
+  pointer-events: none;
 }
 
 .pm2-beyond-word-line {
   display: block;
+  transform-origin: 100% 50%;
   will-change: transform, opacity;
 }
 
 .pm2-beyond-copy {
   position: absolute;
-  left: clamp(20px, 4vw, 64px);
-  bottom: clamp(24px, 7vh, 68px);
-  max-width: 44ch;
-  font-size: 15px;
+  left: max(clamp(20px, 4vw, 64px), calc(env(safe-area-inset-left) + 16px));
+  bottom: max(clamp(24px, 5vh, 56px), calc(env(safe-area-inset-bottom) + 18px));
+  z-index: 1;
+  max-width: 45ch;
+  font-size: clamp(14.5px, 0.9vw, 17px);
   line-height: 1.55;
-  color: rgba(233, 213, 255, 0.62);
+  color: rgba(227, 252, 237, 0.92);
+  font-weight: 500;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 22px rgba(4, 10, 7, 0.98);
   will-change: transform, opacity;
+  isolation: isolate;
+}
+
+/* The copy needs its own contrast protection too: particles can pass directly
+   behind it at any aspect ratio, so a soft edge-to-edge fade is more robust
+   than relying on text colour alone. */
+.pm2-beyond-copy::before {
+  content: '';
+  position: absolute;
+  inset: -26px -34px;
+  z-index: -1;
+  background: radial-gradient(
+    110% 110% at 0% 100%,
+    rgba(4, 10, 7, 0.92) 0%,
+    rgba(4, 10, 7, 0.7) 48%,
+    rgba(4, 10, 7, 0) 78%
+  );
+  pointer-events: none;
 }
 
 .pm2-beyond-copy p {
@@ -213,33 +266,47 @@
   }
 
   .pm2-beyond-copy {
-    max-width: 40ch;
-    font-size: 14.5px;
+    max-width: 40vw;
+    font-size: clamp(13px, 2vw, 14.5px);
   }
 }
 
 @media (max-width: 600px) {
   .pm2-beyond-word {
-    font-size: clamp(64px, 17vw, 110px);
+    font-size: clamp(42px, 12.8vw, 64px);
   }
 
   .pm2-beyond-word--a {
-    top: 3.5vh;
+    top: 13vh; /* clears the floating mobile header even with the drift */
     left: 5vw;
   }
 
-  /* lifted clear of the paragraphs below */
+  /* Both lower blocks share the bottom edge and use opposite columns. This
+     keeps the phrase in its requested corner without colliding with copy. */
   .pm2-beyond-word--b {
-    right: 5vw;
-    bottom: 34vh;
+    right: max(5vw, calc(env(safe-area-inset-right) + 14px));
+    bottom: max(4vh, calc(env(safe-area-inset-bottom) + 16px));
+    max-width: 55vw;
   }
 
   .pm2-beyond-copy {
-    left: 5vw;
-    right: 5vw;
-    bottom: 6vh;
-    max-width: 34ch;
-    font-size: 14px;
+    left: max(5vw, calc(env(safe-area-inset-left) + 14px));
+    right: auto;
+    bottom: max(4vh, calc(env(safe-area-inset-bottom) + 16px));
+    width: 40vw;
+    max-width: 40vw;
+    font-size: clamp(12.5px, 3.35vw, 14px);
+    line-height: 1.5;
+  }
+
+  .pm2-beyond-copy::before {
+    inset: -22px -20px;
+    background: radial-gradient(
+      112% 112% at 0% 100%,
+      rgba(4, 10, 7, 0.95) 0%,
+      rgba(4, 10, 7, 0.74) 54%,
+      rgba(4, 10, 7, 0) 82%
+    );
   }
 
   .pm2-beyond-glow {

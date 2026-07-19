@@ -22,7 +22,7 @@ const rawIndustries = {
     path: '/industry/healthcare',
     h1: "Transforming Healthcare Through Design & Innovation",
     tagline: "Your trusted creative partner to design and build your healthcare brand.",
-    video: "https://eloqwntmain.ams3.cdn.digitaloceanspaces.com/Industries/healthcare-3_5fqxU9mh.mp4",
+    video: "/assets/industry-videos/healthcare.mp4",
     cover: "/assets/industries/healthcare.avif",
     approachTitle: "Here\u2019s our approach to every single healthcare project",
     steps: [
@@ -66,7 +66,7 @@ const rawIndustries = {
     path: '/industry/fintech',
     h1: "Fintech Design Agency That Aligns With Your Business Goals",
     tagline: "Your trusted fintech design agency.",
-    video: "https://eloqwntmain.ams3.cdn.digitaloceanspaces.com/Industries/fintech-2_7uG8sQWW.mp4",
+    video: "/assets/industry-videos/fintech.mp4",
     cover: "/assets/industries/fintech.avif",
     approachTitle: "Here\u2019s our approach to every single fintech project",
     steps: [
@@ -111,7 +111,7 @@ const rawIndustries = {
     path: '/industry/web3',
     h1: "Web3 Design Agency That Aligns With Your Business Goals",
     tagline: "Your trusted partner in building web3 solutions.",
-    video: "https://eloqwntmain.ams3.cdn.digitaloceanspaces.com/Industries/web3-3_DvuCK2Ce.mp4",
+    video: "/assets/industry-videos/web3.mp4",
     cover: "/assets/industries/web3.avif",
     approachTitle: "Here\u2019s our approach to handle web3 projects",
     steps: [
@@ -153,7 +153,7 @@ const rawIndustries = {
     path: '/industry/technology',
     h1: "Effective Creative Solutions For Tech Companies",
     tagline: "Your trusted partner in bringing tech to life.",
-    video: "https://eloqwntmain.ams3.cdn.digitaloceanspaces.com/Industries/technology-2_3g8tWUCX.mp4",
+    video: "/assets/industry-videos/technology.mp4",
     cover: "/assets/industries/technology.avif",
     approachTitle: "Here\u2019s our approach to handle technological projects",
     steps: [
@@ -196,7 +196,7 @@ const rawIndustries = {
     path: '/industry/corporate',
     h1: "Creative Agency For End-To-End Corporate Design Services",
     tagline: "Your trusted design partner to grow your business.",
-    video: "https://eloqwntmain.ams3.cdn.digitaloceanspaces.com/Industries/corporate-1_UkRHMO2W.mp4",
+    video: "/assets/industry-videos/corporate.mp4",
     cover: "/assets/industries/corporate.avif",
     approachTitle: "Here\u2019s our approach to handle projects",
     steps: [
@@ -238,7 +238,7 @@ const rawIndustries = {
     path: '/industry/ai',
     h1: "UX-First Design Agency for B2B And AI Companies",
     tagline: "Your trusted design partner in building AI solutions",
-    video: "https://eloqwntmain.ams3.cdn.digitaloceanspaces.com/Industries/ai-1_NEoqawDn.mp4",
+    video: "/assets/industry-videos/ai.mp4",
     cover: "/assets/industries/ai.avif",
     approachTitle: "Here\u2019s our approach to handle AI projects",
     steps: [
@@ -283,7 +283,7 @@ const rawIndustries = {
     path: '/industry/real-estate',
     h1: "Design Agency Focused On Digital Experiences For Real Estate Companies",
     tagline: "Your trusted design partner in building Real Estate projects",
-    video: "https://cdn.dribbble.com/userupload/15998316/file/original-69c29475c7b2d5548f00e63b0d844f01.mp4",
+    video: "/assets/industry-videos/real-estate.mp4",
     cover: "/assets/industries/real-estate.avif",
     approachTitle: "Here\u2019s our approach to handle real estate projects",
     steps: [
@@ -314,7 +314,7 @@ const rawIndustries = {
     path: '/industry/e-commerce',
     h1: "E-Commerce Design And Development Agency",
     tagline: "Your trusted partner in elevating your e-commerce brand to the next level.",
-    video: "https://eloqwntmain.ams3.cdn.digitaloceanspaces.com/Glowskin/home-2-1_vz3ODLGd.mp4",
+    video: "/assets/industry-videos/e-commerce.mp4",
     cover: "/assets/industries/e-commerce.avif",
     approachTitle: "Here\u2019s our approach to handle e-commerce projects",
     steps: [
@@ -349,7 +349,6 @@ const rawIndustries = {
     path: '/industry/fmcg',
     h1: "FMCG Creative Agency To Elevate Your Market Presence",
     tagline: "Your trusted design partner in FMCG & Retail Design",
-    video: "https://cdn.dribbble.com/userupload/17983598/file/original-17ee8fbbd5dd3901cd1afade2777578b.mp4",
     cover: "/assets/industries/fmcg.avif",
     approachTitle: "Here\u2019s our approach to handle FMCG and Retail projects",
     steps: [
@@ -379,7 +378,7 @@ const rawIndustries = {
     path: '/industry/hospitality',
     h1: "Global Hospitality Design And Branding Studio",
     tagline: "Your trusted partner in creating amazing guest experiences",
-    video: "https://eloqwntmain.ams3.cdn.digitaloceanspaces.com/InnRev/innrevshot.mp4",
+    video: "/assets/industry-videos/hospitality.mp4",
     cover: "/assets/industries/hospitality.avif",
     approachTitle: "Here\u2019s our approach to handle hospitality projects",
     steps: [

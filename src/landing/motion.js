@@ -23,20 +23,33 @@ export const reducedMotion = () =>
 
 // —— rAF loop ————————————————————————————————————————————————
 // useRafLoop((dt, now) => { ... }) — dt clamped to 50ms, runs until unmount.
+// All subscribers share ONE requestAnimationFrame pump: a dozen independent
+// rAF callbacks per frame cost scheduler overhead and, worse, interleave in
+// arbitrary order. A single pump runs them in mount order (progress/pointer
+// hooks before their component's write loop) with one shared timestamp.
+const rafSubs = new Set()
+let rafId = 0
+let rafLast = 0
+function rafPump(now) {
+  rafId = requestAnimationFrame(rafPump)
+  const dt = Math.min(50, now - rafLast)
+  rafLast = now
+  rafSubs.forEach(cb => cb(dt, now))
+}
 export function useRafLoop(callback) {
   const cbRef = useRef(callback)
   cbRef.current = callback
   useEffect(() => {
-    let raf = 0
-    let last = performance.now()
-    const tick = now => {
-      const dt = Math.min(50, now - last)
-      last = now
-      cbRef.current(dt, now)
-      raf = requestAnimationFrame(tick)
+    const cb = (dt, now) => cbRef.current(dt, now)
+    rafSubs.add(cb)
+    if (rafSubs.size === 1) {
+      rafLast = performance.now()
+      rafId = requestAnimationFrame(rafPump)
     }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    return () => {
+      rafSubs.delete(cb)
+      if (rafSubs.size === 0) cancelAnimationFrame(rafId)
+    }
   }, [])
 }
 

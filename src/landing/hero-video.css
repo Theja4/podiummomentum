@@ -1,0 +1,159 @@
+/* HeroVideo — card-face showreel styles: the inline preview fills the hero
+   card's own shape; the "View" chip replaces the cursor over it; the lightbox
+   uses crisp, high-contrast translucent surfaces. */
+
+/* —— card-face preview ——————————————————————————————— */
+.pm2-hero-video-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #08130d;
+  /* same inner slide/scale entrance the proof ledger played (hero.css) */
+  animation: pm2HeroCardImg 1.9s cubic-bezier(0.22, 0.8, 0.24, 1) 0.55s backwards;
+}
+
+.pm2-hero-video-wrap.is-cursor-on {
+  cursor: none;
+}
+
+.pm2-hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* the portrait card crops the 16:9 reel, like any card media */
+  pointer-events: none; /* the wrap owns hover/click */
+}
+
+/* The reel is intentionally cinematic/cropped while it plays in the hero
+   card. For its final four-second brand lockup, fit the complete 16:9 frame
+   inside any card shape so "WE ARE", the star, and the wordmark stay centered
+   and title-safe on desktop, mobile, portrait, or landscape layouts. */
+.pm2-hero-video-wrap.is-end-card {
+  background: #040a07;
+}
+
+.pm2-hero-video-wrap.is-end-card .pm2-hero-video {
+  object-fit: contain;
+  object-position: 50% 50%;
+}
+
+/* —— "View" cursor chip: shared TrailCursor (trail-cursor.css) ———————— */
+
+/* touch + small screens keep the native cursor, no chip */
+@media (hover: none), (max-width: 900px) {
+  .pm2-hero-video-wrap.is-cursor-on {
+    cursor: auto;
+  }
+}
+
+/* —— crisp lightbox ————————————————————————————————— */
+body.pm2-video-modal-open {
+  overflow: hidden;
+}
+
+.pm2-video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 3vw, 44px);
+  background: rgba(3, 8, 6, 0.84);
+  animation: pm2VideoModalIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.pm2-video-modal-frame {
+  position: relative;
+  padding: clamp(8px, 1vw, 14px);
+  border-radius: 30px;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0.05) 55%,
+    rgba(124, 240, 189, 0.08)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow:
+    0 40px 120px -30px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  animation: pm2VideoFrameIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.pm2-video-modal-vid {
+  display: block;
+  width: min(1200px, 92vw, 142vh);
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 20px;
+  background: #040a07;
+}
+
+.pm2-video-modal-close {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(8, 19, 13, 0.92);
+  color: #f4fff9;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.pm2-video-modal-close:hover {
+  transform: rotate(90deg) scale(1.06);
+  background: rgba(103, 224, 163, 0.9);
+  color: #04130b;
+}
+
+.pm2-video-modal-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes pm2VideoModalIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pm2VideoFrameIn {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .pm2-video-modal-close {
+    top: 8px;
+    right: 8px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm2-hero-video-wrap,
+  .pm2-video-modal,
+  .pm2-video-modal-frame {
+    animation: none !important;
+  }
+  .pm2-video-modal-close {
+    transition: none !important;
+  }
+}

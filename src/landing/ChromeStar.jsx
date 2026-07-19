@@ -116,12 +116,12 @@ export default function ChromeStar({ className = '', style, spin = 1, scaleRef =
       const mesh = new THREE.Mesh(geometry, material)
       scene.add(mesh)
 
-      // Liquid-metal lighting: violet kick low-left, cool rim high-right,
+      // Liquid-metal lighting: emerald kick low-left, cool rim high-right,
       // plus a narrow white spot from the upper-left that carves the hard
       // specular streak along an arm (the f_067 edge highlight).
-      const violetLight = new THREE.PointLight(0x8b5cf6, 30, 0, 2)
-      violetLight.position.set(-2.4, -2.0, 2.2)
-      scene.add(violetLight)
+      const mintLight = new THREE.PointLight(0x2fbf7f, 30, 0, 2)
+      mintLight.position.set(-2.4, -2.0, 2.2)
+      scene.add(mintLight)
       const rimLight = new THREE.DirectionalLight(0xf5f7ff, 2.4)
       rimLight.position.set(3, 4, 2.5)
       scene.add(rimLight)

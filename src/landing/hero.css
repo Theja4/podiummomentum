@@ -1,12 +1,21 @@
 /* ============================================================================
-   Hero (pm2) — violet panel that spins ~90° away + lime card that seats into
-   the services coverflow. Scoped under .pm2-hero. Motion values are written
-   inline by Hero.jsx's rAF loop; this file owns layout, resting states, and
-   entrance keyframes.
+   Hero (pm2) — forest panel that spins ~90° away + the mint brand card that
+   seats into the services coverflow. Scoped under .pm2-hero. Motion values
+   are written inline by Hero.jsx's rAF loop; this file owns layout, resting
+   states, and entrance keyframes.
    ========================================================================== */
 
 .pm2-hero {
   --pm2-hero-inset: clamp(10px, 1.6vw, 24px);
+  /* the composition box: hero copy + card live inside this, centered on
+     ultrawide screens so the headline and card never drift apart */
+  --pm2-hero-boxw: min(calc(100vw - 2 * var(--pm2-hero-inset)), 1760px);
+  --pm2-hero-boxl: calc((100vw - var(--pm2-hero-boxw)) / 2);
+  /* the card column — mirrors the coverflow card width (Hero.jsx cw) */
+  --pm2-hero-cardw: clamp(400px, 29vw, 540px);
+  --pm2-hero-cardoff: clamp(48px, calc(10vw - 56px), 128px);
+  --pm2-hero-colgap: clamp(48px, 4vw, 72px);
+  --pm2-hero-padx: clamp(24px, 4vw, 64px);
   position: relative;
   height: 230vh;
   /* transparent: the landing root (.pm2) provides the white; the carousel's
@@ -27,37 +36,32 @@
   perspective-origin: 50% 40%;
 }
 
-/* —— the violet panel ———————————————————————— */
+/* —— the forest panel ———————————————————————— */
 
 .pm2-hero-panel {
   position: absolute;
   inset: var(--pm2-hero-inset);
   z-index: 2;
   border-radius: var(--v-radius-panel);
+  /* A restrained brand field: deep forest with one quiet lift toward the
+     showreel. The cleaner surface gives the editorial type room to lead. */
   background:
-    radial-gradient(130% 105% at 50% 118%, var(--v-glow) 0%, var(--v-core) 34%, rgba(109, 40, 217, 0) 72%),
-    radial-gradient(80% 60% at 50% 112%, rgba(168, 85, 247, 0.6) 0%, rgba(168, 85, 247, 0) 62%),
-    linear-gradient(180deg, #08040f 0%, #12072a 52%, var(--v-deep) 100%);
+    radial-gradient(58% 76% at 92% 44%, rgba(103, 224, 163, 0.16), transparent 72%),
+    linear-gradient(128deg, #07160f 0%, #0a2418 58%, #0b3021 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 40px 90px -40px rgba(27, 11, 58, 0.55);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 34px 80px -48px rgba(7, 31, 20, 0.48);
   transform-origin: 50% 50%; /* flat in-plane spin about the panel's center */
-  will-change: transform, opacity;
+  /* no will-change here: a permanent hint keeps the panel (and all the hero
+     copy inside it) on a composited layer — text loses subpixel AA. The
+     scroll rAF promotes the layer on demand when the spin actually starts. */
   animation: pm2HeroPanelIn 1s var(--v-ease) backwards;
 }
 
-/* film grain */
+/* The old dot/grain matrix made the surface feel templated. Keep it clean. */
 .pm2-hero-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
-  opacity: 0.055;
-  mix-blend-mode: overlay;
-  pointer-events: none;
+  content: none;
 }
 
 @keyframes pm2HeroPanelIn {
@@ -67,41 +71,93 @@
 
 .pm2-hero-inner {
   position: relative;
+  z-index: 1; /* copy sits above the orbit hairline */
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: clamp(24px, 4vw, 64px);
+  /* Keep the eyebrow below the floating navigation even on short desktop
+     viewports; the previous fluid top inset could slide underneath the pill. */
+  padding: clamp(68px, 4vw, 76px) var(--pm2-hero-padx)
+    clamp(24px, 4vw, 64px);
+  /* the copy centers with the composition box on ultrawide screens, so it
+     stays married to the card instead of hugging the far edge */
+  max-width: var(--pm2-hero-boxw);
+  margin-inline: auto;
+}
+
+/* —— quiet credential above the headline ———————————————————————— */
+
+.pm2-hero-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.pm2-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  margin: 0 0 clamp(18px, 2.8vh, 32px) 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.66);
+  animation: pm2HeroFade 0.9s var(--v-ease) 0.05s backwards;
+}
+
+.pm2-hero-eyebrow-mark {
+  flex: 0 0 auto;
+}
+
+@keyframes pm2HeroFade {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 /* —— title ———————————————————————— */
 
 .pm2-hero-title {
   margin: 0;
-  font-size: clamp(56px, 8.5vw, 128px);
-  font-weight: 600;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  color: #fff;
+  max-width: calc(
+    var(--pm2-hero-boxw) - var(--pm2-hero-padx) - var(--pm2-hero-cardoff) -
+      var(--pm2-hero-cardw) - var(--pm2-hero-colgap)
+  );
+  font-size: clamp(
+    56px,
+    min(5.25vw, 11.5vh),
+    92px
+  );
+  font-family: var(--v-serif);
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: -0.047em;
+  color: #f6fff9;
 }
 
 .pm2-hero-line {
   display: block;
-  padding-bottom: 0.04em;
+  padding: 0 0 0.08em;
+  white-space: nowrap;
 }
 
-.pm2-hero-line--dim {
-  color: rgba(233, 213, 255, 0.55);
+.pm2-hero-line--accent {
+  color: var(--v-bright);
+  font-style: italic;
 }
 
 .pm2-hero-line-in {
   display: block;
-  will-change: transform, clip-path;
   animation: pm2HeroRise 1s var(--v-ease) 0.18s backwards;
 }
 
 .pm2-hero-line:nth-child(2) .pm2-hero-line-in {
   animation-delay: 0.3s;
+}
+
+.pm2-hero-line:nth-child(3) .pm2-hero-line-in {
+  animation-delay: 0.4s;
 }
 
 @keyframes pm2HeroRise {
@@ -129,22 +185,145 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(16px, 2.2vh, 26px);
+  gap: 0;
+  max-width: min(620px, calc(100vw - var(--pm2-hero-cardw) - 112px));
   animation: pm2HeroFade 0.9s var(--v-ease) 0.45s backwards;
 }
 
 .pm2-hero-lead {
+  margin: 0 0 12px;
+  font-size: clamp(17px, 1.3vw, 20px);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: #f6fff9;
+  max-width: 49ch;
+}
+
+.pm2-hero-detail {
   margin: 0;
-  font-size: 17px;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.8);
-  max-width: 34ch;
+  max-width: 54ch;
+  font-size: clamp(13px, 0.95vw, 15px);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: rgba(246, 255, 249, 0.58);
+}
+
+/* On wide screens, use the full text column instead of leaving a hollow band
+   between the supporting copy and the card. The whole block still exits as
+   one ref-driven unit, so this rearrangement does not touch scroll timing. */
+@media (min-width: 1281px) {
+  .pm2-hero-mid {
+    width: calc(
+      var(--pm2-hero-boxw) - var(--pm2-hero-padx) - var(--pm2-hero-cardoff) -
+        var(--pm2-hero-cardw) - var(--pm2-hero-colgap)
+    );
+  }
+
+  .pm2-hero-copy {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: end;
+    column-gap: clamp(30px, 3vw, 52px);
+    width: 100%;
+    max-width: none;
+  }
+
+  .pm2-hero-lead,
+  .pm2-hero-detail {
+    grid-column: 1;
+  }
+
+  .pm2-hero-ctas {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: end;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 0;
+  }
 }
 
 .pm2-hero-ctas {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 22px;
+  margin-top: clamp(22px, 3vh, 34px);
+}
+
+.pm2-hero-ctas .pm2-pill {
+  min-height: 58px;
+  gap: 24px;
+  padding: 7px 8px 7px 24px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pm2-hero-ctas .pm2-pill:hover {
+  background: #fff;
+  box-shadow: none;
+}
+
+.pm2-hero-ctas .pm2-pill:focus-visible,
+.pm2-hero-text-link:focus-visible {
+  outline: 2px solid var(--v-bright);
+  outline-offset: 4px;
+}
+
+.pm2-hero-cta-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: var(--v-bright);
+  color: var(--v-ink);
+  transition: transform 0.4s var(--v-ease);
+}
+
+.pm2-hero-ctas .pm2-pill:hover .pm2-hero-cta-icon {
+  transform: translateX(2px);
+}
+
+.pm2-hero-cta-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.pm2-hero-cta-icon path,
+.pm2-hero-text-link path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pm2-hero-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 0 7px;
+  border-bottom: 1px solid rgba(246, 255, 249, 0.32);
+  color: rgba(246, 255, 249, 0.82);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.pm2-hero-text-link:hover {
+  color: #fff;
+  border-color: var(--v-bright);
+}
+
+.pm2-hero-text-link svg {
+  width: 16px;
+  height: 16px;
 }
 
 .pm2-hero-stats {
@@ -167,7 +346,7 @@
 }
 
 .pm2-hero-stat-value {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -182,51 +361,45 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* THE hero card — photo face on top, lime face wiping in from the bottom.
-   Stage-level: escapes the panel's spin/fade. Positioning mirrors the panel's
-   card slot; JS measures rest geometry via offsetLeft/offsetTop every frame. */
+/* THE hero card — photo face on top, the mint brand face wiping in from the
+   bottom. Stage-level: escapes the panel's spin/fade. Positioning mirrors the
+   panel's card slot; JS measures rest geometry via offsetLeft/offsetTop
+   every frame. */
 .pm2-hero-card {
   position: absolute;
   z-index: 3; /* above the panel */
-  right: calc(var(--pm2-hero-inset) + clamp(24px, 4vw, 64px));
+  /* anchored to the composition box, not the viewport — on ultrawide the
+     card follows the centered content instead of the far edge */
+  right: calc(var(--pm2-hero-boxl) + var(--pm2-hero-cardoff));
   top: 50%;
   /* exactly the coverflow card's size — the seat scale lands at 1.0, so the
      face is pixel-identical at the swap (no stretch, no color shift) */
-  width: min(370px, 80vw);
-  height: min(530px, 74vh);
-  margin-top: calc(min(530px, 74vh) / -2);
+  width: var(--pm2-hero-cardw);
+  height: min(560px, 74vh);
+  margin-top: calc(min(560px, 74vh) / -2);
   will-change: transform, opacity;
 }
 
-/* the lime face — hidden behind a bottom-edge clip until the scroll wipe */
-.pm2-hero-card-lime {
+/* the wipe face — hidden behind a bottom-edge clip until the scroll wipe.
+   Carries the coverflow card's theme class (pm2-carousel-card--ice), so its
+   background and face chrome are the card's own — the swap is invisible. */
+.pm2-hero-card-wipe {
   position: absolute;
   inset: 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  padding: 22px;
-  border-radius: 26px;
+  padding: var(--pm2-card-pad, 22px);
+  border-radius: var(--pm2-card-radius, 26px);
   overflow: hidden;
-  background: #0a0d06; /* = the coverflow's lime face */
   color: #fff;
   clip-path: inset(100% 0 0 0 round 26px); /* JS rises this to inset(0) */
   will-change: clip-path;
 }
 
-/* lime-face accents the scoped coverflow rules would have provided */
-.pm2-hero-card-lime .pm2-carousel-idx {
-  background: var(--v-lime);
-  border-color: transparent;
-  color: #131607;
-  font-weight: 700;
-}
-
-.pm2-hero-card-lime .pm2-carousel-chip {
-  border-color: rgba(201, 246, 45, 0.35);
-}
-
-/* face A — the ghost's own identity, slides/spins OUT as --m rises */
+/* The moving handoff stays artwork-only. Copy belongs to the final services
+   stage, where it can reveal after the card has finished rotating and opening;
+   suppressing it here also removes the clipped title at the card's top-left. */
 .pm2-hero-ghost-faceA {
   position: absolute;
   inset: 0;
@@ -245,43 +418,38 @@
 }
 
 .pm2-hero-ghost-labelMask {
-  position: absolute;
-  left: 18px;
-  bottom: 16px;
-  overflow: hidden;
+  display: none;
 }
 
 .pm2-hero-ghost-label {
   font-size: 12.5px;
   font-weight: 500;
   letter-spacing: 0.02em;
-  color: rgba(234, 255, 176, 0.85);
+  color: rgba(10, 20, 15, 0.72);
   /* slides down out of its mask — never ghosts through the title */
   transform: translateY(calc(clamp(0, (var(--m, 0) - 0.3) / 0.35, 1) * 110%));
 }
 
-/* face B — the coverflow card's face, falls INTO place as --m rises */
+/* face B contributes only the artwork/visual layer during the handoff. */
 .pm2-hero-ghost-faceB {
   display: contents; /* children join the ghost's own flex flow */
 }
 
-.pm2-hero-ghost-faceB .pm2-carousel-card-top {
-  /* badge + domain drop in as the sparkle finishes spinning out */
-  opacity: clamp(0, calc((var(--m, 0) - 0.35) / 0.3), 1);
-  transform: translateY(
-    calc((1 - clamp(0, (var(--m, 0) - 0.35) / 0.3, 1)) * -10px)
-  );
+.pm2-hero-ghost-faceB .pm2-carousel-card-top,
+.pm2-hero-ghost-faceB .pm2-carousel-card-bottom {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .pm2-hero-ghost-faceB .pm2-carousel-card-mid {
-  opacity: clamp(0, calc((var(--m, 0) - 0.5) / 0.3, 1));
+  opacity: clamp(0, calc((var(--m, 0) - 0.5) / 0.3), 1);
   transform: translateY(
       calc((1 - clamp(0, (var(--m, 0) - 0.5) / 0.3, 1)) * 14px)
     )
     scale(calc(0.92 + 0.08 * clamp(0, (var(--m, 0) - 0.5) / 0.3, 1)));
 }
 
-/* the title falls into place from above, clipped by its mask */
+/* shared title mask used by the settled carousel cards */
 .pm2-mask {
   display: block;
   overflow: hidden;
@@ -291,17 +459,14 @@
   display: block;
 }
 
-.pm2-hero-ghost-faceB .pm2-carousel-card-bottom .pm2-mask-in {
-  transform: translateY(
-    calc((1 - clamp(0, (var(--m, 0) - 0.45) / 0.4, 1)) * -110%)
-  );
-}
-
 /* load entrance: the card twists and falls into place */
 .pm2-hero-card-enter {
   position: relative;
   z-index: 1;
-  will-change: transform;
+  /* definite height — the float/reveal/work chain below is all 100% — without
+     this the float collapses to content height (the work stack is entirely
+     absolutely positioned, so content height is ~zero) */
+  height: 100%;
   animation: pm2HeroCardEnter 1.15s var(--v-ease) 0.35s backwards;
 }
 
@@ -324,33 +489,23 @@
   height: 100%;
   border-radius: 26px;
   overflow: hidden;
-  background: #0d0718;
+  background: #08130d;
   transform: rotate(-4deg);
   box-shadow:
-    0 30px 80px -20px rgba(13, 7, 24, 0.35),
-    0 20px 55px -18px rgba(109, 40, 217, 0.45),
+    0 30px 80px -20px rgba(5, 10, 12, 0.5),
+    0 20px 55px -18px rgba(47, 191, 127, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
   will-change: transform;
   animation: pm2HeroFloat 7s ease-in-out infinite;
 }
 
-/* sliding image reveal — clip wipe + inner slide/scale, image-agnostic */
+/* sliding image reveal — clip wipe + inner slide/scale, content-agnostic */
 .pm2-hero-card-reveal {
   width: 100%;
   height: 100%;
   border-radius: 22px;
   overflow: hidden;
-  will-change: clip-path;
   animation: pm2HeroCardReveal 1.5s cubic-bezier(0.65, 0, 0.15, 1) 0.5s backwards;
-}
-
-.pm2-hero-card-reveal img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  will-change: transform;
-  animation: pm2HeroCardImg 1.9s cubic-bezier(0.22, 0.8, 0.24, 1) 0.55s backwards;
 }
 
 @keyframes pm2HeroCardReveal {
@@ -361,6 +516,118 @@
 @keyframes pm2HeroCardImg {
   from { transform: translate3d(0, -14%, 0) scale(1.28); }
   to { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* —— "Selected results": a still editorial ledger on warm paper —————————— */
+
+.pm2-hero-proof {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 26px 22px;
+  overflow: hidden;
+  color: #0a140f;
+  background:
+    radial-gradient(circle, rgba(10, 20, 15, 0.045) 1px, transparent 1.5px) 0 0 / 22px 22px,
+    linear-gradient(180deg, #f7f5ef 0%, #edeae0 100%);
+  animation: pm2HeroCardImg 1.9s cubic-bezier(0.22, 0.8, 0.24, 1) 0.55s backwards;
+}
+
+.pm2-hero-proof-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pm2-hero-proof-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(10, 20, 15, 0.45);
+}
+
+.pm2-hero-proof-mark {
+  opacity: 0.8;
+}
+
+/* the ledger: three outcomes, typeset large, hairline rules between */
+.pm2-hero-proof-rows {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pm2-hero-proof-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 26px 0;
+  animation: pm2HeroProofRow 0.9s var(--v-ease) backwards;
+}
+
+.pm2-hero-proof-row + .pm2-hero-proof-row {
+  border-top: 1px solid rgba(10, 20, 15, 0.12);
+}
+
+.pm2-hero-proof-row:nth-child(1) { animation-delay: 0.85s; }
+.pm2-hero-proof-row:nth-child(2) { animation-delay: 1s; }
+.pm2-hero-proof-row:nth-child(3) { animation-delay: 1.15s; }
+
+@keyframes pm2HeroProofRow {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pm2-hero-proof-value {
+  font-size: 46px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #0a140f;
+  font-variant-numeric: tabular-nums;
+}
+
+.pm2-hero-proof-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  text-align: right;
+}
+
+.pm2-hero-proof-cap {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(10, 20, 15, 0.6);
+}
+
+.pm2-hero-proof-brand {
+  font-family: var(--v-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(10, 20, 15, 0.38);
+}
+
+/* quiet foot: the domain under a hairline, same as the service cards */
+.pm2-hero-proof-foot {
+  padding-top: 14px;
+  border-top: 1px solid rgba(10, 20, 15, 0.12);
+  animation: pm2HeroProofRow 0.9s var(--v-ease) 1.3s backwards;
+}
+
+.pm2-hero-proof-domain {
+  font-family: var(--v-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(10, 20, 15, 0.38);
 }
 
 @keyframes pm2HeroFloat {
@@ -375,59 +642,144 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
+  margin-top: clamp(12px, 2vh, 20px);
   animation: pm2HeroFade 0.9s var(--v-ease) 0.55s backwards;
 }
 
+/* trust strip: a quiet editorial colophon, not a pill-on-pill widget */
 .pm2-hero-trust {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 100%;
+}
+
+.pm2-hero-trust-label {
+  max-width: none;
+  font-size: clamp(15px, 1.15vw, 17px);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.012em;
+  color: rgba(255, 255, 255, 0.76);
+  white-space: nowrap;
+}
+
+.pm2-hero-logos {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 18px;
   max-width: 100%;
-  padding: 8px 18px 8px 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  padding: 0;
 }
 
-.pm2-hero-avatars {
+.pm2-hero-logo {
   display: inline-flex;
+  align-items: center;
+  gap: 8px;
   flex: 0 0 auto;
+  /* colourless at rest — the marks read as quiet monochrome proof; the
+     brand colour returns on hover (filter on the whole entry so the mark
+     and wordmark light up together) */
+  filter: grayscale(1);
+  opacity: 0.72;
+  transition:
+    filter 0.35s var(--v-ease),
+    opacity 0.35s var(--v-ease);
 }
 
-.pm2-hero-avatars img {
-  position: relative;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
+.pm2-hero-logo:hover {
+  filter: grayscale(0);
+  opacity: 1;
+}
+
+.pm2-hero-logo + .pm2-hero-logo {
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pm2-hero-logo img.is-mark {
+  width: 21px;
+  height: 21px;
+  object-fit: contain;
+}
+
+.pm2-hero-logo img.is-chip {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  margin-left: -10px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
-.pm2-hero-avatars img:first-child {
-  margin-left: 0;
+/* wordmark PNGs ship dark-surface variants (white text + brand-color glyph),
+   so no filter is needed on the dark panel */
+.pm2-hero-logo img.is-word {
+  height: 15px;
+  width: auto;
 }
 
-.pm2-hero-trust-text {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+.pm2-hero-logo-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.88);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.pm2-hero-caption {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.5);
-  max-width: 36ch;
-  text-align: right;
+/* Editorial display type needs a distinct short-desktop composition. Without
+   this height-aware scale, the third line can enter the copy/CTA band. */
+@media (min-width: 901px) and (max-height: 800px) {
+  .pm2-hero-title {
+    font-size: clamp(48px, 5vw, 72px);
+    line-height: 0.92;
+  }
+
+  .pm2-hero-eyebrow {
+    margin-bottom: 14px;
+  }
+
+  .pm2-hero-lead {
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .pm2-hero-detail {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .pm2-hero-ctas {
+    margin-top: 18px;
+  }
+
+  .pm2-hero-ctas .pm2-pill {
+    min-height: 52px;
+    padding-left: 20px;
+  }
+
+  .pm2-hero-cta-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+  }
 }
 
-/* —— responsive: stacked static hero ———————————————————————— */
+/* Keep a real text column on compact desktop widths. The video remains the
+   same animated card; only its resting width steps down with the composition. */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .pm2-hero {
+    --pm2-hero-cardw: 400px;
+    --pm2-hero-cardoff: 28px;
+    --pm2-hero-padx: clamp(28px, 4vw, 44px);
+  }
+
+  .pm2-hero-title {
+    font-size: clamp(48px, 5vw, 55px);
+  }
+}
+
+/* —— responsive: stacked hero, card resting in the panel's field ————————— */
 
 @media (max-width: 900px) {
   .pm2-hero {
@@ -443,73 +795,170 @@
   .pm2-hero-panel {
     position: relative;
     inset: auto;
-    margin: 0 10px 10px;
+    /* sits BELOW the floating nav pill (10px offset + ~61px tall) with the
+       same 10px breathing room the sides get — an even border, the bar
+       never inside the green field */
+    margin: 81px 10px 10px;
+    min-height: calc(100svh - 91px);
     transform: none !important;
     opacity: 1 !important;
+    /* the inner stretches with the panel so the composition distributes
+       title → copy → card field → trust row */
+    display: flex;
+    flex-direction: column;
   }
 
   .pm2-hero-inner {
+    flex: 1;
     height: auto;
     justify-content: flex-start;
-    gap: 26px;
-    padding: clamp(78px, 13vw, 104px) 22px 26px;
+    gap: clamp(14px, 2.4vh, 22px);
+    padding: clamp(18px, 3.6vh, 30px) 20px 18px;
+    /* the desktop composition box doesn't apply to the stacked panel — and
+       auto inline margins on a flex item collapse it to fit-content */
+    max-width: none;
+    margin-inline: 0;
   }
 
   .pm2-hero-title {
-    font-size: clamp(40px, 11.5vw, 64px);
+    max-width: none;
+    font-size: clamp(40px, 11.5vw, 62px);
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+  }
+
+  .pm2-hero-line {
+    white-space: normal;
+  }
+
+  .pm2-hero-eyebrow {
+    gap: 7px;
+    padding: 0;
+    margin-bottom: 16px;
+    font-size: 11px;
   }
 
   .pm2-hero-mid {
+    flex: 0 0 auto;
     flex-direction: column;
     align-items: stretch;
-    gap: 24px;
+  }
+
+  .pm2-hero-copy {
+    max-width: 38ch;
   }
 
   .pm2-hero-lead {
-    font-size: 15.5px;
+    margin-bottom: 8px;
+    font-size: 15px;
+    max-width: 34ch;
   }
 
-  .pm2-hero-card {
+  .pm2-hero-detail {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .pm2-hero-ctas {
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .pm2-hero-ctas .pm2-pill {
+    min-height: 50px;
+    padding: 6px 7px 6px 18px;
+    border-radius: 15px;
+    font-size: 13px;
+  }
+
+  .pm2-hero-cta-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+  }
+
+  .pm2-hero-text-link {
+    font-size: 12.5px;
+  }
+
+  .pm2-hero-stats {
+    gap: 12px 16px;
+    margin-top: 0;
+  }
+
+  .pm2-hero-stat-value {
+    font-size: 19px;
+  }
+
+  .pm2-hero-stat-label {
+    font-size: 9px;
+  }
+
+  /* the open field in the panel's lower half — the card's rest slot; the
+     rAF loop scale-fits the card into this box every frame */
+  .pm2-hero-cardSlot {
     position: relative;
-    right: auto;
-    top: auto;
-    width: 100%;
-    height: auto;
-    margin: 0 0 10px;
-    transform: none !important;
+    flex: 1 1 auto;
+    min-height: 150px;
   }
 
-  .pm2-hero-card-lime {
-    display: none; /* no scroll journey on small screens */
+  /* the card is BUILT at the coverflow's exact mobile card size (mirrors
+     carousel.css @900) so the seat scale lands 1.0 at the swap; the rest
+     miniature is pure transform, refined by the rAF's first frame */
+  .pm2-hero-card {
+    --pm2-cardr: 26px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    right: auto;
+    width: 78vw;
+    height: min(480px, 64vh);
+    margin: calc(min(480px, 64vh) / -2) 0 0 -39vw;
+    transform: rotate(-4deg) scale(0.55);
+  }
+
+  .pm2-hero-card-wipe {
+    padding: 20px; /* mirrors the mobile coverflow card's padding */
   }
 
   .pm2-hero-card-float {
-    aspect-ratio: 16 / 10;
-    height: auto;
-    border-radius: 18px;
-    transform: none;
+    height: 100%;
+    border-radius: var(--pm2-cardr);
+    transform: none; /* the rest tilt lives on .pm2-hero-card (rAF-owned) */
     animation: none;
   }
 
   .pm2-hero-card-reveal {
-    border-radius: 18px;
+    border-radius: var(--pm2-cardr);
   }
 
   .pm2-hero-bottom {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
   }
 
-  .pm2-hero-caption {
-    text-align: left;
-    max-width: 46ch;
+  .pm2-hero-trust-label {
+    white-space: normal;
+  }
+
+}
+
+/* short phones: tighten the composition so the card field keeps real height */
+@media (max-width: 900px) and (max-height: 700px) {
+  .pm2-hero-inner {
+    gap: 12px;
   }
 }
 
 @media (max-width: 600px) {
-  .pm2-hero-inner {
-    padding: 76px 18px 22px;
+  .pm2-hero-card {
+    --pm2-cardr: 22px;
+  }
+
+  .pm2-hero-card-wipe {
+    border-radius: 22px;
+    clip-path: inset(100% 0 0 0 round 22px);
   }
 
   .pm2-hero-stats {
@@ -521,18 +970,37 @@
     font-size: 20px;
   }
 
-  .pm2-hero-trust {
-    gap: 10px;
-    padding-right: 14px;
+  .pm2-hero-logos {
+    gap: 8px;
+    padding: 9px 12px;
   }
 
-  .pm2-hero-trust-text {
+  .pm2-hero-logo + .pm2-hero-logo {
+    padding-left: 8px;
+  }
+
+  .pm2-hero-logo img.is-mark {
+    width: 18px;
+    height: 18px;
+  }
+
+  .pm2-hero-logo img.is-chip {
+    width: 19px;
+    height: 19px;
+  }
+
+  .pm2-hero-logo-name {
     font-size: 12px;
   }
 
-  .pm2-hero-caption {
-    font-size: 12.5px;
+  .pm2-hero-logo img.is-word {
+    height: 12.5px;
   }
+
+  .pm2-hero-logo:last-child {
+    display: none;
+  }
+
 }
 
 /* —— reduced motion: plain full-viewport hero, no pin/tilt/drift ———————— */
@@ -560,13 +1028,15 @@
 
   .pm2-hero-card-enter,
   .pm2-hero-card-reveal,
-  .pm2-hero-card-reveal img,
-  .pm2-hero-card-lime {
+  .pm2-hero-proof,
+  .pm2-hero-proof *,
+  .pm2-hero-card-wipe {
     animation: none !important;
   }
 
   .pm2-hero-panel,
   .pm2-hero-line-in,
+  .pm2-hero-eyebrow,
   .pm2-hero-copy,
   .pm2-hero-card,
   .pm2-hero-bottom {
@@ -577,6 +1047,11 @@
 @media (prefers-reduced-motion: reduce) and (max-width: 900px) {
   .pm2-hero-stage {
     height: auto;
+  }
+
+  /* the rest tilt lives on .pm2-hero-card on mobile — never double it */
+  .pm2-hero-card-float {
+    transform: none;
   }
 }
 
@@ -592,43 +1067,66 @@
 html body.pm2-active .header {
   position: fixed !important;
   top: 14px !important;
-  left: 50% !important;
-  right: auto !important;
-  width: max-content !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: min(872px, calc(100vw - 24px)) !important;
   max-width: calc(100vw - 24px);
   height: auto !important;
   min-height: 0 !important;
+  margin-inline: auto !important;
   padding: 6px 8px 6px 18px !important;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.86) !important;
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(13, 7, 24, 0.08);
-  box-shadow: 0 10px 40px -12px rgba(13, 7, 24, 0.25) !important;
+  background: #fff !important;
+  /* Keep the navbar on a fully opaque, non-filtered surface. Even a disabled
+     glass effect can read soft when the surface itself still lets the moving
+     hero show through. */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+  border: 1px solid rgba(8, 19, 13, 0.14);
+  box-shadow: none !important;
   z-index: 200;
-  transform: translate3d(-50%, 0, 0) !important;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  will-change: transform;
+  transform: none !important;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease !important;
+  will-change: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 html body.pm2-active .header:not(.header-hidden) {
-  transform: translate3d(-50%, 0, 0) !important;
+  transform: none !important;
 }
 
 html body.pm2-active .header.header-hidden {
-  transform: translate3d(-50%, calc(-100% - 40px), 0) !important;
+  transform: none !important;
+  opacity: 0;
+  pointer-events: none;
 }
 
 html body.pm2-active .header.header-scrolled {
-  background: rgba(255, 255, 255, 0.92) !important;
-  box-shadow: 0 12px 44px -12px rgba(13, 7, 24, 0.3) !important;
+  background: #fff !important;
+  box-shadow: none !important;
 }
 
 html body.pm2-active .header .header-inner {
-  width: auto;
+  width: 100%;
   height: auto;
-  justify-content: center;
-  gap: clamp(16px, 2.4vw, 40px);
+  justify-content: space-between;
+  gap: 24px;
+  animation: none !important;
+  transform: none !important;
+  will-change: auto;
+  opacity: 1;
+}
+
+/* Avoid persistent GPU compositing on navbar text and logos. A completed
+   translate3d/scale animation can leave glyphs rasterized as a texture. */
+html body.pm2-active .header .logo-link,
+html body.pm2-active .header .nav > *,
+html body.pm2-active .header .header-actions {
+  transform: none !important;
+  animation: none !important;
+  will-change: auto;
 }
 
 /* logo lockup — compact mark + wordmark */
@@ -641,23 +1139,19 @@ html body.pm2-active .header .logo-lockup {
   gap: 8px !important;
 }
 
-html body.pm2-active .header .logo-lockup-mark {
-  width: 22px !important;
-  height: 22px !important;
+html body.pm2-active .header .logo-lockup-img {
+  /* wordmark inside the lockup reads ~15px at this height — level with the
+     16px nav items */
+  height: 28px;
 }
 
-html body.pm2-active .header .logo-wordmark {
-  font-size: 15px !important;
-  line-height: 1;
-  color: #0b0910 !important;
-}
-
-/* desktop nav: tight pill items */
+/* desktop nav: tight pill items — one size for every entry, links and
+   dropdown triggers alike */
 @media (min-width: 901px) {
   html body.pm2-active .header .nav {
     gap: 4px !important;
     height: auto !important;
-    font-size: 13.5px;
+    font-size: 16px;
   }
 
   html body.pm2-active .header .nav > a,
@@ -667,7 +1161,8 @@ html body.pm2-active .header .logo-wordmark {
     max-height: 38px !important;
     padding: 0 13px !important;
     border-radius: 999px;
-    font-size: 13.5px;
+    font-size: 16px !important;
+    font-weight: 600;
     color: #0b0910 !important;
     transition: background-color 0.25s ease;
   }
@@ -675,7 +1170,7 @@ html body.pm2-active .header .logo-wordmark {
   html body.pm2-active .header .nav > a:hover,
   html body.pm2-active .header .nav > .nav-dropdown:hover,
   html body.pm2-active .header .nav > .nav-dropdown.is-open {
-    background-color: rgba(13, 7, 24, 0.05);
+    background-color: rgba(8, 19, 13, 0.05);
   }
 
   /* retire the old underline + emerald gradient bar */
@@ -688,7 +1183,8 @@ html body.pm2-active .header .logo-wordmark {
     height: 38px !important;
     min-height: 38px !important;
     padding: 0 !important;
-    font-size: 13.5px !important;
+    font-size: 16px !important;
+    font-weight: 600;
     color: #0b0910 !important;
   }
 
@@ -697,23 +1193,23 @@ html body.pm2-active .header .logo-wordmark {
     color: #0b0910 !important;
   }
 
-  /* dropdown panels: white card, 16px radius, violet-tinted glow */
+  /* dropdown panels: white card, 16px radius, mint-tinted glow */
   html body.pm2-active .header .nav-dropdown-panel-card {
     border-radius: 16px;
-    border: 1px solid rgba(13, 7, 24, 0.08);
+    border: 1px solid rgba(8, 19, 13, 0.08);
     box-shadow:
-      0 24px 60px -24px rgba(13, 7, 24, 0.28),
-      0 8px 24px -12px rgba(13, 7, 24, 0.1);
+      0 24px 60px -24px rgba(8, 19, 13, 0.28),
+      0 8px 24px -12px rgba(8, 19, 13, 0.1);
   }
 
   html body.pm2-active .header .nav-dropdown-panel-card::before {
     background:
-      radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.12), transparent 45%),
-      radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.08), transparent 40%);
+      radial-gradient(circle at 100% 0%, rgba(103, 224, 163, 0.14), transparent 45%),
+      radial-gradient(circle at 0% 100%, rgba(47, 191, 127, 0.10), transparent 40%);
   }
 }
 
-/* snug pill on small desktops */
+/* snug pill on small desktops — still one uniform size */
 @media (min-width: 901px) and (max-width: 1100px) {
   html body.pm2-active .header .header-inner {
     gap: 14px;
@@ -722,11 +1218,11 @@ html body.pm2-active .header .logo-wordmark {
   html body.pm2-active .header .nav > a,
   html body.pm2-active .header .nav > .nav-dropdown {
     padding: 0 9px !important;
-    font-size: 12.5px;
+    font-size: 14px !important;
   }
 
   html body.pm2-active .header .nav .nav-dropdown-trigger {
-    font-size: 12.5px !important;
+    font-size: 14px !important;
   }
 }
 
@@ -737,7 +1233,7 @@ html body.pm2-active #root .header .header-actions > .pill {
   min-height: 0 !important;
   padding: 10px 20px !important;
   border-radius: 999px !important;
-  background: #0d0718 !important;
+  background: #08130d !important;
   color: #fff !important;
   box-shadow: none !important;
   font-size: 13.5px !important;
@@ -745,9 +1241,9 @@ html body.pm2-active #root .header .header-actions > .pill {
 }
 
 html body.pm2-active #root .header .header-actions > .pill:hover {
-  background: #6d28d9 !important;
+  background: #2fbf7f !important;
   color: #fff !important;
-  box-shadow: 0 10px 30px -10px rgba(109, 40, 217, 0.55) !important;
+  box-shadow: 0 10px 30px -10px rgba(47, 191, 127, 0.5) !important;
   transform: none !important;
 }
 
@@ -777,7 +1273,7 @@ html body.pm2-active .header .header-actions {
   }
 
   html body.pm2-active .header .menu {
-    background: #0d0718;
+    background: #08130d;
     color: #fff;
     border: 0;
   }
@@ -785,9 +1281,9 @@ html body.pm2-active .header .header-actions {
   /* The drawer opens as a viewport-fixed sheet (see styles.css .nav.open):
      keep that behavior, just align it under the pill and restyle the card. */
   html body.pm2-active .header .nav {
-    border: 1px solid rgba(13, 7, 24, 0.08);
+    border: 1px solid rgba(8, 19, 13, 0.08);
     border-radius: 22px;
-    box-shadow: 0 24px 60px -24px rgba(13, 7, 24, 0.3);
+    box-shadow: 0 24px 60px -24px rgba(8, 19, 13, 0.3);
   }
 
   html body.pm2-active .header .nav.open {
@@ -799,7 +1295,7 @@ html body.pm2-active .header .header-actions {
   }
 
   html body.pm2-active .header .mobile-nav-cta {
-    background: #0d0718;
+    background: #08130d;
     color: #fff !important;
   }
 }

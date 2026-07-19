@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: Mazzard;
-  src: url('/fonts/MazzardM-Light.ttf') format('truetype');
+  src: url('/fonts/MazzardM-Regular.ttf') format('truetype'); /* Light file not shipped — nearest available cut */
   font-weight: 300;
   font-display: swap;
 }
@@ -31,7 +31,7 @@
 }
 @font-face {
   font-family: Mazzard;
-  src: url('/fonts/MazzardM-Italic.ttf') format('truetype');
+  src: url('/fonts/MazzardM-Regular.ttf') format('truetype'); /* Italic file not shipped — renders upright */
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -501,7 +501,9 @@ footer {
   max-width: var(--container) !important;
   margin: 1.25rem auto 0 !important;
   border-radius: var(--standart-section-radius) var(--standart-section-radius) 0 0 !important;
-  padding: var(--pad-standart) !important;
+  /* Slimmer bottom padding pulls the oversized sign-off lockup toward the
+     page edge instead of leaving a full pad of dead space under it. */
+  padding: var(--pad-standart) var(--pad-standart) 1.25rem !important;
 }
 .footer-col a:after {
   background: #000 !important;
@@ -970,7 +972,11 @@ html[data-theme='dark'] .cu-form-card {
     width: 100% !important;
   }
   .ind-hero-fs {
-    padding: 0 1rem !important;
+    padding: 0 !important; /* hero shell bleeds edge-to-edge on mobile */
+  }
+
+  .ind-h1 {
+    font-size: clamp(1.6rem, 9.6vw, 2.1rem) !important;
   }
 }
 

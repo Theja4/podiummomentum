@@ -3,15 +3,16 @@
 //   1. on load, the hero card plays its entrance: twists and falls into place
 //      while its photo image wipes in top→bottom (any image works)
 //   2. on scroll, the SAME card transforms: a sliding wipe rises from the
-//      card's bottom edge to its top, revealing the lime face — the exact
-//      reverse of the load wipe — no second card ever appears
-//   3. simultaneously, the purple panel spins ~90° clockwise about its center,
+//      card's bottom edge to its top, revealing the mint brand face — the
+//      exact reverse of the load wipe — no second card ever appears
+//   3. simultaneously, the forest panel spins ~90° clockwise about its center,
 //      while the card slides to the stage center, grows (capped inside the
 //      viewport so content stays crisp), and swivels upright — all at once
 //   4. it shrinks to the exact coverflow card size, falls into the first
-//      card's live slot, and swaps invisibly (faces pixel-identical)
+//      card's live slot, and swaps invisibly (faces pixel-identical: the
+//      ghost renders the very same CardFace as the coverflow)
 // All scroll motion runs in one rAF loop writing transforms imperatively.
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   useRafLoop,
   useProgress,
@@ -23,6 +24,8 @@ import {
   easeOutBack,
 } from './motion.js'
 import Sparkle from './Sparkle.jsx'
+import HeroVideo from './HeroVideo.jsx'
+import { CardFace, faceTheme } from './Carousel.jsx'
 import { HERO, SERVICE_CARDS } from './data.js'
 import { heroHandoff } from './handoff.js'
 import './hero.css'
@@ -49,7 +52,7 @@ const CARD_JOURNEY = {
   growScale: 1.7, // capped live to fit inside 86% of the viewport — no blur
   uprightFrom: 0.15, // swivels into upright EARLY — simultaneous with the spin
   uprightTo: 0.75,
-  wipeFrom: 0.12, // the lime face wipes in bottom→top (reverse of the load wipe)
+  wipeFrom: 0.12, // the mint face wipes in bottom→top (reverse of the load wipe)
   wipeTo: 0.55,
   seatFrom: 0.86, // shrinks to the exact coverflow card size, fully upright
   seatTo: 1,
@@ -57,17 +60,49 @@ const CARD_JOURNEY = {
   // section's rise (see the rAF loop): merge across rise 0.62→0.97, then a
   // hard one-frame swap at rise 0.96 (faces are pixel-identical by then)
 }
-const IDLE_TILT_DEG = 2.5 // pointer-driven idle tilt while scroll progress ≈ 0
-const IDLE_TILT_RANGE = 0.12 // sticky-progress range over which idle tilt dies
-const CARD_PARALLAX = { translate: 14, rotate: 8, lerp: 0.12 } // px / deg / per-frame
+const IDLE_TILT_RANGE = 0.12 // sticky-progress range over which card parallax dies
+const CARD_PARALLAX = { translate: 0, rotate: 0, lerp: 0.12 } // px / deg / per-frame
+// (parallax disabled: any residual sub-pixel rotate/translate composites the
+// card face soft — the user wants it razor sharp; the float + journey motion
+// already carry the liveliness)
 const PROGRESS_SMOOTH = 0.14
+// The mobile journey — the same film compressed into the seam between the
+// hero and the services deck, all driven by that section's rise (0→1 as its
+// top crosses the viewport): the mint face wipes up over the resting card,
+// the card detaches from the panel's field, swings upright, grows from its
+// rest scale to the coverflow's exact first-card size and seats into the
+// live slot — finished by the same hard one-frame swap as desktop.
+const MOBILE_JOURNEY = {
+  restTilt: -4, // deg — the resting tilt, unwound with a soft swing in flight
+  restMaxS: 0.8, // rest-fit scale clamps: the card must read as a miniature…
+  restMinS: 0.34, // …but never collapse on very short phones
+  wipeFrom: 0.06, // the mint face starts rising off the card's bottom edge
+  wipeTo: 0.5,
+  flyFrom: 0.14, // detaches from the panel and heads for the slot
+  flyTo: 0.96,
+  uprightTo: 0.66, // tilt fully unwound (easeOutBack — tiny overshoot swing)
+  morphFrom: 0.62, // faceA→faceB content morph (--m), same story as desktop
+  morphTo: 0.93,
+  swapAt: 0.965, // the hard swap into the coverflow's first card
+}
+const DESKTOP_WIDE_CARD = {
+  maxW: 780,
+  vw: 0.66,
+  maxH: 610,
+  vh: 0.7,
+  openFrom: 0.72,
+  openTo: 0.965,
+}
 
 export default function Hero({ navigate }) {
   const sectionRef = useRef(null)
   const panelRef = useRef(null)
   const cardRef = useRef(null)
-  const limeRef = useRef(null)
+  const wipeRef = useRef(null)
   const photoRef = useRef(null)
+  const titleRef = useRef(null)
+  const copyBlockRef = useRef(null)
+  const bottomRef = useRef(null)
   const carouselRef = useRef(null)
   const card0Ref = useRef(null)
 
@@ -75,15 +110,37 @@ export default function Hero({ navigate }) {
   const pointer = usePointer()
 
   const cardCur = useRef({ x: 0, y: 0, r: 0 })
-  // Static mode: small screens (no sticky/tilt) or reduced motion — the rAF
-  // loop then clears its writes and CSS lays out a plain stacked hero.
+  // Per-frame write dedupe: geometry writes (width/height/margin) invalidate
+  // layout, so they only happen when the value actually changed; one-shot
+  // clears are flagged so rest frames write nothing at all.
+  const frameCache = useRef({
+    geomKey: '',
+    staticCleared: false,
+    reducedCleared: false,
+    heroPointerEvents: '',
+  })
+  // Static mode: small screens (no sticky/tilt) or reduced motion — on small
+  // screens the compressed MOBILE_JOURNEY runs (wipe → fly → seat into the
+  // deck); reduced motion freezes the card at its rest fit, no journey.
   const staticRef = useRef(false)
+  const mobileRef = useRef(false)
+  const reducedRef = useRef(false)
+  // Mobile relocates the card INTO the panel's open field (a flex slot in
+  // the hero copy column); desktop keeps it stage-level so it escapes the
+  // panel's spin. Rendering position must follow the breakpoint.
+  const slotRef = useRef(null)
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches,
+  )
 
   useEffect(() => {
     const mqMobile = window.matchMedia('(max-width: 900px)')
     const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)')
     const update = () => {
+      mobileRef.current = mqMobile.matches
+      reducedRef.current = mqReduced.matches
       staticRef.current = mqMobile.matches || mqReduced.matches
+      setIsMobile(mqMobile.matches)
     }
     update()
     mqMobile.addEventListener('change', update)
@@ -93,77 +150,300 @@ export default function Hero({ navigate }) {
       mqReduced.removeEventListener('change', update)
       // release the coverflow's first card when the hero unmounts
       heroHandoff.ghostOpacity = 0
+      heroHandoff.cardExpansion = 0
     }
   }, [])
 
   useRafLoop(() => {
     const panel = panelRef.current
     const card = cardRef.current
-    const lime = limeRef.current
+    const wipe = wipeRef.current
     const photo = photoRef.current
 
+    const frame = frameCache.current
+    const setHeroPassThrough = passThrough => {
+      const pointerEvents = passThrough ? 'none' : ''
+      if (frame.heroPointerEvents === pointerEvents) return
+      frame.heroPointerEvents = pointerEvents
+      if (sectionRef.current) sectionRef.current.style.pointerEvents = pointerEvents
+    }
+
     if (staticRef.current) {
-      // Let CSS own the layout entirely (stacked mobile hero / reduced motion).
-      heroHandoff.ghostOpacity = 0
-      if (panel) {
-        panel.style.transform = ''
-        panel.style.opacity = ''
-        panel.style.pointerEvents = ''
+      if (!card) return
+      heroHandoff.cardExpansion = 0
+      if (!frame.staticCleared) {
+        frame.staticCleared = true
+        frame.geomKey = ''
+        // CSS owns the stacked layout; the panel never transforms on mobile
+        if (panel) {
+          panel.style.transform = ''
+          panel.style.opacity = ''
+          panel.style.pointerEvents = ''
+        }
+        // Desktop writes live dimensions during the portrait→wide morph.
+        // Release those inline values when a resize enters the CSS-owned
+        // mobile/reduced layout so the card cannot inherit a stale wide shape.
+        card.style.removeProperty('width')
+        card.style.removeProperty('height')
+        card.style.removeProperty('margin-top')
+        card.style.removeProperty('--pm2-card-pad')
+        card.style.removeProperty('--pm2-card-radius')
+        card.style.removeProperty('--pm2-card-title')
+        card.style.removeProperty('--pm2-card-copy')
       }
-      if (card) {
-        card.style.transform = ''
+      if (reducedRef.current && !mobileRef.current) {
+        // reduced motion on desktop: plain stacked hero, no journey at all
+        setHeroPassThrough(false)
+        if (!frame.reducedCleared) {
+          frame.reducedCleared = true
+          heroHandoff.ghostOpacity = 0
+          card.style.transform = ''
+          card.style.opacity = ''
+          card.style.removeProperty('--m')
+          if (wipe) wipe.style.clipPath = ''
+          if (photo) {
+            photo.style.transform = ''
+            photo.style.opacity = ''
+          }
+        }
+        return
+      }
+      frame.reducedCleared = false
+
+      const M = MOBILE_JOURNEY
+      const vw = window.innerWidth || 1
+      const vh = window.innerHeight || 1
+
+      // Rest geometry: the card is BUILT at the coverflow's exact mobile
+      // card size and scale-fitted into the slot the panel reserves for it
+      // (measured live — the wrapper never transforms, so its rect is safe).
+      const wrapR = slotRef.current ? slotRef.current.getBoundingClientRect() : null
+      const cw = card.offsetWidth || 1
+      const ch = card.offsetHeight || 1
+      const restS = wrapR
+        ? Math.min(M.restMaxS, Math.max(M.restMinS, Math.min(wrapR.width / cw, wrapR.height / ch)))
+        : 0.6
+      const restCX = wrapR ? wrapR.left + wrapR.width / 2 : vw / 2
+      const restCY = wrapR ? wrapR.top + wrapR.height / 2 : vh / 2
+
+      if (reducedRef.current) {
+        // reduced motion on mobile: the card holds its rest fit, no journey
+        setHeroPassThrough(false)
+        heroHandoff.ghostOpacity = 0
+        card.style.transform = `rotate(${M.restTilt}deg) scale(${restS.toFixed(4)})`
         card.style.opacity = ''
+        card.style.pointerEvents = ''
         card.style.removeProperty('--m')
+        if (wipe) wipe.style.clipPath = ''
+        if (photo) {
+          photo.style.transform = ''
+          photo.style.opacity = ''
+        }
+        return
       }
-      if (lime) lime.style.clipPath = ''
+
+      // —— the mobile journey: driven by the services section's rise ——
+      if (!carouselRef.current) carouselRef.current = document.getElementById('services')
+      const cEl = carouselRef.current
+      const rise = cEl ? clamp01((vh - cEl.getBoundingClientRect().top) / vh) : 0
+
+      // the coverflow's first-card slot, tracked live from its ACTUAL rect —
+      // so the ghost lands exactly on it at any scroll speed
+      let slotX = vw / 2
+      let slotY = vh / 2
+      let seatSX = 1
+      let seatSY = 1
+      if (cEl) {
+        if (!card0Ref.current || !card0Ref.current.isConnected) {
+          card0Ref.current = cEl.querySelector('.pm2-carousel-card')
+        }
+        if (card0Ref.current) {
+          const r = card0Ref.current.getBoundingClientRect()
+          if (r.width > 1) {
+            slotX = r.left + r.width / 2
+            slotY = r.top + r.height / 2
+            seatSX = r.width / cw
+            seatSY = r.height / ch
+          }
+        }
+      }
+
+      const w = easeInOutCubic(range(rise, M.wipeFrom, M.wipeTo))
+      const e = easeInOutCubic(range(rise, M.flyFrom, M.flyTo))
+      const eUp = easeOutBack(range(rise, M.flyFrom, M.uprightTo)) // swings past 0
+      const m = easeInOutCubic(range(rise, M.morphFrom, M.morphTo))
+      // the faces are pixel-identical by now — a hard one-frame swap
+      const cOp = rise < M.swapAt ? 1 : 0
+
+      if (wipe) {
+        const rad = vw <= 600 ? 22 : 26 // mirrors carousel.css card radius
+        wipe.style.clipPath = `inset(${((1 - w) * 100).toFixed(2)}% 0 0 0 round ${rad}px)`
+      }
+      // the photo drifts up gently as the wipe passes beneath it
       if (photo) {
-        photo.style.transform = ''
-        photo.style.opacity = ''
+        if (w < 0.0005) {
+          photo.style.transform = ''
+          photo.style.opacity = ''
+        } else {
+          photo.style.transform = `translateY(${(-8 * w).toFixed(2)}%)`
+          photo.style.opacity = (1 - 0.35 * w).toFixed(3)
+        }
       }
+
+      const gx = (slotX - restCX) * e
+      const gy = (slotY - restCY) * e
+      const gr = M.restTilt * (1 - eUp)
+      const sx = lerp(restS, seatSX, e)
+      const sy = lerp(restS, seatSY, e)
+      card.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0) rotate(${gr.toFixed(3)}deg) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`
+      card.style.opacity = cOp.toFixed(3)
+      card.style.pointerEvents = cOp < 0.5 ? 'none' : ''
+      // The hero and services overlap during the handoff. Once the ghost has
+      // seated, release the hero's full section hit area—not only the ghost
+      // card—so every visible part of the service cards can receive hover,
+      // pointer-cursor and click events. Reverse scrolling restores the hero.
+      setHeroPassThrough(cOp <= 0.01)
+      card.style.setProperty('--m', m.toFixed(4))
+      // the coverflow keeps its own first card hidden until we've landed
+      heroHandoff.ghostOpacity = rise >= M.flyFrom ? cOp : 0
       return
     }
 
     const vw = window.innerWidth || 1
     const vh = window.innerHeight || 1
+    frame.staticCleared = false
+
+    // —— frame reads: every layout query happens up front, before any style
+    // write in this loop, so no read can force a mid-frame reflow. Offset
+    // reads may lag one frame behind a geometry write during the expansion
+    // beat — invisible on smoothly interpolating values. ——
+    if (!carouselRef.current) carouselRef.current = document.getElementById('services')
+    let rise = 0
+    let slotX = vw / 2
+    let slotY = vh / 2
+    if (carouselRef.current) {
+      const cEl = carouselRef.current
+      rise = clamp01((vh - cEl.getBoundingClientRect().top) / vh)
+      if (!card0Ref.current || !card0Ref.current.isConnected) {
+        card0Ref.current = cEl.querySelector('.pm2-carousel-card')
+      }
+      if (card0Ref.current) {
+        const r = card0Ref.current.getBoundingClientRect()
+        if (r.width > 1) {
+          slotX = r.left + r.width / 2
+          slotY = r.top + r.height / 2
+        }
+      }
+    }
+    const heroR = sectionRef.current ? sectionRef.current.getBoundingClientRect() : null
+    const cardW = card ? card.offsetWidth || 1 : 1
+    const cardH = card ? card.offsetHeight || 1 : 1
+    const cardL = card ? card.offsetLeft : 0
+    const cardT = card ? card.offsetTop : 0
 
     // —— panel spin (sticky progress 0→1): flat ~90° clockwise rotation ——
+    // NOTE: the panel carries ALL the hero copy, so it never 3D-tilts on
+    // pointer idle (any non-identity 3D transform composited the panel and
+    // rasterized its text soft). Pointer parallax lives on the card only.
     const s = sticky.current
     const e = easeInOutCubic(range(s, TILT.spinFrom, TILT.spinTo))
     const idle = 1 - range(s, 0, IDLE_TILT_RANGE)
     const px = pointer.current.x
     const py = pointer.current.y
-    const rx = TILT.tipX * e - py * IDLE_TILT_DEG * idle
-    const ry = px * IDLE_TILT_DEG * idle
+    const rx = TILT.tipX * e
+    const ry = 0
     const rz = TILT.spin * e
     const sc = lerp(1, TILT.scale, e)
     const tx = TILT.driftXvw * e
     const ty = TILT.driftYvh * e
     const op = 1 - range(s, TILT.fadeStart, TILT.fadeEnd)
     if (panel) {
-      panel.style.transform = `translate3d(${tx.toFixed(3)}vw, ${ty.toFixed(3)}vh, 0) rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg) rotateZ(${rz.toFixed(3)}deg) scale(${sc.toFixed(4)})`
-      panel.style.opacity = op.toFixed(3)
-      panel.style.pointerEvents = op < 0.05 ? 'none' : ''
+      // At rest write NO transform: a per-frame 3D string — even an identity
+      // one — pins the panel to a composited layer and its text rasterizes
+      // soft. The resting hero must stay pixel-crisp; transforms resume the
+      // moment scroll progress moves the panel.
+      if (e < 0.0005) {
+        panel.style.transform = ''
+        panel.style.opacity = ''
+        panel.style.pointerEvents = ''
+      } else {
+        panel.style.transform = `translate3d(${tx.toFixed(3)}vw, ${ty.toFixed(3)}vh, 0) rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg) rotateZ(${rz.toFixed(3)}deg) scale(${sc.toFixed(4)})`
+        panel.style.opacity = op.toFixed(3)
+        panel.style.pointerEvents = op < 0.05 ? 'none' : ''
+      }
     }
 
-    // —— the hero card: wipes photo→lime, slides to center, grows, swivels
+    // —— hero copy exit: as the scroll begins the text lifts out in a
+    // stagger (title → lead/CTAs/stats → trust strip), ahead of the panel's
+    // spin. Progress-driven, so it plays in reverse on the way back up. ——
+    const exits = [
+      [titleRef.current, 0, 0.18],
+      [copyBlockRef.current, 0.05, 0.23],
+      [bottomRef.current, 0.1, 0.28],
+    ]
+    for (const [el, from, to] of exits) {
+      if (!el) continue
+      const t = easeInOutCubic(range(s, from, to))
+      if (t < 0.0005) {
+        el.style.opacity = ''
+        el.style.transform = ''
+        el.style.pointerEvents = ''
+      } else {
+        el.style.opacity = (1 - t).toFixed(3)
+        el.style.transform = `translate3d(0, ${(-46 * t).toFixed(1)}px, 0)`
+        el.style.pointerEvents = t > 0.5 ? 'none' : ''
+      }
+    }
+
+    // —— the hero card: wipes photo→mint, slides to center, grows, swivels
     // upright, shrinks, then falls into the coverflow's first card slot ——
     if (card) {
+      // The familiar portrait card opens into the carousel's wider cinematic
+      // canvas only during the final merge. Updating its real dimensions
+      // (instead of stretching it with scaleX) lets image crop and live type
+      // reflow naturally throughout the choreography.
+      const cardExpansion = easeInOutCubic(
+        range(rise, DESKTOP_WIDE_CARD.openFrom, DESKTOP_WIDE_CARD.openTo),
+      )
+      heroHandoff.cardExpansion = cardExpansion
+      const portraitW = Math.min(540, Math.max(400, vw * 0.29))
+      const portraitH = Math.min(portraitW * 1.27, vh * 0.78)
+      const wideW = Math.min(DESKTOP_WIDE_CARD.maxW, vw * DESKTOP_WIDE_CARD.vw)
+      const wideH =
+        vh <= 820
+          ? Math.min(560, vh * 0.69)
+          : Math.min(DESKTOP_WIDE_CARD.maxH, vh * DESKTOP_WIDE_CARD.vh)
+      const liveW = lerp(portraitW, wideW, cardExpansion)
+      const liveH = lerp(portraitH, wideH, cardExpansion)
+      const liveRadius = lerp(26, 34, cardExpansion)
+      // Geometry writes dirty layout; only touch them when the values moved.
+      const geomKey = `${liveW.toFixed(1)}|${liveH.toFixed(1)}|${cardExpansion.toFixed(4)}`
+      if (frame.geomKey !== geomKey) {
+        frame.geomKey = geomKey
+        card.style.width = `${liveW.toFixed(1)}px`
+        card.style.height = `${liveH.toFixed(1)}px`
+        card.style.marginTop = `${(-liveH / 2).toFixed(1)}px`
+        card.style.setProperty('--pm2-card-pad', `${lerp(22, 30, cardExpansion).toFixed(1)}px`)
+        card.style.setProperty('--pm2-card-radius', `${liveRadius.toFixed(1)}px`)
+        card.style.setProperty('--pm2-card-title', `${lerp(36, 46, cardExpansion).toFixed(1)}px`)
+        card.style.setProperty('--pm2-card-copy', `${lerp(14, 16, cardExpansion).toFixed(1)}px`)
+      }
+
       // Rest geometry is MEASURED (offsetLeft/offsetTop are layout values,
-      // unaffected by the transforms we write), never mirrored from CSS.
-      const heroR = sectionRef.current ? sectionRef.current.getBoundingClientRect() : null
+      // unaffected by the transforms we write), never mirrored from CSS —
+      // read once in the frame's read phase above.
       const stickySpan = heroR ? heroR.height - vh : 0
       // sticky stage: pinned at 0 while the section scrolls through, then
       // scrolls up with it after release
       const stageTop = heroR ? (heroR.top > -stickySpan ? 0 : heroR.top + stickySpan) : 0
       const stageLeft = heroR ? heroR.left : 0
-      const restCX = stageLeft + card.offsetLeft + card.offsetWidth / 2
-      const restCY = stageTop + card.offsetTop + card.offsetHeight / 2
+      const restCX = stageLeft + cardL + cardW / 2
+      const restCY = stageTop + cardT + cardH / 2
       // the coverflow card it will become (mirrors carousel.css card sizing —
-      // the hero card is built at the same size, so the seat scale lands 1.0)
-      const cw = Math.min(370, vw * 0.8)
-      const ch = Math.min(530, vh * 0.74)
-      const seatSX = cw / card.offsetWidth
-      const seatSY = ch / card.offsetHeight
+      // the hero card is built at the same size, so the seat scale lands 1.0;
+      // short desktop viewports use the compact card tune)
+      const seatSX = liveW / cardW
+      const seatSY = liveH / cardH
 
       // ONE simultaneous motion with the panel's spin: slide + grow + swivel
       const eG = easeInOutCubic(range(s, CARD_JOURNEY.slideFrom, CARD_JOURNEY.slideTo))
@@ -173,8 +453,8 @@ export default function Hero({ navigate }) {
       // grown size is capped so the card never fills/stretches past the window
       const gsMax = Math.min(
         CARD_JOURNEY.growScale,
-        (vw * 0.86) / card.offsetWidth,
-        (vh * 0.86) / card.offsetHeight,
+        (vw * 0.86) / cardW,
+        (vh * 0.86) / cardH,
       )
       const growS = lerp(1, gsMax, eG)
       const sx = lerp(growS, seatSX, eS)
@@ -185,35 +465,25 @@ export default function Hero({ navigate }) {
       const cx = lerp(restCX, vw / 2, eG)
       const cy = lerp(restCY, vh / 2, eG)
 
-      // —— the sliding wipe: lime face rises from the card's bottom edge ——
+      // —— the sliding wipe: the mint face rises from the card's bottom edge ——
       const w = easeInOutCubic(range(s, CARD_JOURNEY.wipeFrom, CARD_JOURNEY.wipeTo))
-      if (lime) {
-        lime.style.clipPath = `inset(${((1 - w) * 100).toFixed(2)}% 0 0 0 round 26px)`
+      if (wipe) {
+        wipe.style.clipPath = `inset(${((1 - w) * 100).toFixed(2)}% 0 0 0 round ${liveRadius.toFixed(1)}px)`
       }
       // the photo drifts up gently as the wipe passes beneath it
       if (photo) {
-        photo.style.transform = `translateY(${(-8 * w).toFixed(2)}%)`
-        photo.style.opacity = (1 - 0.35 * w).toFixed(3)
+        if (w < 0.0005) {
+          photo.style.transform = ''
+          photo.style.opacity = ''
+        } else {
+          photo.style.transform = `translateY(${(-8 * w).toFixed(2)}%)`
+          photo.style.opacity = (1 - 0.35 * w).toFixed(3)
+        }
       }
 
-      // The coverflow's first-card slot, tracked live from the card's ACTUAL
-      // rendered rect — so it lands exactly on it at any scroll speed.
-      if (!carouselRef.current) carouselRef.current = document.getElementById('services')
-      let rise = 0
-      let slotX = vw / 2
-      let slotY = vh / 2
-      if (carouselRef.current) {
-        const cEl = carouselRef.current
-        rise = clamp01((vh - cEl.getBoundingClientRect().top) / vh)
-        if (!card0Ref.current || !card0Ref.current.isConnected) {
-          card0Ref.current = cEl.querySelector('.pm2-carousel-card')
-        }
-        if (card0Ref.current) {
-          const r = card0Ref.current.getBoundingClientRect()
-          slotX = r.left + r.width / 2
-          slotY = r.top + r.height / 2
-        }
-      }
+      // The coverflow's first-card slot (slotX/slotY) was tracked from the
+      // card's ACTUAL rendered rect in the read phase above — so the ghost
+      // lands exactly on it at any scroll speed.
       const eM = easeInOutCubic(range(rise, 0.62, 0.97)) // merge into the slot
       const goalX = lerp(vw / 2, slotX, eM)
       const goalY = lerp(vh / 2, slotY, eM)
@@ -223,37 +493,109 @@ export default function Hero({ navigate }) {
       c.r = lerp(c.r, px * CARD_PARALLAX.rotate, CARD_PARALLAX.lerp)
       const gx = cx - restCX + (goalX - vw / 2) + c.x * idle
       const gy = cy - restCY + (goalY - vh / 2) + c.y * idle
-      // content morph: the lime face slides into the card's face mid-fall
+      // content morph: the coverflow face slides over the ghost's own mid-fall
       const m = easeInOutCubic(range(rise, 0.66, 0.94))
       // the faces are pixel-identical by now — a hard one-frame swap
       const cOp = rise < 0.96 ? 1 : 0
 
-      card.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0) rotate(${(gr + c.r * idle).toFixed(3)}deg) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`
-      card.style.opacity = cOp.toFixed(3)
+      // same rest rule as the panel: identity transforms are cleared so the
+      // resting card (and everything it contains) rasterizes crisp
+      const cardAtRest =
+        s < 0.0005 &&
+        rise < 0.0005 &&
+        Math.abs(px) < 0.004 &&
+        Math.abs(py) < 0.004 &&
+        Math.abs(c.x) < 0.05 &&
+        Math.abs(c.y) < 0.05 &&
+        Math.abs(c.r) < 0.02
+      if (cardAtRest) {
+        card.style.transform = ''
+        card.style.opacity = ''
+      } else {
+        card.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0) rotate(${(gr + c.r * idle).toFixed(3)}deg) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`
+        card.style.opacity = cOp.toFixed(3)
+      }
+      // Once the handoff ghost has disappeared, release its hit area so the
+      // real left-side carousel card underneath receives hover and clicks.
+      card.style.pointerEvents = cOp <= 0.01 ? 'none' : 'auto'
+      // The transparent hero section is still stacked above the carousel, so
+      // its viewport-sized box must become click-through along with the ghost.
+      setHeroPassThrough(cOp <= 0.01)
       card.style.setProperty('--m', m.toFixed(4))
       // the coverflow keeps its own first card hidden until we've landed
       heroHandoff.ghostOpacity = s >= CARD_JOURNEY.slideFrom ? cOp : 0
     }
   })
 
+  // THE card: photo face on top, the mint brand face wiping in from the
+  // bottom. Desktop: stage-level (escapes the panel's spin), slides out of
+  // the panel slot, grows, swivels upright, then falls into the coverflow.
+  // Mobile: rests scaled-down inside the panel's open field, then flies
+  // into the same slot. It is never replaced by a new card.
+  const heroCard = (
+    <div className="pm2-hero-card" ref={cardRef}>
+      {/* entrance wrapper: twists and falls into place on load */}
+      <div className="pm2-hero-card-enter">
+        <div className="pm2-hero-card-float">
+          {/* the showreel face — the card IS the video player: muted inline
+              preview in the card's own shape; a "View" cursor chip trails the
+              pointer on hover; clicking opens the glass lightbox with sound */}
+          <div className="pm2-hero-card-reveal" ref={photoRef}>
+            <HeroVideo />
+          </div>
+          {/* wipe face — the scroll wipe reveals it bottom→top; it IS the
+              first coverflow card's face (same component, same theme
+              class) so the seating swap is invisible */}
+          <div
+            className={`pm2-hero-card-wipe pm2-carousel-card--${faceTheme(CARD0)} ${CARD0.image ? 'pm2-carousel-card--image' : ''}${CARD0.slug === 'website-design' ? ' pm2-carousel-card--website' : ''}`}
+            ref={wipeRef}
+            aria-hidden="true"
+          >
+            {/* the coverflow card's face, slides in with --m */}
+            <span className="pm2-hero-ghost-faceB" aria-hidden="true">
+              <CardFace card={CARD0} />
+            </span>
+            {/* the wipe face's own identity, slides out with --m */}
+            <span className="pm2-hero-ghost-faceA" aria-hidden="true">
+              <Sparkle size={26} color="#0a140f" className="pm2-hero-ghost-sparkle" />
+              <span className="pm2-hero-ghost-labelMask">
+                <span className="pm2-mask-in pm2-hero-ghost-label">Browse our services</span>
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <section className="pm2-hero" id="top" ref={sectionRef}>
       <div className="pm2-hero-stage">
-        {/* the violet panel that spins ~90° away on scroll */}
+        {/* the forest panel that spins ~90° away on scroll */}
         <div className="pm2-hero-panel" ref={panelRef}>
           <div className="pm2-hero-inner">
-            <h1 className="pm2-hero-title">
-              <span className="pm2-hero-line">
-                <span className="pm2-hero-line-in">{HERO.line1}</span>
+            <div className="pm2-hero-head" ref={titleRef}>
+              <span className="pm2-hero-eyebrow">
+                <Sparkle size={11} color="#8beec0" className="pm2-hero-eyebrow-mark" />
+                {HERO.eyebrow}
               </span>
-              <span className="pm2-hero-line pm2-hero-line--dim">
-                <span className="pm2-hero-line-in">{HERO.line2}</span>
-              </span>
-            </h1>
+              <h1 className="pm2-hero-title">
+                <span className="pm2-hero-line pm2-hero-line--accent">
+                  <span className="pm2-hero-line-in">{HERO.line1}</span>
+                </span>
+                <span className="pm2-hero-line">
+                  <span className="pm2-hero-line-in">{HERO.line2}</span>
+                </span>
+                <span className="pm2-hero-line">
+                  <span className="pm2-hero-line-in">{HERO.line3}</span>
+                </span>
+              </h1>
+            </div>
 
             <div className="pm2-hero-mid">
-              <div className="pm2-hero-copy">
+              <div className="pm2-hero-copy" ref={copyBlockRef}>
                 <p className="pm2-hero-lead">{HERO.lead}</p>
+                <p className="pm2-hero-detail">{HERO.caption}</p>
                 <div className="pm2-hero-ctas">
                   <a
                     className="pm2-pill pm2-pill--white"
@@ -263,97 +605,73 @@ export default function Hero({ navigate }) {
                       navigate?.(HERO.primaryCta.href)
                     }}
                   >
-                    {HERO.primaryCta.label}
-                  </a>
-                  <a className="pm2-pill pm2-pill--ghost" href={HERO.secondaryCta.href}>
-                    {HERO.secondaryCta.label}
-                  </a>
-                </div>
-                <div className="pm2-hero-stats">
-                  {HERO.stats.map(stat => (
-                    <div className="pm2-hero-stat" key={stat.label}>
-                      <span className="pm2-hero-stat-value">{stat.value}</span>
-                      <span className="pm2-hero-stat-label">{stat.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="pm2-hero-bottom">
-              <div className="pm2-hero-trust">
-                <span className="pm2-hero-avatars" aria-hidden="true">
-                  {HERO.avatars.map((src, i) => (
-                    <img
-                      key={src}
-                      src={src}
-                      alt=""
-                      width="34"
-                      height="34"
-                      loading="lazy"
-                      decoding="async"
-                      draggable="false"
-                      style={{ zIndex: HERO.avatars.length - i }}
-                    />
-                  ))}
-                </span>
-                <span className="pm2-hero-trust-text">{HERO.trust}</span>
-              </div>
-              <p className="pm2-hero-caption">{HERO.caption}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* THE card: photo face on top, lime face wiping in from the bottom.
-            It slides out of the panel slot, grows, swivels upright, then
-            falls into the coverflow — it never gets replaced by a new card */}
-        <div className="pm2-hero-card" ref={cardRef}>
-          {/* entrance wrapper: twists and falls into place on load */}
-          <div className="pm2-hero-card-enter">
-            <div className="pm2-hero-card-float">
-              {/* photo face — the load wipe reveals it top→bottom */}
-              <div className="pm2-hero-card-reveal" ref={photoRef}>
-                <img
-                  src={HERO.cardArt}
-                  alt="Abstract violet brand artwork with a figure in motion"
-                  width="340"
-                  height="425"
-                  loading="lazy"
-                  decoding="async"
-                  draggable="false"
-                />
-              </div>
-              {/* lime face — the scroll wipe reveals it bottom→top */}
-              <div className="pm2-hero-card-lime" ref={limeRef} aria-hidden="true">
-                <span className="pm2-carousel-cover" aria-hidden="true">
-                  <img src="/assets/pm2/art-lime.jpg" alt="" loading="lazy" decoding="async" draggable="false" />
-                </span>
-                {/* the coverflow card's face, slides in with --m */}
-                <span className="pm2-hero-ghost-faceB" aria-hidden="true">
-                  <span className="pm2-carousel-card-top">
-                    <span className="pm2-carousel-idx">{String(CARD0.index).padStart(2, '0')}</span>
-                    <span className="pm2-carousel-domain">{CARD0.domain}</span>
-                  </span>
-                  <span className="pm2-carousel-card-mid">
-                    <span className="pm2-carousel-chip">{CARD0.line}</span>
-                  </span>
-                  <span className="pm2-carousel-card-bottom">
-                    <span className="pm2-mask">
-                      <span className="pm2-mask-in pm2-carousel-card-title">{CARD0.title}</span>
+                    <span>{HERO.primaryCta.label}</span>
+                    <span className="pm2-hero-cta-icon" aria-hidden="true">
+                      <svg viewBox="0 0 20 20">
+                        <path d="M4 10h11M11 6l4 4-4 4" />
+                      </svg>
                     </span>
-                  </span>
-                </span>
-                {/* the lime card's own identity, slides out with --m */}
-                <span className="pm2-hero-ghost-faceA" aria-hidden="true">
-                  <Sparkle size={26} color="#c9f62d" className="pm2-hero-ghost-sparkle" />
-                  <span className="pm2-hero-ghost-labelMask">
-                    <span className="pm2-mask-in pm2-hero-ghost-label">Browse our services</span>
-                  </span>
+                  </a>
+                  <a className="pm2-hero-text-link" href={HERO.secondaryCta.href}>
+                    <span>{HERO.secondaryCta.label}</span>
+                    <svg viewBox="0 0 18 18" aria-hidden="true">
+                      <path d="M4 14 14 4M7 4h7v7" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* mobile only: the open field in the panel's lower half — the
+                card's rest slot; the rAF scale-fits the card into it */}
+            {isMobile && (
+              <div className="pm2-hero-cardSlot" ref={slotRef}>
+                {heroCard}
+              </div>
+            )}
+
+            <div className="pm2-hero-bottom" ref={bottomRef}>
+              <div className="pm2-hero-trust">
+                <span className="pm2-hero-trust-label">{HERO.trust}</span>
+                <span className="pm2-hero-logos">
+                  {HERO.logos.map(logo => (
+                    <span className="pm2-hero-logo" key={logo.name}>
+                      {logo.mark && (
+                        <img
+                          src={logo.mark}
+                          alt=""
+                          className={logo.chip ? 'is-chip' : 'is-mark'}
+                          width="22"
+                          height="22"
+                          loading="lazy"
+                          decoding="async"
+                          draggable="false"
+                        />
+                      )}
+                      {logo.word ? (
+                        <img
+                          src={logo.word}
+                          alt={logo.name}
+                          className="is-word"
+                          height="15"
+                          loading="lazy"
+                          decoding="async"
+                          draggable="false"
+                        />
+                      ) : (
+                        <span className="pm2-hero-logo-name">{logo.name}</span>
+                      )}
+                    </span>
+                  ))}
                 </span>
               </div>
             </div>
           </div>
         </div>
+
+        {/* desktop: the card lives at stage level so it escapes the panel's
+            spin and can fly the pinned journey */}
+        {!isMobile && heroCard}
       </div>
     </section>
   )

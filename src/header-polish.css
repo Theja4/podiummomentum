@@ -145,13 +145,8 @@ html[data-theme='dark'] .header.header-scrolled {
     gap: 8px !important;
   }
 
-  .header .logo-lockup-mark {
-    width: 28px !important;
-    height: 28px !important;
-  }
-
-  .header .logo-wordmark {
-    font-size: 17px !important;
+  .header .logo-lockup-img {
+    height: 24px !important;
   }
 
   .header .menu {
@@ -226,5 +221,782 @@ html[data-theme='dark'] .header.header-scrolled {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   Liquid Glass navigation
+
+   The header and both dropdowns are one material system: a translucent,
+   saturated base, a bright rim, and a soft specular reflection. The page
+   remains visible through the material instead of being replaced by an
+   opaque white card.
+   ========================================================================== */
+.header {
+  --nav-glass: rgba(250, 253, 251, .62);
+  --nav-glass-strong: rgba(250, 253, 251, .76);
+  --nav-glass-line: rgba(255, 255, 255, .82);
+  --nav-glass-ink: #07110b;
+  --nav-glass-muted: rgba(7, 17, 11, .58);
+  --nav-glass-shadow: rgba(18, 48, 31, .16);
+  top: 0 !important;
+  padding-top: 12px !important;
+  padding-bottom: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+.header .header-inner {
+  min-height: 60px;
+  height: 60px;
+  padding: 6px 8px 6px 18px;
+  border: 1px solid rgba(12, 31, 20, .12);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .80), rgba(255, 255, 255, .48)),
+    var(--nav-glass);
+  -webkit-backdrop-filter: blur(24px) saturate(175%);
+  backdrop-filter: blur(24px) saturate(175%);
+  box-shadow:
+    0 14px 34px -22px var(--nav-glass-shadow),
+    0 2px 8px rgba(8, 19, 13, .05),
+    inset 0 1px 0 var(--nav-glass-line),
+    inset 0 -1px 0 rgba(255, 255, 255, .28);
+  isolation: isolate;
+  pointer-events: auto;
+  transition:
+    background-color .35s ease,
+    border-color .35s ease,
+    box-shadow .45s cubic-bezier(.16, 1, .3, 1) !important;
+}
+
+.header .header-inner::before,
+.header .header-inner::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.header .header-inner::before {
+  inset: 0;
+  background:
+    radial-gradient(65% 130% at 8% -35%, rgba(255, 255, 255, .98), transparent 62%),
+    radial-gradient(45% 120% at 100% 110%, rgba(103, 224, 163, .13), transparent 72%);
+  opacity: .82;
+}
+
+.header .header-inner::after {
+  inset: 1px;
+  border: 1px solid rgba(255, 255, 255, .38);
+  -webkit-mask-image: linear-gradient(115deg, #000 0 38%, transparent 62%);
+  mask-image: linear-gradient(115deg, #000 0 38%, transparent 62%);
+}
+
+.header.header-scrolled .header-inner {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .86), rgba(255, 255, 255, .62)),
+    var(--nav-glass-strong);
+  border-color: rgba(12, 31, 20, .14);
+  box-shadow:
+    0 22px 52px -28px rgba(8, 30, 18, .30),
+    0 4px 12px rgba(8, 19, 13, .07),
+    inset 0 1px 0 rgba(255, 255, 255, .94),
+    inset 0 -1px 0 rgba(255, 255, 255, .32);
+}
+
+/* The landing previously put the opaque pill on the outer header. Move the
+   material to .header-inner so every route uses exactly the same glass layer. */
+html body.pm2-active #root .header,
+html body.pm2-active #root .header.header-scrolled {
+  top: 0 !important;
+  height: 80px !important;
+  padding: 12px 0 8px !important;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html body.pm2-active #root .header .header-inner {
+  height: 60px !important;
+  min-height: 60px !important;
+  padding: 6px 8px 6px 18px !important;
+  -webkit-backdrop-filter: blur(24px) saturate(175%) !important;
+  backdrop-filter: blur(24px) saturate(175%) !important;
+}
+
+/* The landing hero is deliberately high-contrast and animated. Give its
+   dropdown a slightly denser frost so large artwork never competes with the
+   service labels while the material still reacts to what passes behind it. */
+html body.pm2-active #root .header .nav-dropdown-panel-card {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .91), rgba(242, 249, 245, .80)) !important;
+}
+
+@media (min-width: 901px) {
+  .header .nav > a,
+  .header .nav > .nav-dropdown {
+    border-radius: 999px;
+    transition:
+      color .25s ease,
+      background-color .3s ease,
+      box-shadow .3s ease !important;
+  }
+
+  .header .nav > a {
+    padding-inline: .62rem !important;
+  }
+
+  .header .nav > a:hover,
+  .header .nav > .nav-dropdown:hover,
+  .header .nav > .nav-dropdown.is-open {
+    background: rgba(255, 255, 255, .50);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .88),
+      0 5px 16px -10px rgba(8, 19, 13, .35);
+  }
+
+  .header .nav-dropdown-trigger::after,
+  .header .nav > a::after {
+    display: none !important;
+  }
+
+  .header .nav-dropdown-chevron {
+    opacity: .64;
+    transition:
+      transform .42s cubic-bezier(.16, 1, .3, 1),
+      opacity .25s ease !important;
+  }
+
+  .header .nav-dropdown.is-open .nav-dropdown-chevron {
+    opacity: 1;
+  }
+
+  /* The panel wrapper stays transparent to preserve its hover bridge. */
+  .header .nav-dropdown-panel-card {
+    border: 1px solid rgba(255, 255, 255, .72) !important;
+    border-radius: 22px !important;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, .78), rgba(245, 251, 247, .56)) !important;
+    -webkit-backdrop-filter: blur(34px) saturate(185%) !important;
+    backdrop-filter: blur(34px) saturate(185%) !important;
+    box-shadow:
+      0 32px 70px -30px rgba(7, 25, 15, .38),
+      0 12px 30px -18px rgba(7, 25, 15, .24),
+      inset 0 1px 0 rgba(255, 255, 255, .96),
+      inset 0 0 0 1px rgba(9, 36, 21, .035) !important;
+  }
+
+  .header .nav-dropdown-panel-card::before {
+    z-index: 0;
+    background:
+      radial-gradient(80% 85% at 4% -12%, rgba(255, 255, 255, .96), transparent 62%),
+      radial-gradient(65% 80% at 104% 102%, rgba(103, 224, 163, .18), transparent 68%) !important;
+    opacity: 1;
+  }
+
+  .header .nav-dropdown-panel-card::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 1px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, .42);
+    -webkit-mask-image: linear-gradient(125deg, #000 0 30%, transparent 58%);
+    mask-image: linear-gradient(125deg, #000 0 30%, transparent 58%);
+    pointer-events: none;
+  }
+
+  .header .nav-dropdown-panel--mega {
+    width: min(31rem, 86vw) !important;
+  }
+
+  .header .nav-dropdown-head {
+    padding: .45rem .62rem .72rem;
+    border-bottom-color: rgba(7, 17, 11, .08);
+  }
+
+  .header .nav-dropdown-eyebrow {
+    color: var(--nav-glass-muted);
+    letter-spacing: .14em;
+  }
+
+  .header .nav-dropdown-all {
+    min-height: 30px;
+    padding: .28rem .58rem;
+    border-radius: 999px;
+    color: #0d6743 !important;
+    background: rgba(255, 255, 255, .44);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .78);
+    transition: background-color .25s ease, transform .3s cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .header .nav-dropdown-all:hover {
+    background: rgba(255, 255, 255, .76);
+    transform: translateY(-1px);
+  }
+
+  .header .nav-dropdown-list {
+    gap: .24rem;
+    padding-right: 2px;
+  }
+
+  .header .nav-dropdown-item {
+    min-height: 58px;
+    padding: .68rem .74rem;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    transition:
+      transform .38s cubic-bezier(.16, 1, .3, 1),
+      opacity .3s ease,
+      background-color .28s ease,
+      border-color .28s ease,
+      box-shadow .35s ease;
+  }
+
+  .header .nav-dropdown-item-bg {
+    background:
+      linear-gradient(110deg, rgba(255, 255, 255, .72), rgba(224, 249, 235, .52));
+    transform: translateY(4px) scale(.985);
+    opacity: 0;
+    transition:
+      transform .42s cubic-bezier(.16, 1, .3, 1),
+      opacity .25s ease;
+  }
+
+  .header .nav-dropdown-item:hover,
+  .header .nav-dropdown-item:focus-visible {
+    border-color: rgba(255, 255, 255, .68);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .90),
+      0 10px 24px -18px rgba(10, 56, 33, .42);
+    outline: 0;
+  }
+
+  .header .nav-dropdown-item:hover .nav-dropdown-item-bg,
+  .header .nav-dropdown-item:focus-visible .nav-dropdown-item-bg {
+    transform: none;
+    opacity: 1;
+  }
+
+  .header .nav-dropdown-item-copy small {
+    color: rgba(7, 17, 11, .56);
+    -webkit-line-clamp: 1;
+  }
+
+  .header .nav-dropdown-arrow {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border: 1px solid rgba(9, 36, 21, .08);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .50);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .82);
+  }
+
+  .header .nav-dropdown-item:hover .nav-dropdown-arrow,
+  .header .nav-dropdown-chip:hover .nav-dropdown-arrow {
+    transform: translateX(2px);
+  }
+
+  .header .nav-dropdown-chip {
+    min-height: 52px;
+    border: 1px solid rgba(255, 255, 255, .50);
+    background: rgba(255, 255, 255, .36);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .68);
+  }
+
+  .header .nav-dropdown-chip:hover,
+  .header .nav-dropdown-chip:focus-visible {
+    background: rgba(255, 255, 255, .66);
+    border-color: rgba(255, 255, 255, .82);
+    outline: 0;
+  }
+
+  .header .nav-dropdown-chip .nav-dropdown-item-bg {
+    display: none;
+  }
+}
+
+/* Dark pages use a smoke-glass material while retaining the same highlights. */
+html[data-theme='dark'] .header {
+  --nav-glass: rgba(8, 13, 10, .58);
+  --nav-glass-strong: rgba(8, 13, 10, .74);
+  --nav-glass-line: rgba(255, 255, 255, .16);
+  --nav-glass-ink: #f5f8f6;
+  --nav-glass-muted: rgba(238, 246, 241, .58);
+  --nav-glass-shadow: rgba(0, 0, 0, .55);
+  background: transparent !important;
+}
+
+html[data-theme='dark'] .header .header-inner {
+  background:
+    linear-gradient(135deg, rgba(24, 32, 27, .74), rgba(5, 10, 7, .54)),
+    var(--nav-glass);
+  border-color: rgba(255, 255, 255, .12);
+  box-shadow:
+    0 20px 50px -26px rgba(0, 0, 0, .80),
+    inset 0 1px 0 rgba(255, 255, 255, .14),
+    inset 0 -1px 0 rgba(255, 255, 255, .04);
+}
+
+html[data-theme='dark'] .header .header-inner::before {
+  background:
+    radial-gradient(65% 130% at 8% -35%, rgba(255, 255, 255, .16), transparent 64%),
+    radial-gradient(45% 120% at 100% 110%, rgba(103, 224, 163, .12), transparent 72%);
+}
+
+@media (min-width: 901px) {
+  html[data-theme='dark'] .header .nav > a:hover,
+  html[data-theme='dark'] .header .nav > .nav-dropdown:hover,
+  html[data-theme='dark'] .header .nav > .nav-dropdown.is-open {
+    background: rgba(255, 255, 255, .08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10);
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-panel-card {
+    border-color: rgba(255, 255, 255, .14) !important;
+    background:
+      linear-gradient(145deg, rgba(25, 34, 29, .82), rgba(6, 11, 8, .68)) !important;
+    box-shadow:
+      0 34px 74px -28px rgba(0, 0, 0, .88),
+      inset 0 1px 0 rgba(255, 255, 255, .13),
+      inset 0 0 0 1px rgba(255, 255, 255, .025) !important;
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-panel-card::before {
+    background:
+      radial-gradient(80% 85% at 4% -12%, rgba(255, 255, 255, .13), transparent 62%),
+      radial-gradient(65% 80% at 104% 102%, rgba(103, 224, 163, .14), transparent 68%) !important;
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-all,
+  html[data-theme='dark'] .header .nav-dropdown-arrow,
+  html[data-theme='dark'] .header .nav-dropdown-chip {
+    background: rgba(255, 255, 255, .07);
+    border-color: rgba(255, 255, 255, .10);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-item-bg {
+    background:
+      linear-gradient(110deg, rgba(255, 255, 255, .09), rgba(41, 112, 73, .20));
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-item-copy small {
+    color: rgba(238, 246, 241, .56);
+  }
+}
+
+@media (max-width: 900px) {
+  .header {
+    height: 76px !important;
+    padding: 10px 12px !important;
+  }
+
+  .header .header-inner,
+  html body.pm2-active #root .header .header-inner {
+    width: 100%;
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 6px 6px 6px 14px !important;
+    -webkit-backdrop-filter: blur(22px) saturate(170%) !important;
+    backdrop-filter: blur(22px) saturate(170%) !important;
+  }
+
+  .header .menu {
+    border: 1px solid rgba(255, 255, 255, .72) !important;
+    background: rgba(255, 255, 255, .58) !important;
+    color: #07110b !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .90),
+      0 8px 20px -14px rgba(8, 19, 13, .45);
+  }
+
+  .header .nav.open,
+  html body.pm2-active #root .header .nav.open {
+    top: 78px !important;
+    left: 12px !important;
+    right: 12px !important;
+    padding: 12px !important;
+    border: 1px solid rgba(255, 255, 255, .72) !important;
+    border-radius: 24px !important;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, .82), rgba(244, 250, 246, .68)) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    box-shadow:
+      0 30px 64px -28px rgba(7, 25, 15, .48),
+      inset 0 1px 0 rgba(255, 255, 255, .94) !important;
+  }
+
+  .header .nav.open::before {
+    background: rgba(5, 12, 8, .26);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+
+  .header .nav.open > a,
+  .header .nav.open .nav-dropdown-trigger {
+    border-radius: 14px;
+  }
+
+  .header .nav.open > a:hover,
+  .header .nav.open .nav-dropdown-trigger:hover {
+    background: rgba(255, 255, 255, .54);
+  }
+
+  .header .nav-dropdown-panel {
+    border: 1px solid rgba(255, 255, 255, .62) !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, .38) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+    backdrop-filter: blur(18px) saturate(160%) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72);
+  }
+
+  .header .nav-dropdown-panel-card {
+    width: 100%;
+  }
+
+  .header .nav-dropdown-item,
+  .header .nav-dropdown-chip {
+    border-radius: 13px;
+  }
+
+  .header .nav-dropdown-item:hover,
+  .header .nav-dropdown-chip:hover {
+    background: rgba(255, 255, 255, .52);
+  }
+
+  html[data-theme='dark'] .header .menu {
+    border-color: rgba(255, 255, 255, .12) !important;
+    background: rgba(255, 255, 255, .08) !important;
+    color: #fff !important;
+  }
+
+  html[data-theme='dark'] .header .nav.open {
+    border-color: rgba(255, 255, 255, .13) !important;
+    background:
+      linear-gradient(145deg, rgba(24, 32, 27, .88), rgba(5, 10, 7, .78)) !important;
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-panel {
+    background: rgba(255, 255, 255, .05) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+  }
+}
+
+/* ==========================================================================
+   Brand-green dropdown motion
+
+   Services and Industries share one interaction language: the trigger picks
+   up the brand tint, the panel draws in a green rule, and each destination
+   receives the same soft colour sweep and responsive arrow treatment.
+   ========================================================================== */
+.header {
+  /* These stay tied to the Podium palette even on routes whose editorial
+     theme intentionally remaps the generic green tokens to monochrome. */
+  --nav-brand: #67e0a3;
+  --nav-brand-bright: #7cf0bd;
+  --nav-brand-soft: #aff9c9;
+  --nav-brand-deep: #146b48;
+}
+
+@media (min-width: 901px) {
+  .header .nav > .nav-dropdown {
+    isolation: isolate;
+  }
+
+  .header .nav > .nav-dropdown::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 3px -7px;
+    border-radius: inherit;
+    background: linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--nav-brand) 34%, transparent),
+      color-mix(in srgb, var(--nav-brand-bright) 18%, transparent)
+    );
+    opacity: 0;
+    transform: scale(.82);
+    transition:
+      opacity .28s ease,
+      transform .48s cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .header .nav > .nav-dropdown:hover::before,
+  .header .nav > .nav-dropdown.is-open::before {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .header .nav-dropdown-trigger {
+    transition: color .28s ease !important;
+  }
+
+  .header .nav-dropdown.is-open .nav-dropdown-trigger {
+    color: var(--nav-brand-deep) !important;
+  }
+
+  .header .nav-dropdown-chevron {
+    transition:
+      color .28s ease,
+      transform .48s cubic-bezier(.16, 1, .3, 1),
+      opacity .25s ease !important;
+  }
+
+  .header .nav-dropdown.is-open .nav-dropdown-chevron {
+    color: var(--nav-brand-deep);
+  }
+
+  .header .nav-dropdown-panel-card {
+    transform-origin: 50% 0;
+  }
+
+  .header .nav-dropdown.is-open .nav-dropdown-panel-card {
+    animation: navBrandCardIn .48s cubic-bezier(.16, 1, .3, 1) both;
+  }
+
+  .header .nav-dropdown-head {
+    position: relative;
+    overflow: hidden;
+    border-bottom-color: transparent;
+  }
+
+  .header .nav-dropdown-head::after {
+    content: "";
+    position: absolute;
+    right: .62rem;
+    bottom: 0;
+    left: .62rem;
+    height: 1px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--nav-brand-deep),
+      var(--nav-brand),
+      var(--nav-brand-bright),
+      transparent 96%
+    );
+    opacity: .7;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .header .nav-dropdown.is-open .nav-dropdown-head::after {
+    animation: navBrandRuleIn .72s cubic-bezier(.16, 1, .3, 1) .1s both;
+  }
+
+  .header .nav-dropdown.is-open :is(.nav-dropdown-item, .nav-dropdown-chip) {
+    animation: navBrandItemIn .52s cubic-bezier(.16, 1, .3, 1) both;
+    animation-delay: calc(70ms + var(--i, 0) * 34ms);
+  }
+
+  .header .nav-dropdown-item,
+  .header .nav-dropdown-chip {
+    will-change: transform, opacity;
+  }
+
+  .header .nav-dropdown-item-bg,
+  .header .nav-dropdown-chip .nav-dropdown-item-bg {
+    display: block;
+    overflow: hidden;
+    background:
+      linear-gradient(
+        102deg,
+        color-mix(in srgb, var(--nav-brand) 34%, white),
+        color-mix(in srgb, var(--nav-brand-bright) 25%, white) 62%,
+        color-mix(in srgb, var(--nav-brand-soft) 18%, white)
+      );
+    opacity: 0;
+    transform: translateX(-14px) scale(.97);
+    transition:
+      opacity .25s ease,
+      transform .48s cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .header .nav-dropdown-item-bg::after {
+    content: "";
+    position: absolute;
+    inset: -40% auto -40% -24%;
+    width: 34%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, .68),
+      transparent
+    );
+    transform: skewX(-18deg) translateX(-180%);
+  }
+
+  .header :is(.nav-dropdown-item, .nav-dropdown-chip):is(:hover, :focus-visible) {
+    transform: translateX(4px);
+  }
+
+  .header :is(.nav-dropdown-item, .nav-dropdown-chip):is(:hover, :focus-visible) .nav-dropdown-item-bg {
+    opacity: 1;
+    transform: none;
+  }
+
+  .header :is(.nav-dropdown-item, .nav-dropdown-chip):is(:hover, :focus-visible) .nav-dropdown-item-bg::after {
+    animation: navBrandSheen .62s cubic-bezier(.16, 1, .3, 1) both;
+  }
+
+  .header .nav-dropdown-chip {
+    background: rgba(255, 255, 255, .30);
+    transition:
+      transform .42s cubic-bezier(.16, 1, .3, 1),
+      border-color .28s ease,
+      box-shadow .32s ease;
+  }
+
+  .header .nav-dropdown-chip:hover,
+  .header .nav-dropdown-chip:focus-visible {
+    background: rgba(255, 255, 255, .30);
+    border-color: color-mix(in srgb, var(--nav-brand) 48%, white);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .9),
+      0 12px 28px -20px color-mix(in srgb, var(--nav-brand-deep) 56%, transparent);
+  }
+
+  .header :is(.nav-dropdown-item, .nav-dropdown-chip):is(:hover, :focus-visible) .nav-dropdown-num {
+    color: var(--nav-brand-deep);
+    transform: translateX(2px);
+  }
+
+  .header .nav-dropdown-num {
+    transition:
+      color .25s ease,
+      transform .38s cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .header .nav-dropdown-arrow {
+    color: var(--nav-brand-deep);
+    transition:
+      color .25s ease,
+      background-color .3s ease,
+      border-color .3s ease,
+      box-shadow .3s ease,
+      transform .42s cubic-bezier(.16, 1, .3, 1),
+      opacity .25s ease;
+  }
+
+  .header :is(.nav-dropdown-item, .nav-dropdown-chip):is(:hover, :focus-visible) .nav-dropdown-arrow {
+    color: #fff;
+    background: var(--nav-brand-deep);
+    border-color: var(--nav-brand-deep);
+    box-shadow: 0 7px 18px -8px color-mix(in srgb, var(--nav-brand-deep) 72%, transparent);
+    transform: translateX(3px) rotate(-8deg);
+  }
+
+  .header .nav-dropdown-all {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--nav-brand) 24%, transparent);
+  }
+
+  .header .nav-dropdown-all:hover,
+  .header .nav-dropdown-all:focus-visible {
+    color: #fff !important;
+    background: var(--nav-brand-deep);
+    border-color: var(--nav-brand-deep);
+    box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--nav-brand-deep) 70%, transparent);
+    outline: 0;
+  }
+}
+
+@keyframes navBrandCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(.975);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes navBrandRuleIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: .7;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes navBrandItemIn {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(12px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+@keyframes navBrandSheen {
+  from { transform: skewX(-18deg) translateX(-180%); }
+  to { transform: skewX(-18deg) translateX(520%); }
+}
+
+@media (min-width: 901px) {
+  html[data-theme='dark'] .header .nav-dropdown.is-open .nav-dropdown-trigger,
+  html[data-theme='dark'] .header .nav-dropdown.is-open .nav-dropdown-chevron {
+    color: var(--nav-brand) !important;
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-item-bg,
+  html[data-theme='dark'] .header .nav-dropdown-chip .nav-dropdown-item-bg {
+    background:
+      linear-gradient(
+        102deg,
+        color-mix(in srgb, var(--nav-brand-deep) 54%, transparent),
+        color-mix(in srgb, var(--nav-brand) 24%, transparent)
+      );
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown-chip,
+  html[data-theme='dark'] .header .nav-dropdown-chip:hover,
+  html[data-theme='dark'] .header .nav-dropdown-chip:focus-visible {
+    background: rgba(255, 255, 255, .055);
+  }
+
+  html[data-theme='dark'] .header :is(.nav-dropdown-item, .nav-dropdown-chip):is(:hover, :focus-visible) .nav-dropdown-num {
+    color: var(--nav-brand);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header .nav > .nav-dropdown::before,
+  .header .nav-dropdown-panel-card,
+  .header .nav-dropdown-head::after,
+  .header .nav-dropdown-item,
+  .header .nav-dropdown-chip,
+  .header .nav-dropdown-item-bg,
+  .header .nav-dropdown-item-bg::after,
+  .header .nav-dropdown-num,
+  .header .nav-dropdown-arrow {
+    animation: none !important;
+    filter: none !important;
+    transition-duration: .01ms !important;
+  }
+
+  .header .nav-dropdown.is-open .nav-dropdown-head::after {
+    opacity: .7;
+    transform: scaleX(1);
   }
 }

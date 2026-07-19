@@ -3,7 +3,7 @@
 //
 //   1. THE BLOOM (entry, raw scroll): while the sticky stage rises over the
 //      carousel, a black four-point sparkle — viewport-anchored (fixed), so
-//      it stays centred on the violet card instead of riding up with the
+//      it stays centred on the brand card instead of riding up with the
 //      incoming panel — grows from the card's orb size to well past the
 //      viewport diagonal, wiping the page to black. The compact particle
 //      ring and the small white centre sparkle fade/scale in inside the
@@ -11,7 +11,7 @@
 //      exactly and the bloom rejoins the stage flow.
 //   2. THE POPS (pinned, smoothed scrub): once black, "Beyond" (top left),
 //      the paragraphs (bottom left) and "all / limits" (bottom right, line
-//      by line) pop in with a scale/blur settle while the ring blows out
+//      by line) pop in with a clean scale settle while the ring blows out
 //      into the dispersed galaxy field.
 //   3. THE HOLD: the scattered field idles (spin + wobble + pointer tilt)
 //      until the canvas dims for the WorkRail handoff.
@@ -60,14 +60,14 @@ const POINTER_ROT = 0.12 // pointer parallax on the group, rad
 
 // —— the bloom (driven by raw entry progress: section top rising through
 //    the viewport — overlaps the tail of the carousel) ————————————————
-const WIPE_START_PX = 190 // ~the violet card's black orb, so it reads as the orb expanding
+const WIPE_START_PX = 190 // ~the brand card's dark orb, so it reads as the orb expanding
 const WIPE_EXP = 1.5 // accelerating growth: a slow window, then a sudden engulf
 const WIPE_FADE = [0, 0.06] // star materialises out of the orb
 const STAR_ON = 0.04 // white centre sparkle pops in early in the bloom
 const RING_POP = [0.35, 1] // galaxy scales up from the centre inside the star
 const RING_POP_FROM = 0.55
 const CANVAS_IN = [0.55, 0.85] // points fade in once the star is wide enough
-const GLOW_IN = [0.8, 1] // ambient violet only once the star nearly covers
+const GLOW_IN = [0.8, 1] // ambient emerald only once the star nearly covers
 const WAIST = 0.2333 // sparkle waist radius as a fraction of element size
 
 // —— the pops (driven by smoothed sticky progress once pinned) ————————
@@ -76,12 +76,11 @@ const COPY_RANGE = [0.06, 0.16] // paragraphs follow
 const WORD_B_START = 0.09 // "all" / "limits" — line i: START + i*STEP, span WORD_B_SPAN
 const WORD_B_SPAN = 0.09
 const WORD_B_STEP = 0.045
-const POP_SCALE = 1.16 // pop = settle from slightly larger + unblur
-const POP_BLUR = 10 // px
+const POP_SCALE = 1.16 // pop = settle from slightly larger
 const COPY_RISE = 42 // px
 const CANVAS_OUT = [0.93, 1] // canvas dims out across the final stretch
-const WORD_A_DRIFT = -12 // vh of upward parallax across the section
-const WORD_B_DRIFT = -20
+const WORD_A_DRIFT = -4 // vh of upward parallax across the section — kept
+// shallow so the word never drifts up under the fixed header
 
 // —— shaders —————————————————————————————————————————————————————————
 const VERT = /* glsl */ `
@@ -127,8 +126,8 @@ void main() {
   float d = length(gl_PointCoord - vec2(0.5));
   float alpha = smoothstep(0.5, 0.12, d);
   if (alpha <= 0.01) discard;
-  vec3 deep = vec3(0.486, 0.227, 0.929); // #7c3aed
-  vec3 glow = vec3(0.659, 0.333, 0.969); // #a855f7
+  vec3 deep = vec3(0.184, 0.749, 0.498); // #2fbf7f
+  vec3 glow = vec3(0.486, 0.941, 0.741); // #7cf0bd
   vec3 pale = vec3(0.941, 0.671, 0.988); // #f0abfc
   vec3 col = mix(deep, glow, smoothstep(0.08, 0.6, vRand));
   col = mix(col, pale, smoothstep(0.6, 0.95, vRand));
@@ -199,14 +198,20 @@ export default function Beyond({ navigate } = {}) {
   }, [])
 
   // —— three.js scene (lazy import, disposed on unmount) ————————————————
+  // Init is resilient by design: context creation can fail (or the browser
+  // can silently drop the context) when the GPU is under pressure — this page
+  // also decodes several videos — and that used to leave the galaxy blank
+  // until a manual refresh. Failures now retry with backoff, and an
+  // unrecovered context loss rebuilds the scene on a fresh canvas.
   useEffect(() => {
     let alive = true
     let cleanup = null
-    const canvas = canvasRef.current
+    let retryTimer = 0
+    let restoreTimer = 0
     const stage = stageRef.current
-    if (!canvas || !stage) return undefined
+    if (!canvasRef.current || !stage) return undefined
 
-    ;(async () => {
+    const init = async (attempt = 0) => {
       let THREE
       try {
         THREE = await import('three')
@@ -214,20 +219,56 @@ export default function Beyond({ navigate } = {}) {
         return // no WebGL module — CSS glow + overlay still render
       }
       if (!alive) return
+      const canvas = canvasRef.current
+      if (!canvas) return
 
       const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR)
       const small =
         window.matchMedia(MOBILE_QUERY).matches || (window.devicePixelRatio || 1) > 2
       const count = small ? COUNT_MOBILE : COUNT_DESKTOP
 
-      const renderer = new THREE.WebGLRenderer({
-        canvas,
-        alpha: true,
-        antialias: false,
-        powerPreference: 'high-performance',
-      })
+      let renderer
+      try {
+        renderer = new THREE.WebGLRenderer({
+          canvas,
+          alpha: true,
+          antialias: false,
+          powerPreference: 'high-performance',
+        })
+        if (!renderer.getContext()) throw new Error('WebGL context unavailable')
+      } catch (err) {
+        renderer?.dispose?.()
+        if (alive && attempt < 4) {
+          retryTimer = window.setTimeout(() => init(attempt + 1), 800 * (attempt + 1))
+        } else {
+          console.warn('Beyond: WebGL init failed, galaxy disabled', err)
+        }
+        return
+      }
       renderer.setPixelRatio(dpr)
       renderer.setClearColor(0x000000, 0) // transparent — page black shows through
+
+      // three restores the context itself when the browser fires
+      // webglcontextrestored; when that event never arrives (common under
+      // memory pressure) the canvas is dead — rebuild on a fresh element.
+      const onLost = () => {
+        window.clearTimeout(restoreTimer)
+        restoreTimer = window.setTimeout(() => {
+          if (!alive) return
+          const old = canvasRef.current
+          if (cleanup) cleanup()
+          cleanup = null
+          if (old && old.parentNode) {
+            const fresh = old.cloneNode(false)
+            old.parentNode.replaceChild(fresh, old)
+            canvasRef.current = fresh
+          }
+          init(0)
+        }, 2500)
+      }
+      const onRestored = () => window.clearTimeout(restoreTimer)
+      canvas.addEventListener('webglcontextlost', onLost)
+      canvas.addEventListener('webglcontextrestored', onRestored)
 
       const scene = new THREE.Scene()
       const camera = new THREE.PerspectiveCamera(CAM_FOV, 1, 0.1, 40)
@@ -320,16 +361,22 @@ export default function Beyond({ navigate } = {}) {
 
       cleanup = () => {
         ro.disconnect()
+        canvas.removeEventListener('webglcontextlost', onLost)
+        canvas.removeEventListener('webglcontextrestored', onRestored)
         if (threeRef.current === t) threeRef.current = null
         geometry.dispose()
         material.dispose()
         renderer.dispose()
         if (renderer.forceContextLoss) renderer.forceContextLoss()
       }
-    })()
+    }
+
+    init()
 
     return () => {
       alive = false
+      window.clearTimeout(retryTimer)
+      window.clearTimeout(restoreTimer)
       if (cleanup) cleanup()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -382,7 +429,7 @@ export default function Beyond({ navigate } = {}) {
       wipe.style.opacity = String(range(enterP, WIPE_FADE[0], WIPE_FADE[1]))
     }
 
-    // ambient violet — only once the star nearly covers, so it never tints
+    // ambient emerald — only once the star nearly covers, so it never tints
     // the carousel peeking around the star's concave edges
     const glow = glowRef.current
     if (glow) glow.style.opacity = String(range(enterP, GLOW_IN[0], GLOW_IN[1]))
@@ -414,7 +461,7 @@ export default function Beyond({ navigate } = {}) {
       }
     }
 
-    // —— the pops: staggered scale/blur settles once the page is black ————
+    // —— the pops: staggered, crisp scale settles once the page is black ————
 
     // "Beyond" (top left) pops first + keeps its slow upward drift
     const wa = wordARef.current
@@ -423,7 +470,6 @@ export default function Beyond({ navigate } = {}) {
       const drift = (WORD_A_DRIFT / 100) * vh * p
       wa.style.opacity = String(e)
       wa.style.transform = `translate3d(0, ${drift.toFixed(1)}px, 0) scale(${lerp(POP_SCALE, 1, e).toFixed(4)})`
-      wa.style.filter = e >= 1 ? '' : `blur(${((1 - e) * POP_BLUR).toFixed(1)}px)`
     }
 
     // paragraphs (bottom left) fade + rise in across their window
@@ -434,10 +480,13 @@ export default function Beyond({ navigate } = {}) {
       copy.style.transform = `translate3d(0, ${((1 - e) * COPY_RISE).toFixed(1)}px, 0)`
     }
 
-    // "all / limits" (bottom right) — container drifts, lines pop in sequence
+    // "all / limits / together" — the container stays anchored to the
+    // viewport's bottom-right corner at every breakpoint while its lines
+    // pop in. Keeping motion on the children prevents scroll progress from
+    // pulling the whole phrase too far up on short or narrow screens.
     const wb = wordBRef.current
     if (wb) {
-      wb.style.transform = `translate3d(0, ${((WORD_B_DRIFT / 100) * vh * p).toFixed(1)}px, 0)`
+      wb.style.transform = ''
       const lines = wb.children
       for (let i = 0; i < lines.length; i += 1) {
         const a = WORD_B_START + i * WORD_B_STEP
@@ -445,7 +494,6 @@ export default function Beyond({ navigate } = {}) {
         const line = lines[i]
         line.style.opacity = String(e)
         line.style.transform = `scale(${lerp(POP_SCALE, 1, e).toFixed(4)})`
-        line.style.filter = e >= 1 ? '' : `blur(${((1 - e) * POP_BLUR).toFixed(1)}px)`
       }
     }
 
@@ -485,7 +533,7 @@ export default function Beyond({ navigate } = {}) {
             glow, the particle ring and the centre sparkle */}
         <div ref={bloomRef} className="pm2-beyond-bloom" aria-hidden="true">
           <div ref={wipeRef} className="pm2-beyond-wipe">
-            <Sparkle size={160} color="#07030e" className="pm2-beyond-wipe-svg" />
+            <Sparkle size={160} color="#040a07" className="pm2-beyond-wipe-svg" />
           </div>
           <div ref={glowRef} className="pm2-beyond-glow" />
           <canvas ref={canvasRef} className="pm2-beyond-canvas" />
