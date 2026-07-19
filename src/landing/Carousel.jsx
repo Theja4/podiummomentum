@@ -25,12 +25,12 @@ import './carousel.css'
 const N = SERVICE_CARDS.length
 const VH_PER_CARD = 55 // section height = 100vh + N * this
 const SMOOTH = 0.1 // heavy lerp on scroll progress — butter motion
-const SPACING_X = 335 // portrait handoff spacing …
-const SPACING_VW = 0.3 // … before the deck opens
-const SPACING_WIDE_X = 540
-const SPACING_WIDE_VW = 0.43
+const SPACING_X = 300 // portrait handoff spacing …
+const SPACING_VW = 0.27 // … before the deck opens
+const SPACING_WIDE_X = 480
+const SPACING_WIDE_VW = 0.39
 const SPACING_VW_MOBILE = 0.67 // phone fan: matches the desktop overlap ratio
-const DEPTH_Z = 220 // restrained desktop depth; mobile stays on a flat plane
+const DEPTH_Z = 200 // restrained desktop depth; mobile stays on a flat plane
 const MAX_DEPTH_STEPS = 3
 const ROT_DEG = 24 // enough depth to stage the deck without softening live type
 const ROT_MAX = 42
@@ -41,18 +41,18 @@ const ACTIVE_D = 0.5 // |d| below which a card counts as centred/clickable
 const SNAP_IDLE_MS = 180 // scroll quiet time before the deck glides to a slot
 const SNAP_MIN_OFF = 0.02 // dead zone: already close enough to a slot
 const FIRST_CARD_COPY_REVEAL_MS = 1050
-const WIDE_CARD_MAX = 780
-const WIDE_CARD_VW = 0.66
-const WIDE_CARD_H_MAX = 610
-const WIDE_CARD_VH = 0.7
+const WIDE_CARD_MAX = 700
+const WIDE_CARD_VW = 0.60
+const WIDE_CARD_H_MAX = 550
+const WIDE_CARD_VH = 0.63
 
 const desktopCardGeometry = (vw, vh, expansion) => {
   const compact = vh <= 820
-  const portraitW = Math.min(430, vw * 0.84)
-  const portraitH = compact ? Math.min(520, vh * 0.68) : Math.min(560, vh * 0.74)
+  const portraitW = Math.min(390, vw * 0.76)
+  const portraitH = compact ? Math.min(460, vh * 0.60) : Math.min(500, vh * 0.66)
   const wideW = Math.min(WIDE_CARD_MAX, vw * WIDE_CARD_VW)
   const wideH = compact
-    ? Math.min(560, vh * 0.69)
+    ? Math.min(500, vh * 0.62)
     : Math.min(WIDE_CARD_H_MAX, vh * WIDE_CARD_VH)
   return {
     width: lerp(portraitW, wideW, expansion),

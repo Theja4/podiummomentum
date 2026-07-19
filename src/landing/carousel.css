@@ -69,8 +69,8 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(430px, 84vw);
-  height: min(560px, 74vh);
+  width: min(390px, 76vw);
+  height: min(500px, 66vh);
   border-radius: var(--pm2-card-radius, 26px);
   overflow: hidden;
   box-shadow: 0 30px 80px -20px rgba(8, 19, 13, 0.35),

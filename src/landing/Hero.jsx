@@ -86,10 +86,10 @@ const MOBILE_JOURNEY = {
   swapAt: 0.965, // the hard swap into the coverflow's first card
 }
 const DESKTOP_WIDE_CARD = {
-  maxW: 780,
-  vw: 0.66,
-  maxH: 610,
-  vh: 0.7,
+  maxW: 700,
+  vw: 0.60,
+  maxH: 550,
+  vh: 0.63,
   openFrom: 0.72,
   openTo: 0.965,
 }
@@ -406,12 +406,12 @@ export default function Hero({ navigate }) {
         range(rise, DESKTOP_WIDE_CARD.openFrom, DESKTOP_WIDE_CARD.openTo),
       )
       heroHandoff.cardExpansion = cardExpansion
-      const portraitW = Math.min(540, Math.max(400, vw * 0.29))
-      const portraitH = Math.min(portraitW * 1.27, vh * 0.78)
+      const portraitW = Math.min(490, Math.max(360, vw * 0.26))
+      const portraitH = Math.min(portraitW * 1.27, vh * 0.70)
       const wideW = Math.min(DESKTOP_WIDE_CARD.maxW, vw * DESKTOP_WIDE_CARD.vw)
       const wideH =
         vh <= 820
-          ? Math.min(560, vh * 0.69)
+          ? Math.min(500, vh * 0.62)
           : Math.min(DESKTOP_WIDE_CARD.maxH, vh * DESKTOP_WIDE_CARD.vh)
       const liveW = lerp(portraitW, wideW, cardExpansion)
       const liveH = lerp(portraitH, wideH, cardExpansion)
