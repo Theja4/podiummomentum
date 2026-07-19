@@ -17,6 +17,7 @@ import {
   matchServicesRoute,
 } from './servicesData.js'
 import { usePageMotion } from './usePageMotion.js'
+import VoiceAgent from './VoiceAgent.jsx'
 
 export { matchServicesRoute }
 import './services-pages.css'
@@ -520,12 +521,14 @@ export function ServiceDetail({ slug, navigate }) {
             <h1 data-split="words">{service.heroHeadline}</h1>
             <div className="svc-detail-hero-bottom">
               <p className="svc-detail-lead" data-split="letters">{service.heroLead}</p>
-              <a className="svc-scroll-cue" href="#service-intro" aria-label="Scroll to service overview">↓</a>
+              <a className="svc-scroll-cue" href={slug === 'ai-agents' ? '#live-demo' : '#service-intro'} aria-label="Scroll to service overview">↓</a>
             </div>
           </div>
         </div>
       </section>
 
+      {slug === 'ai-agents' && <VoiceAgent />}
+      
       <section className="svc-detail-intro" id="service-intro" data-reveal="panel">
         <div className="svc-container svc-detail-intro-grid">
           <div className="svc-detail-intro-media-wrap">
@@ -539,7 +542,7 @@ export function ServiceDetail({ slug, navigate }) {
             <p data-reveal="up">{service.heroBody}</p>
             <div className="svc-detail-hero-actions" data-reveal="up">
               <Pill href={CONTACT_PATH} navigate={navigate}>
-                Let’s talk
+                Let's talk
               </Pill>
             </div>
           </div>
