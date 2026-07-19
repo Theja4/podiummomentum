@@ -801,6 +801,10 @@
     letter-spacing: -0.05em;
   }
 
+  .pm2-hero-head {
+    margin-bottom: 10px;
+  }
+
   .pm2-hero-line {
     white-space: normal;
   }
@@ -816,7 +820,7 @@
     flex: 0 0 auto;
     flex-direction: column;
     align-items: stretch;
-    margin-top: -6px; /* Bring buttons closer to subtext */
+    margin-top: -10px; /* Bring buttons closer to subtext */
   }
 
   .pm2-hero-copy {
@@ -824,7 +828,7 @@
   }
 
   .pm2-hero-lead {
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     font-size: 15px;
     max-width: 34ch;
   }
@@ -838,20 +842,20 @@
   }
 
   .pm2-hero-ctas .pm2-pill {
-    min-height: 54px;
-    padding: 7px 8px 7px 20px;
-    border-radius: 16px;
-    font-size: 13.5px;
+    min-height: 46px;
+    padding: 5px 6px 5px 16px;
+    border-radius: 14px;
+    font-size: 12.5px;
   }
 
   .pm2-hero-cta-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
   }
 
   .pm2-hero-text-link {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .pm2-hero-stats {

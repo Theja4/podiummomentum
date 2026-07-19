@@ -273,6 +273,7 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   will-change: auto;
+  touch-action: pan-x pan-y;
 }
 
 .pm2-work--simple .pm2-work__track::-webkit-scrollbar {
