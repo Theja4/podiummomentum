@@ -134,6 +134,126 @@ export default function Hero({ navigate }) {
   )
 
   useEffect(() => {
+    const scrollEl = document.scrollingElement || document.documentElement
+    let raf = 0
+    let mode = 'idle' // 'idle' | 'spring'
+    let lastY = window.scrollY
+    let lastT = performance.now()
+    let velPPS = 0 // measured scroll velocity, px/s, lightly smoothed
+    let lastInputT = -1e9
+    let target = 0
+    let springPos = 0
+    let springVel = 0 // px/s
+
+    // A mass-spring-damper drives the magnet — NOT a time-based tween. Two wins:
+    //   • It engages carrying the scroll's live velocity, so the handoff from
+    //     inertia is seamless (velocity-continuous — no "kick" from a dead stop
+    //     into a fast tween start).
+    //   • It is (near) critically damped, so it decelerates smoothly into the
+    //     seat with no overshoot wobble — the old easeOutBack bounced right at
+    //     the pixel-identical card swap, which read as chop at the very end.
+    const OMEGA = 11.5 // rad/s — natural frequency (~0.5s settle)
+    const K = OMEGA * OMEGA
+    const ZETA = 0.95 // damping ratio: a hair under critical, buttery landing
+    const C = 2 * ZETA * OMEGA
+    const INPUT_GRACE = 70 // ms since last real input before the magnet engages
+    const ENGAGE_LO = 0.05
+    const ENGAGE_HI = 0.95
+    const MID = 0.5
+    const PROJECT = 0.16 // s of velocity look-ahead — a flick commits its way
+
+    const anchors = () => {
+      if (reducedRef.current || mobileRef.current) return null
+      // the magnet is the desktop pinned journey; mobile flies the card through
+      // the seam on its own as you scroll, no snap
+      const el = sectionRef.current
+      const services = document.getElementById('services')
+      if (!el || !services) return null
+      const r = el.getBoundingClientRect()
+      const vh = window.innerHeight || 1
+      if (r.height - vh <= 0) return null
+      // restY — hero at rest; seatY — card fully fallen into the coverflow's
+      // first-card slot (only complete once services rises to the viewport top).
+      const restY = window.scrollY + r.top
+      const seatY = window.scrollY + services.getBoundingClientRect().top
+      const span = seatY - restY
+      if (span <= 0) return null
+      return { restY, seatY, span }
+    }
+
+    const endSpring = () => {
+      scrollEl.style.scrollBehavior = ''
+      mode = 'idle'
+      lastY = window.scrollY
+    }
+
+    const tick = now => {
+      raf = requestAnimationFrame(tick)
+      const dt = Math.min(50, now - lastT) || 16
+      lastT = now
+
+      if (mode === 'spring') {
+        const dtf = dt / 1000
+        // integrate the spring toward the target (semi-implicit Euler)
+        springVel += (-K * (springPos - target) - C * springVel) * dtf
+        springPos += springVel * dtf
+        window.scrollTo(0, springPos)
+        lastY = window.scrollY // our own write must not read back as user velocity
+        if (Math.abs(springPos - target) < 0.4 && Math.abs(springVel) < 10) {
+          window.scrollTo(0, target)
+          endSpring()
+        }
+        return
+      }
+
+      // idle: track the live scroll velocity so a handoff can match it
+      const y = window.scrollY
+      const instVel = (y - lastY) / (dt / 1000)
+      lastY = y
+      velPPS = velPPS * 0.55 + instVel * 0.45
+
+      const a = anchors()
+      if (!a) return
+      const progress = (y - a.restY) / a.span
+      if (progress <= ENGAGE_LO || progress >= ENGAGE_HI) return
+      if (now - lastInputT < INPUT_GRACE) return // user is still driving
+
+      // flick-to-commit: project where the residual velocity is headed so a
+      // decisive flick toward the seat completes even from just under halfway
+      const projected = progress + (velPPS * PROJECT) / a.span
+      target = projected >= MID ? a.seatY : a.restY
+      springPos = y
+      springVel = velPPS // seamless: carry the incoming inertia into the spring
+      scrollEl.style.scrollBehavior = 'auto' // own the scroll; CSS smooth would fight
+      mode = 'spring'
+    }
+
+    // Any genuine input hands control straight back — the spring never fights
+    // the user. (Engagement waits out INPUT_GRACE, so an in-flight spring only
+    // ever sees deliberate overrides here, never the inertia that fed it.)
+    const onInput = () => {
+      lastInputT = performance.now()
+      if (mode === 'spring') endSpring()
+    }
+
+    raf = requestAnimationFrame(tick)
+    window.addEventListener('wheel', onInput, { passive: true })
+    window.addEventListener('touchstart', onInput, { passive: true })
+    window.addEventListener('touchmove', onInput, { passive: true })
+    window.addEventListener('pointerdown', onInput, { passive: true })
+    window.addEventListener('keydown', onInput)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('wheel', onInput)
+      window.removeEventListener('touchstart', onInput)
+      window.removeEventListener('touchmove', onInput)
+      window.removeEventListener('pointerdown', onInput)
+      window.removeEventListener('keydown', onInput)
+      scrollEl.style.scrollBehavior = ''
+    }
+  }, [])
+
+  useEffect(() => {
     const mqMobile = window.matchMedia('(max-width: 900px)')
     const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)')
     const update = () => {

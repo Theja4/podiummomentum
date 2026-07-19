@@ -1,0 +1,1 @@
+Repository root for the Podium Momentum brand-and-web-design-agency single-page application, providing Vite/React build configuration, Vercel deployment rules, and static marketing assets.

@@ -1,0 +1,2 @@
+- Theme toggling is driven by a `data-theme` attribute on `<html>` (`light`/`dark`) set inline in `index.html` before React mounts, so the theme is available before JS runs.
+- Static marketing screenshots are placed at the repository root and referenced by absolute paths (e.g. `/selected-work-desktop.png`) rather than imported through the Vite asset pipeline.

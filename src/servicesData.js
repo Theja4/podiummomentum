@@ -176,7 +176,7 @@ const rawServiceCatalog = [
       { title: 'IA for search', body: 'Hub-and-spoke architectures that win topic ownership.' },
       { title: 'On-page systems', body: 'Templates that keep titles, media, and CTAs consistent.' },
       { title: 'Content strategy', body: 'Priority topics mapped to funnel stages and ICP pain.' },
-      { title: 'Measurement', body: 'Dashboards for queries, pages, and conversion paths.' },
+      { title: 'Backlinks', body: 'Domain authority signals from trusted sites that boost search credibility and rankings.' },
       { title: 'Ongoing ops', body: 'Cadence for publishing, refreshing, and technical health.' },
     ],
     process: [

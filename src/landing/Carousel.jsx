@@ -23,7 +23,6 @@ import './carousel.css'
 
 // —— tunables ————————————————————————————————————————————————
 const N = SERVICE_CARDS.length
-const VH_PER_CARD = 55 // section height = 100vh + N * this
 const SMOOTH = 0.1 // heavy lerp on scroll progress — butter motion
 const SPACING_X = 300 // portrait handoff spacing …
 const SPACING_VW = 0.27 // … before the deck opens
@@ -408,6 +407,171 @@ export default function Carousel({ navigate }) {
   const cursorInsideStageRef = useRef(false)
   const [cursorAction, setCursorAction] = useState(null)
   const [isReduced] = useState(reducedMotion)
+  const [vhPerCard, setVhPerCard] = useState(85)
+
+  useEffect(() => {
+    const update = () => {
+      setVhPerCard(window.innerWidth <= 900 ? 15 : 85)
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  const isFlat = isReduced
+  const isDownRef = useRef(false)
+  const startXRef = useRef(0)
+  const scrollLeftRef = useRef(0)
+  const isDraggedRef = useRef(false)
+  const flatRowRef = useRef(null)
+  const stageRef = useRef(null)
+  const [isDragging, setIsDragging] = useState(false)
+
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage || isFlat) return
+
+    let isDown = false
+    let startX = 0
+    let startScrollY = 0
+    let isDraggingGesture = false
+
+    const onMouseDown = e => {
+      if (e.button !== 0) return
+      isDown = true
+      startX = e.clientX
+      startScrollY = window.scrollY
+      isDraggingGesture = false
+    }
+
+    const onMouseMove = e => {
+      if (!isDown) return
+      const dx = e.clientX - startX
+      if (Math.abs(dx) > 5) {
+        isDraggingGesture = true
+        isDraggedRef.current = true
+      }
+      if (isDraggingGesture) {
+        e.preventDefault()
+        // Map horizontal drag to vertical page scroll
+        const scrollAmount = -dx * 5.5
+        window.scrollTo(0, startScrollY + scrollAmount)
+      }
+    }
+
+    const onMouseUpOrLeave = () => {
+      if (!isDown) return
+      isDown = false
+      if (isDraggingGesture) {
+        setTimeout(() => {
+          isDraggedRef.current = false
+        }, 50)
+      }
+    }
+
+    const onWheel = e => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault()
+        window.scrollBy(0, e.deltaX * 1.5)
+      }
+    }
+
+    // Touch Swipe Drag Mapping
+    let touchStartX = 0
+    let touchStartY = 0
+    let touchStartScrollY = 0
+    let isHorizontalSwipe = false
+    let activeTouch = false
+
+    const onTouchStart = e => {
+      if (e.touches.length !== 1) return
+      touchStartX = e.touches[0].clientX
+      touchStartY = e.touches[0].clientY
+      touchStartScrollY = window.scrollY
+      isHorizontalSwipe = false
+      activeTouch = true
+    }
+
+    const onTouchMove = e => {
+      if (!activeTouch) return
+      const dx = e.touches[0].clientX - touchStartX
+      const dy = e.touches[0].clientY - touchStartY
+
+      if (!isHorizontalSwipe && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+        isHorizontalSwipe = true
+      }
+
+      if (isHorizontalSwipe) {
+        if (e.cancelable) e.preventDefault()
+        const scrollAmount = -dx * 5.5
+        window.scrollTo(0, touchStartScrollY + scrollAmount)
+      }
+    }
+
+    const onTouchEnd = () => {
+      activeTouch = false
+    }
+
+    stage.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUpOrLeave)
+    stage.addEventListener('mouseleave', onMouseUpOrLeave)
+    stage.addEventListener('wheel', onWheel, { passive: false })
+
+    stage.addEventListener('touchstart', onTouchStart, { passive: true })
+    stage.addEventListener('touchmove', onTouchMove, { passive: false })
+    stage.addEventListener('touchend', onTouchEnd, { passive: true })
+    stage.addEventListener('touchcancel', onTouchEnd, { passive: true })
+
+    return () => {
+      stage.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUpOrLeave)
+      stage.removeEventListener('mouseleave', onMouseUpOrLeave)
+      stage.removeEventListener('wheel', onWheel)
+
+      stage.removeEventListener('touchstart', onTouchStart)
+      stage.removeEventListener('touchmove', onTouchMove)
+      stage.removeEventListener('touchend', onTouchEnd)
+      stage.removeEventListener('touchcancel', onTouchEnd)
+    }
+  }, [isFlat])
+
+  const handleMouseDown = e => {
+    const row = flatRowRef.current
+    if (!row) return
+    isDownRef.current = true
+    isDraggedRef.current = false
+    setIsDragging(true)
+    startXRef.current = e.pageX - row.offsetLeft
+    scrollLeftRef.current = row.scrollLeft
+    row.style.scrollSnapType = 'none'
+    row.style.scrollBehavior = 'auto'
+    row.style.cursor = 'grabbing'
+  }
+
+  const handleMouseMove = e => {
+    const row = flatRowRef.current
+    if (!isDownRef.current || !row) return
+    e.preventDefault()
+    const x = e.pageX - row.offsetLeft
+    const walk = (x - startXRef.current) * 1.5
+    if (Math.abs(walk) > 5) {
+      isDraggedRef.current = true
+    }
+    row.scrollLeft = scrollLeftRef.current - walk
+  }
+
+  const handleMouseUpOrLeave = () => {
+    isDownRef.current = false
+    setIsDragging(false)
+    const row = flatRowRef.current
+    if (!row) return
+    row.style.scrollSnapType = ''
+    row.style.scrollBehavior = ''
+    row.style.cursor = ''
+  }
+
   const progress = useProgress(sectionRef, { mode: 'sticky', smooth: SMOOTH })
   const visible = useVisible(sectionRef)
 
@@ -439,6 +603,9 @@ export default function Carousel({ navigate }) {
     href,
     onClick: e => {
       e.preventDefault()
+      if (isDraggedRef.current) {
+        return
+      }
       navigate?.(href)
     },
   })
@@ -504,6 +671,11 @@ export default function Carousel({ navigate }) {
   }
 
   const onStageClickCapture = event => {
+    if (isDraggedRef.current) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
     const clickedCard =
       event.target instanceof Element
         ? event.target.closest('.pm2-carousel-card')
@@ -545,6 +717,7 @@ export default function Carousel({ navigate }) {
 
   const onCardClick = (event, card, i) => {
     event.preventDefault()
+    if (isDraggedRef.current) return
     if (Math.abs(i - fRef.current) < ACTIVE_D) navigate?.(card.href)
     else scrollToIndex(i)
   }
@@ -732,13 +905,21 @@ export default function Carousel({ navigate }) {
   })
 
   // —— reduced motion: plain horizontal scroll-snap row ————————————————
-  if (isReduced) {
+  if (isFlat) {
     return (
       <section className="pm2-carousel pm2-carousel--flat" id="services" ref={sectionRef}>
         <div className="pm2-carousel-flat-head">
           <h2 className="pm2-carousel-title">{CAROUSEL.heading}</h2>
         </div>
-        <div className="pm2-carousel-flat-row" role="list">
+        <div
+          className="pm2-carousel-flat-row"
+          role="list"
+          ref={flatRowRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUpOrLeave}
+          onMouseLeave={handleMouseUpOrLeave}
+        >
           {SERVICE_CARDS.map(card => (
             <a
               key={card.slug}
@@ -768,12 +949,13 @@ export default function Carousel({ navigate }) {
       className="pm2-carousel"
       id="services"
       ref={sectionRef}
-      style={{ height: `${100 + N * VH_PER_CARD}vh` }}
+      style={{ height: `${100 + N * vhPerCard}vh` }}
     >
       <div className="pm2-carousel-sticky">
         <h2 className="pm2-carousel-title pm2-carousel-title--stage">{CAROUSEL.heading}</h2>
 
         <div
+          ref={stageRef}
           className={`pm2-carousel-stage${cursorAction ? ' is-cursor-on' : ''}`}
           tabIndex={0}
           role="group"

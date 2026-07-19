@@ -84,7 +84,8 @@
   opacity: 0; /* written by the rAF loop on the first frame */
   pointer-events: none;
   transform: translate(-50%, -50%);
-  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
 }
@@ -1217,6 +1218,7 @@
   padding: 10px max(24px, calc(50vw - 215px)) 44px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  cursor: grab;
 }
 
 .pm2-carousel-flat-row::-webkit-scrollbar {
@@ -1283,6 +1285,11 @@
 }
 
 @media (max-width: 900px) {
+  .pm2-carousel-stage {
+    perspective: none !important;
+    transform-style: flat !important;
+  }
+
   /* no ghost flight on small screens — the section follows the hero
      normally instead of rising 70vh beneath it (which bled the first card
      through the hero card above) */

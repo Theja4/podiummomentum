@@ -275,6 +275,7 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   will-change: auto;
+  cursor: grab;
 }
 
 .pm2-work--simple .pm2-work__track::-webkit-scrollbar {
@@ -284,6 +285,13 @@
 .pm2-work--simple .pm2-work__card {
   width: 86vw;
   scroll-snap-align: center;
+}
+
+@media (min-width: 901px) {
+  .pm2-work--simple .pm2-work__card {
+    width: min(78vw, calc((100svh - 340px) * 1.6), 1120px);
+    cursor: none;
+  }
 }
 
 .pm2-work--simple .pm2-work__glow {
