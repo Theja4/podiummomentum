@@ -1,0 +1,1 @@
+Vercel serverless function that mints single-use Bland Web Agent SDK session tokens, keeping the BLAND_API_KEY server-side and never exposing it to the browser.

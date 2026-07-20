@@ -1,6 +1,6 @@
 schema_version: 1
 module_path: ""
-title: Podium Momentum SPA Project Root
+title: Podium Momentum SPA Root
 scope:
     - .gitignore
     - .mcp.json

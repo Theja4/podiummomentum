@@ -1,1 +1,0 @@
-React 18 + ReactDOM 18, Vite 5 with `@vitejs/plugin-react`, Three.js 0.185, served via Vercel SPA rewrites; development uses pnpm workspaces.

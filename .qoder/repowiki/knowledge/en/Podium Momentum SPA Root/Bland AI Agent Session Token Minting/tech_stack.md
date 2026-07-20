@@ -1,0 +1,1 @@
+Vercel Serverless Functions + `@blandsdk/client` (Bland AI Node SDK) against `https://api.bland.ai`.

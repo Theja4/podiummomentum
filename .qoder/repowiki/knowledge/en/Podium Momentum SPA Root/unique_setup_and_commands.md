@@ -1,0 +1,1 @@
+`pnpm install && pnpm dev` starts the Vite dev server (including the local `/api/agent-authorize` proxy); `pnpm build` emits a static site deployed to Vercel (no Node runtime needed at deploy time). Requires `BLAND_API_KEY` in `.env` for the dev API proxy to mint Bland webchat tokens.

@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: api
+title: Bland AI Agent Session Token Minting
+scope:
+    - api/agent-authorize.js
+source_files: []
+depends_on: []
+related_to: []

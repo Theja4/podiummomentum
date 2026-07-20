@@ -1,0 +1,3 @@
+- CORS headers (`Access-Control-Allow-Origin`, `Allow-Methods`, `Allow-Headers`) are set at the top of every handler before any routing logic.
+- HTTP methods are gated early with explicit `OPTIONS` → 204 and non-POST → 405 responses before reaching business logic.
+- External service errors are caught and mapped to a stable 5xx JSON shape (`{ error: '...' }`) rather than leaking stack traces.

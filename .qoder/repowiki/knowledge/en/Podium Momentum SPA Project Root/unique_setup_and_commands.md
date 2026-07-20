@@ -1,1 +1,0 @@
-`pnpm install && pnpm dev` starts the Vite dev server; `pnpm build` emits a static site deployed to Vercel (no Node runtime needed at deploy time).
