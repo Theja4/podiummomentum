@@ -11,7 +11,7 @@
      ultrawide screens so the headline and card never drift apart */
   --pm2-hero-boxw: min(calc(100vw - 2 * var(--pm2-hero-inset)), 1760px);
   --pm2-hero-boxl: calc((100vw - var(--pm2-hero-boxw)) / 2);
-  /* the card column — mirrors the coverflow card width (Hero.jsx cw) */
+  /* main-branch responsive card column; Hero.jsx mirrors these values */
   --pm2-hero-cardw: clamp(440px, 32vw, 580px);
   --pm2-hero-cardoff: clamp(48px, calc(10vw - 56px), 128px);
   --pm2-hero-colgap: clamp(48px, 4vw, 72px);
@@ -350,6 +350,7 @@
    panel's card slot; JS measures rest geometry via offsetLeft/offsetTop
    every frame. */
 .pm2-hero-card {
+  --pm2-card-radius: 26px;
   position: absolute;
   z-index: 3; /* above the panel */
   /* anchored to the composition box, not the viewport — on ultrawide the
@@ -361,6 +362,10 @@
   width: var(--pm2-hero-cardw);
   height: min(560px, 74vh);
   margin-top: calc(min(560px, 74vh) / -2);
+  border-radius: var(--pm2-card-radius);
+  overflow: hidden;
+  clip-path: inset(0 round var(--pm2-card-radius));
+  transform: rotate(-4deg);
   will-change: transform, opacity;
 }
 
@@ -377,7 +382,7 @@
   border-radius: var(--pm2-card-radius, 26px);
   overflow: hidden;
   color: #fff;
-  clip-path: inset(100% 0 0 0 round 26px); /* JS rises this to inset(0) */
+  clip-path: inset(100% 0 0 0 round var(--pm2-card-radius)); /* JS rises this to inset(0) */
   will-change: clip-path;
 }
 
@@ -451,13 +456,15 @@
      this the float collapses to content height (the work stack is entirely
      absolutely positioned, so content height is ~zero) */
   height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
   animation: pm2HeroCardEnter 1.15s var(--v-ease) 0.35s backwards;
 }
 
 @keyframes pm2HeroCardEnter {
   from {
     opacity: 0;
-    transform: translate3d(0, -9vh, 0) rotate(-16deg) scale(1.07);
+    transform: translate3d(0, -9vh, 0) scale(1.07);
   }
   55% {
     opacity: 1;
@@ -471,30 +478,29 @@
 .pm2-hero-card-float {
   position: relative;
   height: 100%;
-  border-radius: 26px;
+  border-radius: inherit;
   overflow: hidden;
   background: #08130d;
-  transform: rotate(-4deg);
+  transform: none;
   box-shadow:
     0 30px 80px -20px rgba(5, 10, 12, 0.5),
     0 20px 55px -18px rgba(47, 191, 127, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
-  will-change: transform;
-  animation: pm2HeroFloat 7s ease-in-out infinite;
+  will-change: auto;
 }
 
 /* sliding image reveal — clip wipe + inner slide/scale, content-agnostic */
 .pm2-hero-card-reveal {
   width: 100%;
   height: 100%;
-  border-radius: 22px;
+  border-radius: inherit;
   overflow: hidden;
   animation: pm2HeroCardReveal 1.5s cubic-bezier(0.65, 0, 0.15, 1) 0.5s backwards;
 }
 
 @keyframes pm2HeroCardReveal {
-  from { clip-path: inset(0 0 100% 0 round 26px); }
-  to { clip-path: inset(0 0 0 0 round 26px); }
+  from { clip-path: inset(0 0 100% 0 round var(--pm2-card-radius)); }
+  to { clip-path: inset(0 0 0 0 round var(--pm2-card-radius)); }
 }
 
 @keyframes pm2HeroCardImg {
@@ -612,11 +618,6 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(10, 20, 15, 0.38);
-}
-
-@keyframes pm2HeroFloat {
-  0%, 100% { transform: rotate(-4deg) translate3d(0, -10px, 0); }
-  50% { transform: rotate(-4deg) translate3d(0, 10px, 0); }
 }
 
 /* —— bottom row ———————————————————————— */
@@ -888,7 +889,7 @@
      carousel.css @900) so the seat scale lands 1.0 at the swap; the rest
      miniature is pure transform, refined by the rAF's first frame */
   .pm2-hero-card {
-    --pm2-cardr: 26px;
+    --pm2-card-radius: 26px;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -905,13 +906,13 @@
 
   .pm2-hero-card-float {
     height: 100%;
-    border-radius: var(--pm2-cardr);
+    border-radius: inherit;
     transform: none; /* the rest tilt lives on .pm2-hero-card (rAF-owned) */
     animation: none;
   }
 
   .pm2-hero-card-reveal {
-    border-radius: var(--pm2-cardr);
+    border-radius: inherit;
   }
 
   .pm2-hero-bottom {
@@ -939,7 +940,7 @@
 
 @media (max-width: 600px) {
   .pm2-hero-card {
-    --pm2-cardr: 22px;
+    --pm2-card-radius: 22px;
   }
 
   .pm2-hero-card-wipe {

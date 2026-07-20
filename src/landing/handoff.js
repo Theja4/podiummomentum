@@ -5,8 +5,6 @@
 // ghost fades out, the real card fades in at the exact same spot).
 export const heroHandoff = {
   ghostOpacity: 0,
-  // Desktop-only shape choreography: the hero card starts in its familiar
-  // portrait silhouette, then opens into the carousel's cinematic wide
-  // canvas while both ghost and real card still share one measured slot.
+  // Desktop shape choreography shared by the moving hero and card zero.
   cardExpansion: 0,
 }

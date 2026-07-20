@@ -12,6 +12,22 @@
   --pm-sharp-shadow: 0 10px 28px -22px rgba(8, 30, 18, 0.28);
 }
 
+/* The fixed wrapper is only a positioning rail. Keep every route-level
+   surface off it so the pill remains the header's sole visible shape,
+   including tablet/short-window layouts and the scrolled state. */
+html body #root .header,
+html body #root .header.header-scrolled,
+html body #root .header.header-industry,
+html body #root .header.header-industry.header-industry-hero {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 /* Navigation: retain the floating silhouette, but use a dependable opaque
    surface instead of layering large backdrop blurs over page content. */
 .header .header-inner,

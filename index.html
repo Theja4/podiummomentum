@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Podium Momentum: a strategy-led creative partner for ambitious brands." />
     <meta name="color-scheme" content="light dark" />
-    <script>document.documentElement.dataset.theme = 'light'</script>
+    <script>
+      document.documentElement.dataset.theme = 'light'
+      if (location.pathname === '/' || location.pathname === '') {
+        document.documentElement.classList.add('pm-preloader-active')
+      }
+    </script>
     <title>Podium Momentum | Brand and Web Design Agency</title>
     <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
     <link rel="icon" href="/favicon.png?v=2" type="image/png" sizes="64x64" />

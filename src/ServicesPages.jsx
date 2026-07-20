@@ -619,6 +619,7 @@ export function ServiceDetail({ slug, navigate }) {
 
       <section className="svc-pills-nav" data-reveal="panel">
         <div className="svc-container">
+          <DotLabel>Other services</DotLabel>
           <div className="svc-pills-row" data-reveal="up">
             {others.map(s => (
               <a

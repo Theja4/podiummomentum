@@ -12,15 +12,19 @@
 .pm2-gallery {
   position: relative;
   height: 400vh;
-  margin-top: -120vh;
-  /* Transparent across the 120vh work-rail overlap so the rail shows
+  /* Recent Work is 400vh with a 100vh sticky viewport, so a 160vh overlap
+     places this stage at work progress 0.8:
+     (400 - 160 - 100) / (400 - 100) = 0.8. The Intelligence card's camera
+     choreography therefore starts only after 80% of the rail is complete. */
+  margin-top: -160vh;
+  /* Transparent across the work-rail overlap so the rail shows
      through the hand-off; solid black below it so the page's light body
      background can never peek out at the viewport bottom mid-transition. */
   background: linear-gradient(
     to bottom,
     rgba(4, 10, 7, 0) 0,
-    rgba(4, 10, 7, 0) 120vh,
-    var(--v-black) 120vh
+    rgba(4, 10, 7, 0) 160vh,
+    var(--v-black) 160vh
   );
 }
 

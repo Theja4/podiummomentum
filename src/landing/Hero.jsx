@@ -50,7 +50,7 @@ const CARD_JOURNEY = {
   slideFrom: 0.08, // the card slides to center — same driver as the spin
   slideTo: 0.95,
   growScale: 1.7, // capped live to fit inside 86% of the viewport — no blur
-  uprightFrom: 0.15, // swivels into upright EARLY — simultaneous with the spin
+  uprightFrom: 0.15,
   uprightTo: 0.75,
   wipeFrom: 0.12, // the mint face wipes in bottom→top (reverse of the load wipe)
   wipeTo: 0.55,
@@ -73,14 +73,14 @@ const PROGRESS_SMOOTH = 0.14
 // rest scale to the coverflow's exact first-card size and seats into the
 // live slot — finished by the same hard one-frame swap as desktop.
 const MOBILE_JOURNEY = {
-  restTilt: -4, // deg — the resting tilt, unwound with a soft swing in flight
+  restTilt: -4,
   restMaxS: 0.8, // rest-fit scale clamps: the card must read as a miniature…
   restMinS: 0.34, // …but never collapse on very short phones
   wipeFrom: 0.06, // the mint face starts rising off the card's bottom edge
   wipeTo: 0.5,
   flyFrom: 0.14, // detaches from the panel and heads for the slot
   flyTo: 0.96,
-  uprightTo: 0.66, // tilt fully unwound (easeOutBack — tiny overshoot swing)
+  uprightTo: 0.66,
   morphFrom: 0.62, // faceA→faceB content morph (--m), same story as desktop
   morphTo: 0.93,
   swapAt: 0.965, // the hard swap into the coverflow's first card
@@ -145,17 +145,16 @@ export default function Hero({ navigate }) {
     let springPos = 0
     let springVel = 0 // px/s
 
-    // A mass-spring-damper drives the magnet — NOT a time-based tween. Two wins:
+    // A critically damped spring drives the magnet — NOT a time-based tween.
+    // It carries the incoming scroll velocity and uses the closed-form update,
+    // so variable frame times cannot make the card step or overshoot.
     //   • It engages carrying the scroll's live velocity, so the handoff from
     //     inertia is seamless (velocity-continuous — no "kick" from a dead stop
     //     into a fast tween start).
     //   • It is (near) critically damped, so it decelerates smoothly into the
     //     seat with no overshoot wobble — the old easeOutBack bounced right at
     //     the pixel-identical card swap, which read as chop at the very end.
-    const OMEGA = 11.5 // rad/s — natural frequency (~0.5s settle)
-    const K = OMEGA * OMEGA
-    const ZETA = 0.95 // damping ratio: a hair under critical, buttery landing
-    const C = 2 * ZETA * OMEGA
+    const OMEGA = 5.75 // rad/s — half the old frequency (~1s settle, 2× longer)
     const INPUT_GRACE = 70 // ms since last real input before the magnet engages
     const ENGAGE_LO = 0.05
     const ENGAGE_HI = 0.95
@@ -194,9 +193,13 @@ export default function Hero({ navigate }) {
 
       if (mode === 'spring') {
         const dtf = dt / 1000
-        // integrate the spring toward the target (semi-implicit Euler)
-        springVel += (-K * (springPos - target) - C * springVel) * dtf
-        springPos += springVel * dtf
+        // Exact critically damped solution. Unlike Euler integration this is
+        // stable across dropped/variable frames and costs no additional loop.
+        const displacement = springPos - target
+        const velocityTerm = springVel + OMEGA * displacement
+        const decay = Math.exp(-OMEGA * dtf)
+        springPos = target + (displacement + velocityTerm * dtf) * decay
+        springVel = (springVel - OMEGA * velocityTerm * dtf) * decay
         window.scrollTo(0, springPos)
         lastY = window.scrollY // our own write must not read back as user velocity
         if (Math.abs(springPos - target) < 0.4 && Math.abs(springVel) < 10) {
@@ -300,9 +303,8 @@ export default function Hero({ navigate }) {
           panel.style.opacity = ''
           panel.style.pointerEvents = ''
         }
-        // Desktop writes live dimensions during the portrait→wide morph.
-        // Release those inline values when a resize enters the CSS-owned
-        // mobile/reduced layout so the card cannot inherit a stale wide shape.
+        // Desktop writes its fixed responsive geometry inline. Release those
+        // values when mobile/reduced layout returns geometry ownership to CSS.
         card.style.removeProperty('width')
         card.style.removeProperty('height')
         card.style.removeProperty('margin-top')
@@ -371,8 +373,7 @@ export default function Hero({ navigate }) {
       // so the ghost lands exactly on it at any scroll speed
       let slotX = vw / 2
       let slotY = vh / 2
-      let seatSX = 1
-      let seatSY = 1
+      let seatS = 1
       if (cEl) {
         if (!card0Ref.current || !card0Ref.current.isConnected) {
           card0Ref.current = cEl.querySelector('.pm2-carousel-card')
@@ -382,15 +383,14 @@ export default function Hero({ navigate }) {
           if (r.width > 1) {
             slotX = r.left + r.width / 2
             slotY = r.top + r.height / 2
-            seatSX = r.width / cw
-            seatSY = r.height / ch
+            seatS = r.width / cw
           }
         }
       }
 
       const w = easeInOutCubic(range(rise, M.wipeFrom, M.wipeTo))
       const e = easeInOutCubic(range(rise, M.flyFrom, M.flyTo))
-      const eUp = easeOutBack(range(rise, M.flyFrom, M.uprightTo)) // swings past 0
+      const eUp = easeOutBack(range(rise, M.flyFrom, M.uprightTo))
       const m = easeInOutCubic(range(rise, M.morphFrom, M.morphTo))
       // the faces are pixel-identical by now — a hard one-frame swap
       const cOp = rise < M.swapAt ? 1 : 0
@@ -412,10 +412,9 @@ export default function Hero({ navigate }) {
 
       const gx = (slotX - restCX) * e
       const gy = (slotY - restCY) * e
+      const cardScale = lerp(restS, seatS, e)
       const gr = M.restTilt * (1 - eUp)
-      const sx = lerp(restS, seatSX, e)
-      const sy = lerp(restS, seatSY, e)
-      card.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0) rotate(${gr.toFixed(3)}deg) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`
+      card.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0) rotate(${gr.toFixed(3)}deg) scale(${cardScale.toFixed(4)})`
       card.style.opacity = cOp.toFixed(3)
       card.style.pointerEvents = cOp < 0.5 ? 'none' : ''
       // The hero and services overlap during the handoff. Once the ghost has
@@ -434,9 +433,7 @@ export default function Hero({ navigate }) {
     frame.staticCleared = false
 
     // —— frame reads: every layout query happens up front, before any style
-    // write in this loop, so no read can force a mid-frame reflow. Offset
-    // reads may lag one frame behind a geometry write during the expansion
-    // beat — invisible on smoothly interpolating values. ——
+    // write in this loop, so no read can force a mid-frame reflow. ———
     if (!carouselRef.current) carouselRef.current = document.getElementById('services')
     let rise = 0
     let slotX = vw / 2
@@ -515,13 +512,12 @@ export default function Hero({ navigate }) {
       }
     }
 
-    // —— the hero card: wipes photo→mint, slides to center, grows, swivels
+    // —— the hero card: wipes photo→mint, slides to center, grows,
     // upright, shrinks, then falls into the coverflow's first card slot ——
     if (card) {
-      // The familiar portrait card opens into the carousel's wider cinematic
-      // canvas only during the final merge. Updating its real dimensions
-      // (instead of stretching it with scaleX) lets image crop and live type
-      // reflow naturally throughout the choreography.
+      // Restore the local-main choreography: the familiar slanted portrait
+      // opens into the wider services canvas during the final merge. Real
+      // dimensions reflow the artwork instead of stretching it with scaleX.
       const cardExpansion = easeInOutCubic(
         range(rise, DESKTOP_WIDE_CARD.openFrom, DESKTOP_WIDE_CARD.openTo),
       )
@@ -562,13 +558,11 @@ export default function Hero({ navigate }) {
       // the coverflow card it will become (mirrors carousel.css card sizing —
       // the hero card is built at the same size, so the seat scale lands 1.0;
       // short desktop viewports use the compact card tune)
-      const seatSX = liveW / cardW
-      const seatSY = liveH / cardH
+      const seatS = liveW / cardW
 
       // ONE simultaneous motion with the panel's spin: slide + grow + swivel
       const eG = easeInOutCubic(range(s, CARD_JOURNEY.slideFrom, CARD_JOURNEY.slideTo))
       const eUp = easeInOutCubic(range(s, CARD_JOURNEY.uprightFrom, CARD_JOURNEY.uprightTo))
-      const eSp = easeInOutCubic(range(s, CARD_JOURNEY.seatFrom, CARD_JOURNEY.seatTo))
       const eS = easeOutBack(range(s, CARD_JOURNEY.seatFrom, CARD_JOURNEY.seatTo)) // soft snap
       // grown size is capped so the card never fills/stretches past the window
       const gsMax = Math.min(
@@ -577,10 +571,8 @@ export default function Hero({ navigate }) {
         (vh * 0.86) / cardH,
       )
       const growS = lerp(1, gsMax, eG)
-      const sx = lerp(growS, seatSX, eS)
-      const sy = lerp(growS, seatSY, eS)
-      // rides the panel's spin at first, swivels into upright early
-      const gr = rz * (1 - eUp)
+      const cardScale = lerp(growS, seatS, eS)
+      const gr = -4 * (1 - eUp)
       // slides from the panel slot to the stage center
       const cx = lerp(restCX, vw / 2, eG)
       const cy = lerp(restCY, vh / 2, eG)
@@ -604,7 +596,9 @@ export default function Hero({ navigate }) {
       // The coverflow's first-card slot (slotX/slotY) was tracked from the
       // card's ACTUAL rendered rect in the read phase above — so the ghost
       // lands exactly on it at any scroll speed.
-      const eM = easeInOutCubic(range(rise, 0.62, 0.97)) // merge into the slot
+      // The final slide now spans .70 of the services rise instead of .35:
+      // exactly twice the scroll distance, with the same settled endpoint.
+      const eM = easeInOutCubic(range(rise, 0.27, 0.97))
       const goalX = lerp(vw / 2, slotX, eM)
       const goalY = lerp(vh / 2, slotY, eM)
       const c = cardCur.current
@@ -614,7 +608,7 @@ export default function Hero({ navigate }) {
       const gx = cx - restCX + (goalX - vw / 2) + c.x * idle
       const gy = cy - restCY + (goalY - vh / 2) + c.y * idle
       // content morph: the coverflow face slides over the ghost's own mid-fall
-      const m = easeInOutCubic(range(rise, 0.66, 0.94))
+      const m = easeInOutCubic(range(rise, 0.38, 0.94))
       // the faces are pixel-identical by now — a hard one-frame swap
       const cOp = rise < 0.96 ? 1 : 0
 
@@ -632,7 +626,7 @@ export default function Hero({ navigate }) {
         card.style.transform = ''
         card.style.opacity = ''
       } else {
-        card.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0) rotate(${(gr + c.r * idle).toFixed(3)}deg) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`
+        card.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0) rotate(${gr.toFixed(3)}deg) scale(${cardScale.toFixed(4)})`
         card.style.opacity = cOp.toFixed(3)
       }
       // Once the handoff ghost has disappeared, release its hit area so the

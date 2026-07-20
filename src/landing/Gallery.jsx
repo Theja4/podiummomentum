@@ -112,6 +112,107 @@ export default function Gallery() {
     flags.current.reduced = reducedMotion()
   }, [])
 
+  // Match the hero → Web Design handoff with an interruptible scroll magnet.
+  // The gallery begins at exactly 80% of Recent Work; once the user releases
+  // the wheel inside that overlap, this spring carries the live velocity and
+  // seats the Intelligence card at the end of its camera choreography.
+  useEffect(() => {
+    const scrollEl = document.scrollingElement || document.documentElement
+    let raf = 0
+    let mode = 'idle'
+    let lastY = window.scrollY
+    let lastT = performance.now()
+    let velocity = 0
+    let lastInputT = -1e9
+    let springPos = 0
+    let springVel = 0
+    let target = 0
+
+    const OMEGA = 5.75
+    const INPUT_GRACE = 70
+    const ENGAGE_LO = 0.008
+    const ENGAGE_HI = 0.86
+    const SEAT_PROGRESS = 0.87
+
+    const anchors = () => {
+      if (reducedMotion() || window.matchMedia('(max-width: 900px)').matches) return null
+      const section = sectionRef.current
+      if (!section) return null
+      const rect = section.getBoundingClientRect()
+      const vh = window.innerHeight || 1
+      const runway = rect.height - vh
+      if (runway <= 0) return null
+      const restY = window.scrollY + rect.top
+      return { restY, seatY: restY + runway * SEAT_PROGRESS, runway }
+    }
+
+    const endSpring = () => {
+      scrollEl.style.scrollBehavior = ''
+      mode = 'idle'
+      lastY = window.scrollY
+    }
+
+    const tick = now => {
+      raf = requestAnimationFrame(tick)
+      const dt = Math.min(50, now - lastT) || 16
+      lastT = now
+
+      if (mode === 'spring') {
+        const seconds = dt / 1000
+        const displacement = springPos - target
+        const velocityTerm = springVel + OMEGA * displacement
+        const decay = Math.exp(-OMEGA * seconds)
+        springPos = target + (displacement + velocityTerm * seconds) * decay
+        springVel = (springVel - OMEGA * velocityTerm * seconds) * decay
+        window.scrollTo(0, springPos)
+        lastY = window.scrollY
+        if (Math.abs(springPos - target) < 0.4 && Math.abs(springVel) < 10) {
+          window.scrollTo(0, target)
+          endSpring()
+        }
+        return
+      }
+
+      const y = window.scrollY
+      const instantaneous = (y - lastY) / (dt / 1000)
+      lastY = y
+      velocity = velocity * 0.55 + instantaneous * 0.45
+      const a = anchors()
+      if (!a) return
+      const progress = (y - a.restY) / a.runway
+      if (progress <= ENGAGE_LO || progress >= ENGAGE_HI) return
+      if (now - lastInputT < INPUT_GRACE) return
+      if (velocity <= 0) return
+
+      target = a.seatY
+      springPos = y
+      springVel = Math.max(0, velocity)
+      scrollEl.style.scrollBehavior = 'auto'
+      mode = 'spring'
+    }
+
+    const onInput = () => {
+      lastInputT = performance.now()
+      if (mode === 'spring') endSpring()
+    }
+
+    raf = requestAnimationFrame(tick)
+    window.addEventListener('wheel', onInput, { passive: true })
+    window.addEventListener('touchstart', onInput, { passive: true })
+    window.addEventListener('touchmove', onInput, { passive: true })
+    window.addEventListener('pointerdown', onInput, { passive: true })
+    window.addEventListener('keydown', onInput)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('wheel', onInput)
+      window.removeEventListener('touchstart', onInput)
+      window.removeEventListener('touchmove', onInput)
+      window.removeEventListener('pointerdown', onInput)
+      window.removeEventListener('keydown', onInput)
+      scrollEl.style.scrollBehavior = ''
+    }
+  }, [])
+
   // The video's first frame IS the zoom surface. As soon as the clip can
   // render frame 0 (identical pixels to the still) it takes over wholesale;
   // playback starts later, once the full-size frame has landed.
@@ -226,9 +327,9 @@ export default function Gallery() {
 
     const c = measure(vw, vh)
 
-    // —— pinned progress (smoothed): the section overlaps the work rail,
-    // so its stage pins while the rail is still on screen and the pan
-    // starts right there — tiles sweep in over the rail's last card.
+    // —— pinned progress (smoothed): the section begins at exactly 80% of
+    // the work rail's sticky journey, so the Intelligence card choreography
+    // starts there and snaps cleanly into its final framed state.
     const rect = sectionRef.current.getBoundingClientRect()
     const pRaw = clamp01(-rect.top / Math.max(1, rect.height - vh))
     if (pRaw === 0 && uRef.current < 0.001) uRef.current = 0

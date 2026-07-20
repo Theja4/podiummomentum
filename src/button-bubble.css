@@ -48,6 +48,8 @@ html.pm-bubble-fx :is(
   .pm2-pill,
   .cu-brief-submit,
   .mobile-nav-cta,
+  .header .nav > a,
+  .nav-dropdown-trigger,
   .menu,
   .subscribe-action,
   .to-top,
@@ -72,6 +74,8 @@ html.pm-bubble-fx :is(
    content shapes. The subscribe spinner ring keeps its own absolute z-index
    and is deliberately not matched here. */
 html.pm-bubble-fx :is(.cu-brief-submit, .mobile-nav-cta) > span:not(.pm-bubble),
+html.pm-bubble-fx .header .nav > a > span:not(.pm-bubble),
+html.pm-bubble-fx .nav-dropdown-trigger > span:not(.pm-bubble),
 html.pm-bubble-fx .pm2-pill > *:not(.pm-bubble),
 html.pm-bubble-fx :is(
   .pm2-carousel-nav button,
@@ -137,6 +141,8 @@ html.pm-bubble-fx .pill-dark {
 
 /* Soft celadon controls: mint disc (their hover used the mint swap). */
 html.pm-bubble-fx .menu,
+html.pm-bubble-fx .header .nav > a,
+html.pm-bubble-fx .nav-dropdown-trigger,
 html.pm-bubble-fx .pm2-pill--white,
 html.pm-bubble-fx .pm2-pill--ghost,
 html.pm-bubble-fx .pm2-carousel-nav button,
@@ -197,6 +203,17 @@ html.pm-bubble-fx[data-theme] body #root .menu:hover {
   background: var(--pm-control-soft-bg) !important;
 }
 
+html.pm-bubble-fx[data-theme] body #root .header .nav-dropdown-trigger:hover,
+html.pm-bubble-fx[data-theme] body #root .header .nav-dropdown.is-open .nav-dropdown-trigger {
+  background: transparent !important;
+  color: var(--pm-btn-ink) !important;
+}
+
+html.pm-bubble-fx[data-theme] body #root .header .nav > a:hover {
+  background: transparent !important;
+  color: var(--pm-btn-ink) !important;
+}
+
 html.pm-bubble-fx[data-theme] body #root :is(
   .svc-pill-link,
   .svc-all-projects a,
@@ -235,4 +252,45 @@ html.pm-bubble-fx body.pm2-active #root .header .header-actions > .pill:hover {
 /* Mobile nav CTA has no prior hover state; its forest disc needs a light label. */
 html.pm-bubble-fx .header .mobile-nav-cta:hover {
   color: #fff !important;
+}
+
+/* Desktop header links and dropdown triggers are one button family. Keep the
+   interactive surface equal to the visible pill so no pale outer halo remains. */
+@media (min-width: 901px) {
+  html body #root .header .nav > a,
+  html body #root .header .nav > .nav-dropdown {
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html body #root .header .nav > a,
+  html body #root .header .nav-dropdown-trigger {
+    height: 2.25rem !important;
+    min-height: 2.25rem !important;
+    padding: 0 .72rem !important;
+    border-radius: 999px !important;
+    color: var(--nav-glass-ink, var(--pm-btn-ink)) !important;
+    background: transparent !important;
+    transition: color .32s ease, box-shadow .4s var(--pm-btn-ease) !important;
+  }
+
+  html body #root .header .nav > a:hover,
+  html body #root .header .nav-dropdown:hover .nav-dropdown-trigger,
+  html body #root .header .nav-dropdown.is-open .nav-dropdown-trigger {
+    color: var(--pm-btn-ink) !important;
+    box-shadow: 0 8px 22px rgba(103, 224, 163, .22) !important;
+  }
+
+  html:not(.pm-bubble-fx) body #root .header .nav > a:hover,
+  html:not(.pm-bubble-fx) body #root .header .nav-dropdown:hover .nav-dropdown-trigger,
+  html:not(.pm-bubble-fx) body #root .header .nav-dropdown.is-open .nav-dropdown-trigger,
+  html.pm-bubble-fx body #root .header .nav-dropdown.is-open .nav-dropdown-trigger:not(.pm-bubble-in) {
+    background: var(--pm-btn-mint) !important;
+  }
+
+  html.pm-bubble-fx body #root .header .nav > a,
+  html.pm-bubble-fx body #root .header .nav-dropdown-trigger {
+    --pm-bubble-bg: var(--pm-btn-mint);
+  }
 }

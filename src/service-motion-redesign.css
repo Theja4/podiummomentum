@@ -59,7 +59,6 @@
   transform-origin: 50% 50%;
   will-change: transform, border-radius;
 }
-
 .svc-detail-hero-center {
   width: min(100%, 58rem);
   min-height: calc(100svh - 8.75rem);
@@ -637,7 +636,7 @@
   grid-auto-flow: column;
   grid-auto-columns: minmax(22rem, 26.5rem);
   gap: 1.25rem;
-  margin-top: 3.75rem;
+  margin-top: 2rem;
   padding: 0;
   overflow-x: auto;
   overflow-y: hidden;
@@ -678,8 +677,8 @@
 }
 
 .svc-page.is-detail .svc-testimonial-track article > p {
-  font-size: 1.2rem;
-  line-height: 1.22;
+  font-size: clamp(1.3rem, 1.55vw, 1.55rem);
+  line-height: 1.2;
 }
 
 .svc-page.is-detail .svc-testimonial-person {
@@ -703,8 +702,8 @@
 
 /* Interactive four-column process block. */
 .svc-page.is-detail .svc-process-shell {
-  margin-top: 3.75rem;
-  padding: 3.75rem;
+  margin-top: 2rem;
+  padding: 2.75rem;
   background: #fff;
   border-radius: 2rem;
 }
@@ -717,7 +716,7 @@
 }
 
 .svc-page.is-detail .svc-process-grid article {
-  min-height: 25rem;
+  min-height: 21rem;
   padding: 0 1.25rem;
   border-radius: 0;
   border-left: 1px solid rgba(8, 13, 16, .16);
@@ -731,7 +730,7 @@
 }
 
 .svc-page.is-detail .svc-process-grid article > span {
-  margin: 0 0 5.25rem;
+  margin: 0 0 3.5rem;
   text-align: center;
   text-transform: uppercase;
   color: #7a8183;
@@ -796,6 +795,43 @@
 }
 
 .svc-page.is-detail .svc-process-grid article[data-expanded='true'] .svc-process-answer p { padding-top: 1.2rem; }
+
+/* Compact hand-off between related services, proof, and process. These
+   chapters repeat on every service detail route, so their vertical rhythm
+   matches the standard inter-card gap rather than creating empty bands. */
+.svc-page.is-detail .svc-pills-nav {
+  padding: 2rem 3.75rem !important;
+}
+
+.svc-page.is-detail .svc-pills-nav > .svc-container {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 2rem;
+}
+
+.svc-page.is-detail .svc-pills-nav .svc-dot-label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.svc-page.is-detail .svc-pills-row {
+  justify-content: flex-end;
+}
+
+.svc-page.is-detail .svc-detail-testimonials,
+.svc-page.is-detail .svc-process {
+  padding: 2rem 0 !important;
+}
+
+.svc-page.is-detail :is(.svc-detail-testimonials, .svc-process) .svc-dot-label {
+  margin-bottom: 0;
+  font-size: 1.05rem;
+}
+
+.svc-page.is-detail .svc-detail-testimonials .svc-rail-controls {
+  margin-top: 1.25rem;
+}
 
 /* Dark theme mirrors the geometry and changes only surfaces/contrast. */
 html[data-theme='dark'] .svc-page.is-detail {
@@ -868,8 +904,11 @@ html[data-theme='dark'] .svc-rail-controls button:hover {
 
   .svc-page.is-detail .svc-detail-hero {
     padding: 4rem 1.25rem 1.5rem !important;
-    border-radius: calc(1.25rem * var(--shrink-progress)) !important;
-    transform: scale(calc(1 - (.035 * var(--shrink-progress))));
+    /* On tablet-sized windows the scroll shrink exposed the grey page shell
+       around this white surface, making it look like a large card behind the
+       actual header pill. Keep the hero full-bleed below the desktop layout. */
+    border-radius: 0 !important;
+    transform: none !important;
   }
 
   .svc-detail-hero-center {
@@ -952,7 +991,18 @@ html[data-theme='dark'] .svc-rail-controls button:hover {
 
   .svc-page.is-detail .svc-stats,
   .svc-page.is-detail .svc-process,
-  .svc-page.is-detail .svc-detail-testimonials { padding: 2.5rem 0 !important; }
+  .svc-page.is-detail .svc-detail-testimonials { padding: 1.25rem 0 !important; }
+
+  .svc-page.is-detail .svc-pills-nav {
+    padding: 1.5rem !important;
+  }
+
+  .svc-page.is-detail .svc-pills-nav > .svc-container {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .svc-page.is-detail .svc-pills-row { justify-content: flex-start; }
 
   .svc-page.is-detail .svc-stats-grid {
     grid-template-columns: 1fr;
@@ -1227,7 +1277,12 @@ html[data-theme='dark'] .svc-rail-controls button:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .svc-page.is-detail .svc-detail-hero { transform: scale(.965); }
+  /* A permanently scaled hero exposes the grey page shell around its white
+     surface, which reads as a second card behind the mobile/tablet header. */
+  .svc-page.is-detail .svc-detail-hero {
+    border-radius: 0 !important;
+    transform: none !important;
+  }
   .svc-scroll-cue,
   .svc-rail-progress i,
   .motion-ready .svc-page [data-reveal-group] > [data-reveal].is-inview,

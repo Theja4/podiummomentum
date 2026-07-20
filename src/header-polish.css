@@ -44,6 +44,15 @@ html[data-theme='dark'] .header.header-scrolled {
   will-change: transform, opacity;
 }
 
+/* Do not retain the industry header on a transformed compositor layer after
+   its entrance. Scaling the complete header rasterized the small wordmark and
+   made the otherwise high-resolution lockup look soft. */
+.header.header-industry .header-inner {
+  animation: none;
+  transform: none;
+  will-change: auto;
+}
+
 /* Industry detail heroes sit on an inset card. Keep the fixed navigation
    inside that card only while it is in view; full-width sections below need a
    full-width header rather than an apparently clipped bar. */
@@ -486,6 +495,7 @@ html body.pm2-active #root .header .nav-dropdown-panel-card {
 
   .header .nav-dropdown-item-copy small {
     color: rgba(7, 17, 11, .56);
+    line-clamp: 1;
     -webkit-line-clamp: 1;
   }
 
@@ -693,6 +703,96 @@ html[data-theme='dark'] .header .header-inner::before {
   }
 }
 
+/* Keep the desktop CTA comfortably inside the 60px glass rail. Using rem for
+   its height made it outgrow the rail at wider responsive root font sizes. */
+@media (min-width: 901px) {
+  html body #root .header .header-inner {
+    padding-right: 9px !important;
+  }
+
+  html body #root .header .header-actions > .pill {
+    width: auto !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* The navbar must not show through the brand preloader. `page-loaded` is set
+   immediately on normal routes and only after the homepage curtain is gone. */
+html.pm-preloader-active #root .header {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+  clip-path: inset(0 50% 0 50% round 999px);
+}
+
+body:not(.page-loaded) .header .header-inner {
+  opacity: 0 !important;
+  transform: translate3d(0, -16px, 0) scale(.985) !important;
+  animation: none !important;
+}
+
+body.page-loaded .header:not(.header-industry) .header-inner {
+  animation: headerPageReveal .72s cubic-bezier(.16, 1, .3, 1) both !important;
+}
+
+@keyframes headerPageReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -16px, 0) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* The landing pill arrives only after the loader curtain is completely gone.
+   Clip-path creates the horizontal expansion without scaling the logo or nav
+   text, while margin-top gives the bar a gentle downward slide. */
+html body.pm2-active.page-loaded.pm-preloader-complete #root .header {
+  animation: landingHeaderReveal .88s cubic-bezier(.16, 1, .3, 1) both !important;
+  transform-origin: 50% 0;
+}
+
+@keyframes landingHeaderReveal {
+  0% {
+    opacity: 0;
+    visibility: hidden;
+    margin-top: -18px;
+    clip-path: inset(0 48% 0 48% round 999px);
+  }
+  22% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 1;
+    visibility: visible;
+    margin-top: 0;
+    clip-path: inset(0 0 0 0 round 999px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.page-loaded .header:not(.header-industry) .header-inner {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  html body.pm2-active.page-loaded.pm-preloader-complete #root .header {
+    animation: none !important;
+    opacity: 1 !important;
+    visibility: visible;
+    clip-path: none;
+  }
+}
+
 /* ==========================================================================
    Brand-green dropdown motion
 
@@ -718,18 +818,22 @@ html[data-theme='dark'] .header .header-inner::before {
     content: "";
     position: absolute;
     z-index: -1;
-    inset: 3px -7px;
+    inset: 2px -5px;
     border-radius: inherit;
-    background: linear-gradient(
-      105deg,
-      color-mix(in srgb, var(--nav-brand) 34%, transparent),
-      color-mix(in srgb, var(--nav-brand-bright) 18%, transparent)
-    );
+    border: 1px solid rgba(20, 107, 72, .10);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, .72), rgba(255, 255, 255, .38)),
+      color-mix(in srgb, var(--nav-brand) 8%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .88),
+      0 7px 18px -14px rgba(8, 40, 24, .36);
     opacity: 0;
-    transform: scale(.82);
+    transform: scale(.94);
     transition:
-      opacity .28s ease,
-      transform .48s cubic-bezier(.16, 1, .3, 1);
+      opacity .22s ease,
+      transform .38s cubic-bezier(.22, 1, .36, 1),
+      border-color .28s ease,
+      box-shadow .28s ease;
   }
 
   .header .nav > .nav-dropdown:hover::before,
@@ -739,9 +843,10 @@ html[data-theme='dark'] .header .header-inner::before {
   }
 
   .header .nav-dropdown-trigger {
-    transition: color .28s ease !important;
+    transition: color .24s ease !important;
   }
 
+  .header .nav-dropdown:hover .nav-dropdown-trigger,
   .header .nav-dropdown.is-open .nav-dropdown-trigger {
     color: var(--nav-brand-deep) !important;
   }
@@ -749,12 +854,14 @@ html[data-theme='dark'] .header .header-inner::before {
   .header .nav-dropdown-chevron {
     transition:
       color .28s ease,
-      transform .48s cubic-bezier(.16, 1, .3, 1),
+      transform .38s cubic-bezier(.22, 1, .36, 1),
       opacity .25s ease !important;
   }
 
+  .header .nav-dropdown:hover .nav-dropdown-chevron,
   .header .nav-dropdown.is-open .nav-dropdown-chevron {
     color: var(--nav-brand-deep);
+    opacity: 1;
   }
 
   .header .nav-dropdown-panel-card {
@@ -953,8 +1060,82 @@ html[data-theme='dark'] .header .header-inner::before {
   to { transform: skewX(-18deg) translateX(520%); }
 }
 
+/* Dropdown visibility + shared button interaction
+   The landing header reveal uses a clip-path while entering. Explicitly
+   release it afterwards so menus can paint outside the 60px glass rail. */
+body.page-loaded .header {
+  clip-path: none !important;
+  overflow: visible !important;
+}
+
+body.page-loaded .header .header-inner,
+body.page-loaded .header .nav,
+body.page-loaded .header .nav-dropdown {
+  overflow: visible !important;
+}
+
 @media (min-width: 901px) {
+  .header .nav > .nav-dropdown:hover,
+  .header .nav > .nav-dropdown.is-open {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .header .nav > .nav-dropdown::before {
+    display: none;
+  }
+
+  .header .nav-dropdown-trigger {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden !important;
+    padding: 0 .62rem !important;
+    border-radius: 999px;
+    color: var(--nav-glass-ink) !important;
+    background: transparent !important;
+    transition:
+      color .32s ease,
+      box-shadow .4s cubic-bezier(.16, 1, .3, 1) !important;
+  }
+
+  .header .nav-dropdown-trigger > span:not(.pm-bubble) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .header .nav-dropdown:hover .nav-dropdown-trigger,
+  .header .nav-dropdown.is-open .nav-dropdown-trigger,
+  html[data-theme='dark'] .header .nav-dropdown:hover .nav-dropdown-trigger,
+  html[data-theme='dark'] .header .nav-dropdown.is-open .nav-dropdown-trigger {
+    color: var(--pm-btn-ink) !important;
+    background: var(--nav-brand) !important;
+    box-shadow: 0 8px 22px rgba(103, 224, 163, .22);
+  }
+
+  html.pm-bubble-fx .header .nav-dropdown:hover .nav-dropdown-trigger,
+  html.pm-bubble-fx .header .nav-dropdown.is-open .nav-dropdown-trigger {
+    background: transparent !important;
+  }
+
+  html.pm-bubble-fx .header .nav-dropdown-trigger {
+    --pm-bubble-bg: var(--nav-brand);
+  }
+}
+
+@media (min-width: 901px) {
+  html[data-theme='dark'] .header .nav > .nav-dropdown::before {
+    border-color: rgba(124, 240, 189, .13);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .025)),
+      color-mix(in srgb, var(--nav-brand) 7%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .10),
+      0 8px 20px -15px rgba(0, 0, 0, .84);
+  }
+
+  html[data-theme='dark'] .header .nav-dropdown:hover .nav-dropdown-trigger,
   html[data-theme='dark'] .header .nav-dropdown.is-open .nav-dropdown-trigger,
+  html[data-theme='dark'] .header .nav-dropdown:hover .nav-dropdown-chevron,
   html[data-theme='dark'] .header .nav-dropdown.is-open .nav-dropdown-chevron {
     color: var(--nav-brand) !important;
   }

@@ -206,16 +206,16 @@ export default function VoiceAgent({ navigate }) {
   const isTalking = conversationState === 'active' || conversationState === 'connecting'
 
   return (
-    <section className="va-section" id="live-demo" aria-labelledby="va-heading">
+    <section className="va-section" id="live-demo" aria-labelledby="va-heading" data-reveal="panel">
       <div className="va-card">
         <div className="va-head">
-          <span className="va-eyebrow">Live Demo</span>
-          <h2 id="va-heading">Talk to our AI agent</h2>
-          <p className="va-sub">Experience a real AI voice conversation. Hit play and speak naturally — just like calling the clinic.</p>
+          <span className="va-eyebrow" data-reveal="up">Live clinic demo</span>
+          <h2 id="va-heading" data-reveal="line">Talk to a clinic AI receptionist</h2>
+          <p className="va-sub" data-reveal="up">This is a live demo of an inbound AI receptionist for a clinic. Hit play and speak naturally, just like calling the clinic.</p>
         </div>
 
         {/* Agent Card — animates subtly when live */}
-        <div className={`va-agent-box ${isTalking ? 'va-agent-box--live' : ''}`}>
+        <div className={`va-agent-box ${isTalking ? 'va-agent-box--live' : ''}`} data-reveal="card">
           <AgentOrb active={isTalking} onClick={!isTalking && conversationState !== 'ended' ? requestMicAndStart : undefined} />
           <span className="va-card-sector">{AGENT.sector}</span>
           <strong className="va-card-title">{AGENT.title}</strong>
@@ -237,7 +237,7 @@ export default function VoiceAgent({ navigate }) {
         </div>
 
         {/* Controls */}
-        <div className="va-controls">
+        <div className="va-controls" data-reveal="up">
           {conversationState === 'idle' && (
             <button className="va-start-btn" onClick={requestMicAndStart} type="button">
               <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">

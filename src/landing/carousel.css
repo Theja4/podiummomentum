@@ -52,6 +52,15 @@
   pointer-events: none;
 }
 
+@media (max-width: 900px) {
+  .pm2-carousel-stage,
+  .pm2-carousel-stage .pm2-carousel-card {
+    /* Touch motion is resolved by Carousel.jsx into one discrete card step.
+       Prevent native momentum scrolling from advancing extra cards. */
+    touch-action: none;
+  }
+}
+
 .pm2-carousel-stage:focus-visible {
   box-shadow: inset 0 0 0 2px rgba(47, 191, 127, 0.5);
 }
@@ -1423,7 +1432,7 @@
 
 @media (max-width: 600px) {
   .pm2-carousel-card {
-    border-radius: 22px;
+    --pm2-card-radius: 22px;
   }
 
   .pm2-carousel-card-title {

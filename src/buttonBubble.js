@@ -21,6 +21,8 @@ const SELECTOR = [
   '.submit',
   '.cu-brief-submit',
   '.mobile-nav-cta',
+  '.header .nav > a',
+  '.nav-dropdown-trigger',
   '.menu',
   '.subscribe-action',
   '.to-top',

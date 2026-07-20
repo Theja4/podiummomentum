@@ -24,6 +24,7 @@ import './button-bubble.css'
 import './footer-redesign.css'
 import './enterprise-sharpness.css'
 import { installButtonBubble } from './buttonBubble.js'
+import BrandPreloader from './BrandPreloader.jsx'
 
 installButtonBubble()
 
@@ -193,8 +194,19 @@ function Header({ industryPage = false, contactPage = false }) {
   // or logo/nav stay at opacity:0 from the entrance animation CSS.
   useEffect(() => {
     document.documentElement.classList.add('motion-ready')
-    const id = requestAnimationFrame(() => document.body.classList.add('page-loaded'))
-    return () => cancelAnimationFrame(id)
+    let id = 0
+    const revealPage = () => {
+      id = requestAnimationFrame(() => document.body.classList.add('page-loaded'))
+    }
+    if (document.documentElement.classList.contains('pm-preloader-active')) {
+      window.addEventListener('pm:preloader-complete', revealPage, { once: true })
+    } else {
+      revealPage()
+    }
+    return () => {
+      cancelAnimationFrame(id)
+      window.removeEventListener('pm:preloader-complete', revealPage)
+    }
   }, [])
   useEffect(() => {
     let previous = Math.max(0, window.scrollY)
@@ -1503,8 +1515,15 @@ function App() {
   const servicesMatch = matchServicesRoute(path)
   const industryMatch = matchIndustryRoute(path)
 
+  const withPreloader = content => (
+    <>
+      <BrandPreloader />
+      {content}
+    </>
+  )
+
   if (isContact) {
-    return (
+    return withPreloader(
       <>
         <Header contactPage />
         <ContactUs footer={<Footer />} />
@@ -1558,7 +1577,7 @@ function App() {
       </>
     )
   }
-  return <HomePage />
+  return withPreloader(<HomePage />)
 }
 
 createRoot(document.getElementById('root')).render(<App />)

@@ -6,6 +6,8 @@
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
 - [agent-authorize.js](file://api/agent-authorize.js)
 - [voice-agent.css](file://src/voice-agent.css)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
 - [index.html](file://index.html)
 - [package.json](file://package.json)
 - [vite.config.js](file://vite.config.js)
@@ -13,12 +15,12 @@
 
 ## Update Summary
 **Changes Made**
-- Updated core component analysis to reflect complete VoiceAgent.jsx implementation (318 lines)
-- Enhanced styling system documentation for voice-agent.css (559 lines)
-- Added comprehensive API endpoint documentation for agent-authorize.js (53 lines)
-- Expanded Vite development middleware enhancements and routing integration details
-- Updated architecture diagrams to reflect real-time conversation capabilities and Bland SDK integration
-- Added responsive design implementation details
+- Enhanced VoiceAgent component with new site pill button system for call-to-action elements
+- Replaced previous button styling approaches with modern pill-based design patterns
+- Added wipe animations and bubble effects for improved user experience
+- Refactored CSS with major cleanup removing redundant styling code
+- Updated styling architecture to support modular button systems
+- Enhanced responsive design patterns for mobile-first interactions
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -26,15 +28,18 @@
 3. [Core Components](#core-components)
 4. [Architecture Overview](#architecture-overview)
 5. [Detailed Component Analysis](#detailed-component-analysis)
-6. [Dependency Analysis](#dependency-analysis)
-7. [Performance Considerations](#performance-considerations)
-8. [Troubleshooting Guide](#troubleshooting-guide)
-9. [Conclusion](#conclusion)
+6. [Button System Architecture](#button-system-architecture)
+7. [Dependency Analysis](#dependency-analysis)
+8. [Performance Considerations](#performance-considerations)
+9. [Troubleshooting Guide](#troubleshooting-guide)
+10. [Conclusion](#conclusion)
 
 ## Introduction
 This project is a complete live voice AI agent demo built as a modern web application using React and Vite. The application provides an interactive voice-enabled interface for AI agent interactions, featuring a clean user experience with responsive design and real-time audio processing capabilities.
 
-The demo showcases the full end-to-end implementation of voice input/output functionality integrated with AI agents through the Bland SDK, providing users with a natural conversational interface through their browser. The implementation includes comprehensive state management, real-time communication, and adaptive UI components that respond to various interaction states.
+The demo showcases the full end-to-end implementation of voice input/output functionality integrated with AI agents through the Bland SDK, providing users with a natural conversational interface through their browser. The implementation includes comprehensive state management, real-time communication, adaptive UI components that respond to various interaction states, and an enhanced button system with modern pill-based design patterns.
+
+**Updated** Enhanced with new site pill button system providing improved call-to-action elements, wipe animations, and bubble effects for superior user experience across all devices.
 
 ## Project Structure
 The application follows a modular React architecture with clear separation between UI components, styling, and API integration:
@@ -44,6 +49,12 @@ graph TB
 subgraph "Frontend Application"
 A[main.jsx] --> B[VoiceAgent.jsx]
 B --> C[voice-agent.css]
+B --> D[button-system.css]
+B --> E[button-bubble.css]
+D --> F[Pill Button Components]
+E --> G[Bubble Effects]
+F --> H[Wipe Animations]
+G --> H
 D[index.html] --> A
 E[vite.config.js] --> A
 F[package.json] --> E
@@ -55,19 +66,23 @@ subgraph "External Services"
 H[Bland SDK]
 I[Web Audio API]
 J[Speech Recognition API]
+K[Animation Engine]
 end
 A --> G
 B --> H
 B --> I
 B --> J
+B --> K
 E --> B
 ```
 
 **Diagram sources**
 - [main.jsx](file://src/main.jsx)
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
-- [agent-authorize.js](file://api/agent-authorize.js)
 - [voice-agent.css](file://src/voice-agent.css)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
+- [agent-authorize.js](file://api/agent-authorize.js)
 - [index.html](file://index.html)
 - [vite.config.js](file://vite.config.js)
 - [package.json](file://package.json)
@@ -75,8 +90,10 @@ E --> B
 **Section sources**
 - [main.jsx](file://src/main.jsx)
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
-- [agent-authorize.js](file://api/agent-authorize.js)
 - [voice-agent.css](file://src/voice-agent.css)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
+- [agent-authorize.js](file://api/agent-authorize.js)
 - [index.html](file://index.html)
 - [vite.config.js](file://vite.config.js)
 - [package.json](file://package.json)
@@ -94,6 +111,9 @@ The core VoiceAgent component manages the entire voice interaction flow, includi
 - **Text-to-Speech Output**: Audio synthesis and playback of AI-generated responses
 - **State Management**: Comprehensive UI state handling for loading, error, and conversation states
 - **Responsive Design**: Adaptive interface that works across different screen sizes and devices
+- **Enhanced Button System**: Modern pill-based call-to-action elements with wipe animations and bubble effects
+
+**Updated** Enhanced with new site pill button system providing improved visual feedback, smooth transitions, and modern interaction patterns for better user engagement.
 
 ### API Authorization Handler
 The backend authorization endpoint handles secure authentication for voice agent services, ensuring proper access control and session management. It validates requests and generates temporary tokens for secure client-server communication.
@@ -114,11 +134,16 @@ sequenceDiagram
 participant Browser as "Browser Client"
 participant ReactApp as "React Application"
 participant VoiceAgent as "VoiceAgent Component"
+participant ButtonSystem as "Pill Button System"
 participant AuthAPI as "Authorization API"
 participant BlandSDK as "Bland SDK"
 participant WebAudio as "Web Audio API"
+participant AnimationEngine as "Animation Engine"
 Browser->>ReactApp : Load Application
 ReactApp->>VoiceAgent : Initialize Voice Interface
+VoiceAgent->>ButtonSystem : Setup Pill Buttons
+ButtonSystem->>AnimationEngine : Configure Wipe Animations
+ButtonSystem->>AnimationEngine : Configure Bubble Effects
 VoiceAgent->>AuthAPI : Request Authorization Token
 AuthAPI-->>VoiceAgent : Return Auth Token
 VoiceAgent->>WebAudio : Setup Audio Context
@@ -128,12 +153,17 @@ VoiceAgent->>VoiceAgent : Generate Response Text
 VoiceAgent->>BlandSDK : Send Text Response
 BlandSDK-->>VoiceAgent : Return Audio Response
 VoiceAgent->>WebAudio : Play Audio Output
+VoiceAgent->>ButtonSystem : Update Button States
+ButtonSystem->>AnimationEngine : Trigger Visual Feedback
 VoiceAgent-->>Browser : Update UI State
 Note over VoiceAgent,BlandSDK : Real-time bidirectional communication
+Note over ButtonSystem,AnimationEngine : Enhanced visual interactions
 ```
 
 **Diagram sources**
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
 - [agent-authorize.js](file://api/agent-authorize.js)
 
 ## Detailed Component Analysis
@@ -159,6 +189,17 @@ class VoiceAgent {
 -conversationHistory Array
 -authToken string
 -errorState object
+-buttonStates Object
+}
+class PillButtonSystem {
++createPillButton(config) HTMLElement
++applyWipeAnimation(element) void
++triggerBubbleEffect(element) void
++updateButtonState(state) void
++handleClick(event) void
++cleanupAnimations() void
+-animationQueue Array
+-easingFunctions Object
 }
 class AudioProcessor {
 +captureAudio() MediaStream
@@ -183,10 +224,13 @@ class UIManager {
 +displayError(message) void
 +resetInterface() void
 +handleResponsiveLayout() void
++syncButtonAnimations() void
 }
+VoiceAgent --> PillButtonSystem : "uses"
 VoiceAgent --> AudioProcessor : "uses"
 VoiceAgent --> AIIntegration : "communicates with"
 VoiceAgent --> UIManager : "controls"
+PillButtonSystem <|-- VoiceAgent : "extends"
 AudioProcessor <|-- VoiceAgent : "extends"
 AIIntegration <|-- VoiceAgent : "extends"
 UIManager <|-- VoiceAgent : "extends"
@@ -194,6 +238,8 @@ UIManager <|-- VoiceAgent : "extends"
 
 **Diagram sources**
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
 
 ### Data Flow Processing
 
@@ -215,7 +261,10 @@ Send --> Process["Process AI Response"]
 Process --> Synthesize["Text-to-Speech<br/>Generate Audio"]
 Synthesize --> Play["Play Audio Output"]
 Play --> UpdateUI["Update Conversation Display"]
-UpdateUI --> End([Complete])
+UpdateUI --> ButtonFeedback["Trigger Pill Button<br/>Visual Feedback"]
+ButtonFeedback --> WipeAnim["Apply Wipe Animation"]
+WipeAnim --> BubbleEffect["Trigger Bubble Effect"]
+BubbleEffect --> End([Complete])
 Error --> End
 Feedback --> Start
 Reauth --> Auth
@@ -223,6 +272,8 @@ Reauth --> Auth
 
 **Diagram sources**
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
 
 ### Styling and User Interface System
 
@@ -237,31 +288,109 @@ A --> D[Status Indicators]
 A --> E[Settings Panel]
 A --> F[Error Messages]
 A --> G[Loading States]
+A --> H[Pill Button System]
 end
 subgraph "Styling System"
-H[voice-agent.css] --> I[Responsive Breakpoints]
-H --> J[Accessibility Features]
-H --> K[Animation Effects]
-H --> L[Theme Variables]
-H --> M[Component States]
-H --> N[Mobile Optimizations]
+I[voice-agent.css] --> J[Responsive Breakpoints]
+I --> K[Accessibility Features]
+I --> L[Animation Effects]
+I --> M[Theme Variables]
+I --> N[Component States]
+I --> O[Mobile Optimizations]
+P[button-system.css] --> Q[Pill Button Styles]
+P --> R[Call-to-Action Patterns]
+P --> S[Responsive Button Layouts]
+T[button-bubble.css] --> U[Bubble Effects]
+T --> V[Wipe Animations]
+T --> W[Transition Effects]
+Q --> X[Modern Design Patterns]
+R --> X
+S --> X
+U --> Y[Enhanced UX]
+V --> Y
+W --> Y
 end
-B --> H
-C --> H
-D --> H
-E --> H
-F --> H
-G --> H
+B --> I
+C --> I
+D --> I
+E --> I
+F --> I
+G --> I
+H --> P
+H --> T
+X --> Y
 ```
 
 **Diagram sources**
 - [voice-agent.css](file://src/voice-agent.css)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
 
-**Updated** Enhanced with comprehensive responsive design patterns, accessibility features, and dynamic state-based styling for improved user experience across all devices.
+**Updated** Enhanced with comprehensive responsive design patterns, accessibility features, dynamic state-based styling, and new pill button system with wipe animations and bubble effects for improved user experience across all devices.
 
 **Section sources**
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
 - [voice-agent.css](file://src/voice-agent.css)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
+
+## Button System Architecture
+
+### New Site Pill Button System
+
+The enhanced button system introduces a modern pill-based design pattern that replaces traditional button styling approaches:
+
+```mermaid
+graph TB
+subgraph "Pill Button Components"
+A[Pill Button Base] --> B[Call-to-Action Variants]
+A --> C[Interactive States]
+A --> D[Animation Triggers]
+B --> E[Primary Actions]
+B --> F[Secondary Actions]
+B --> G[Tertiary Actions]
+C --> H[Hover Effects]
+C --> I[Active States]
+C --> J[Disabled States]
+D --> K[Wipe Animations]
+D --> L[Bubble Effects]
+D --> M[Transition Effects]
+end
+subgraph "CSS Architecture"
+N[button-system.css] --> O[Pill Button Styles]
+N --> P[Responsive Layouts]
+N --> Q[Theme Integration]
+R[button-bubble.css] --> S[Bubble Animation Keyframes]
+R --> T[Wipe Transition Effects]
+R --> U[Performance Optimizations]
+O --> V[Modern Design Patterns]
+P --> W[Mobile-First Approach]
+Q --> X[Consistent Theming]
+S --> Y[Smooth Transitions]
+T --> Z[Enhanced UX]
+U --> AA[Optimized Performance]
+end
+```
+
+**Diagram sources**
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
+
+### Enhanced Animation System
+
+The new animation system provides sophisticated visual feedback through wipe animations and bubble effects:
+
+- **Wipe Animations**: Smooth horizontal and vertical wiping transitions for button state changes
+- **Bubble Effects**: Dynamic bubble animations that provide visual feedback for user interactions
+- **Performance Optimization**: Hardware-accelerated animations for smooth 60fps performance
+- **Accessibility Support**: Reduced motion preferences and keyboard navigation support
+- **Cross-browser Compatibility**: Consistent animation behavior across all modern browsers
+
+**Updated** Major CSS refactoring completed with removal of redundant styling code and consolidation of animation logic for improved maintainability and performance.
+
+**Section sources**
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
 
 ## Dependency Analysis
 
@@ -287,20 +416,28 @@ L[VoiceAgent.jsx] --> P[Audio APIs]
 L --> Q[AI Integration]
 L --> R[State Management]
 L --> S[Event Handling]
-T[agent-authorize.js] --> U[Authentication]
-T --> V[Security Middleware]
-T --> W[Request Validation]
-X[vite.config.js] --> Y[Dev Server Config]
-X --> Z[Plugin Configuration]
+L --> T[Pill Button System]
+L --> U[Animation Engine]
+T --> V[CSS Modules]
+T --> W[Animation Utilities]
+U --> X[Wipe Effects]
+U --> Y[Bubble Effects]
+Z[agent-authorize.js] --> AA[Authentication]
+Z --> AB[Security Middleware]
+Z --> AC[Request Validation]
+AD[vite.config.js] --> AE[Dev Server Config]
+AD --> AF[Plugin Configuration]
 ```
 
 **Diagram sources**
 - [package.json](file://package.json)
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
 - [agent-authorize.js](file://api/agent-authorize.js)
 - [vite.config.js](file://vite.config.js)
 
-**Updated** Enhanced with comprehensive build tool configuration, development server optimizations, and plugin integrations for improved development workflow.
+**Updated** Enhanced with comprehensive build tool configuration, development server optimizations, plugin integrations, and new button system dependencies for improved development workflow and user experience.
 
 **Section sources**
 - [package.json](file://package.json)
@@ -317,8 +454,11 @@ The voice AI agent implementation includes several performance optimizations and
 - **Rendering Optimization**: Virtual scrolling for conversation history and efficient DOM updates using React best practices
 - **Resource Cleanup**: Automatic cleanup of audio resources when components unmount or permissions change
 - **Error Boundaries**: Graceful degradation and error recovery mechanisms for robust user experience
+- **Animation Performance**: Hardware-accelerated CSS animations with reduced motion support for accessibility
+- **Button System Optimization**: Efficient pill button rendering with minimal reflows and repaints
+- **CSS Refactoring Benefits**: Removed redundant styling code resulting in smaller stylesheet files and faster parsing
 
-**Updated** Enhanced with comprehensive resource management, memory optimization, and error handling strategies for production deployment.
+**Updated** Enhanced with comprehensive resource management, memory optimization, error handling strategies, and new animation performance optimizations for production deployment.
 
 ## Troubleshooting Guide
 
@@ -341,23 +481,36 @@ Common issues and their solutions:
 - Optimize audio buffer sizes for different devices and network conditions
 - Implement error boundaries for graceful degradation
 - Use performance monitoring tools to identify bottlenecks
+- Check animation performance and reduce motion preferences for accessibility
+
+### Button System Issues
+- Verify CSS module imports for pill button components
+- Check animation keyframe definitions and browser compatibility
+- Ensure proper event listener cleanup for button interactions
+- Test responsive behavior across different screen sizes
+- Validate touch interactions on mobile devices
 
 ### Browser Compatibility
 - Test across multiple browsers (Chrome, Firefox, Safari, Edge)
 - Provide polyfills for older browser versions
 - Implement feature detection and graceful fallbacks
 - Handle mobile-specific audio constraints and limitations
+- Verify animation support and provide fallbacks for unsupported browsers
 
-**Updated** Enhanced with comprehensive browser compatibility testing, mobile optimization strategies, and production-ready error handling patterns.
+**Updated** Enhanced with comprehensive browser compatibility testing, mobile optimization strategies, production-ready error handling patterns, and new button system troubleshooting guidance.
 
 **Section sources**
 - [VoiceAgent.jsx](file://src/VoiceAgent.jsx)
 - [agent-authorize.js](file://api/agent-authorize.js)
+- [button-system.css](file://src/button-system.css)
+- [button-bubble.css](file://src/button-bubble.css)
 
 ## Conclusion
 
-The Voice AI Agent Demo provides a comprehensive foundation for building production-ready voice-enabled AI applications. The complete implementation demonstrates modern web development practices, including real-time audio processing, complex state management, responsive design, and seamless integration with external AI services through the Bland SDK.
+The Voice AI Agent Demo provides a comprehensive foundation for building production-ready voice-enabled AI applications. The complete implementation demonstrates modern web development practices, including real-time audio processing, complex state management, responsive design, seamless integration with external AI services through the Bland SDK, and an enhanced button system with modern pill-based design patterns.
 
-The modular architecture, combined with contemporary web technologies and best practices, creates a scalable and maintainable solution that can be easily extended with additional features, custom AI models, and enhanced user interfaces. The implementation serves as a robust template for developers looking to integrate voice capabilities into their applications while maintaining high performance and excellent user experience across all devices and platforms.
+The modular architecture, combined with contemporary web technologies and best practices, creates a scalable and maintainable solution that can be easily extended with additional features, custom AI models, and enhanced user interfaces. The recent enhancements with the site pill button system, wipe animations, and bubble effects significantly improve user engagement and provide a more polished, professional interface experience.
 
-**Updated** Reflects the complete end-to-end implementation with production-ready features, comprehensive error handling, and cross-platform compatibility.
+The implementation serves as a robust template for developers looking to integrate voice capabilities into their applications while maintaining high performance and excellent user experience across all devices and platforms. The CSS refactoring and removal of redundant styling code ensures better maintainability and performance for future development iterations.
+
+**Updated** Reflects the complete end-to-end implementation with production-ready features, comprehensive error handling, cross-platform compatibility, and the new enhanced button system with modern animations and improved user experience.

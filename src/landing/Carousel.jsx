@@ -1,8 +1,7 @@
-// Services 3D coverflow — a tall section whose sticky stage is scrubbed by
+// Services depth carousel — a tall section whose sticky stage is scrubbed by
 // scroll. A soft mint spotlight sits behind the stage; the 5 service cards
-// fan in 3D (perspective + rotateY) with an original editorial image series on
-// their faces, and the centred card takes full focus — side cards
-// recede and dim with distance while every face stays crisp. All motion runs in one rAF loop writing
+// move laterally and recede in depth while preserving their rectangular
+// silhouette, and the centred card takes full focus. All motion runs in one rAF loop writing
 // transforms imperatively — no per-frame state. prefers-reduced-motion swaps
 // in a flat scroll-snap row.
 import { useEffect, useRef, useState } from 'react'
@@ -24,14 +23,14 @@ import './carousel.css'
 // —— tunables ————————————————————————————————————————————————
 const N = SERVICE_CARDS.length
 const SMOOTH = 0.1 // heavy lerp on scroll progress — butter motion
-const SPACING_X = 300 // portrait handoff spacing …
-const SPACING_VW = 0.27 // … before the deck opens
+const SPACING_X = 300
+const SPACING_VW = 0.27
 const SPACING_WIDE_X = 480
 const SPACING_WIDE_VW = 0.39
 const SPACING_VW_MOBILE = 0.67 // phone fan: matches the desktop overlap ratio
 const DEPTH_Z = 200 // restrained desktop depth; mobile stays on a flat plane
 const MAX_DEPTH_STEPS = 3
-const ROT_DEG = 24 // enough depth to stage the deck without softening live type
+const ROT_DEG = 24
 const ROT_MAX = 42
 const MOBILE_BP = 900
 const OPACITY_FULL = 0.35 // |d| fully opaque inside this
@@ -39,20 +38,14 @@ const OPACITY_GONE = 1.85 // |d| invisible beyond this — neighbours fade fast 
 const ACTIVE_D = 0.5 // |d| below which a card counts as centred/clickable
 const SNAP_IDLE_MS = 180 // scroll quiet time before the deck glides to a slot
 const SNAP_MIN_OFF = 0.02 // dead zone: already close enough to a slot
-const FIRST_CARD_COPY_REVEAL_MS = 1050
-const WIDE_CARD_MAX = 700
-const WIDE_CARD_VW = 0.60
-const WIDE_CARD_H_MAX = 550
-const WIDE_CARD_VH = 0.63
-
+const FIRST_CARD_COPY_REVEAL_MS = 131.25
+const MOBILE_SWIPE_THRESHOLD = 28
 const desktopCardGeometry = (vw, vh, expansion) => {
   const compact = vh <= 820
   const portraitW = Math.min(390, vw * 0.76)
   const portraitH = compact ? Math.min(460, vh * 0.60) : Math.min(500, vh * 0.66)
-  const wideW = Math.min(WIDE_CARD_MAX, vw * WIDE_CARD_VW)
-  const wideH = compact
-    ? Math.min(500, vh * 0.62)
-    : Math.min(WIDE_CARD_H_MAX, vh * WIDE_CARD_VH)
+  const wideW = Math.min(700, vw * 0.60)
+  const wideH = compact ? Math.min(500, vh * 0.62) : Math.min(550, vh * 0.63)
   return {
     width: lerp(portraitW, wideW, expansion),
     height: lerp(portraitH, wideH, expansion),
@@ -476,40 +469,70 @@ export default function Carousel({ navigate }) {
       }
     }
 
-    // Touch Swipe Drag Mapping
+    // Mobile touch choreography is discrete: one gesture advances one card,
+    // regardless of how far or fast the finger travels. Both vertical page
+    // swipes and horizontal carousel swipes use the same one-slot step.
     let touchStartX = 0
     let touchStartY = 0
-    let touchStartScrollY = 0
-    let isHorizontalSwipe = false
+    let touchStartIndex = 0
+    let touchAxis = null
     let activeTouch = false
 
     const onTouchStart = e => {
       if (e.touches.length !== 1) return
       touchStartX = e.touches[0].clientX
       touchStartY = e.touches[0].clientY
-      touchStartScrollY = window.scrollY
-      isHorizontalSwipe = false
+      const el = sectionRef.current
+      const vh = window.innerHeight || 1
+      const rangePx = Math.max(1, (el?.offsetHeight || vh) - vh)
+      const rawP = el ? clamp01(-el.getBoundingClientRect().top / rangePx) : 0
+      touchStartIndex = Math.round(rawP * (N - 1))
+      touchAxis = null
       activeTouch = true
     }
 
     const onTouchMove = e => {
-      if (!activeTouch) return
+      if (!activeTouch || e.touches.length !== 1) return
       const dx = e.touches[0].clientX - touchStartX
       const dy = e.touches[0].clientY - touchStartY
 
-      if (!isHorizontalSwipe && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
-        isHorizontalSwipe = true
+      if (!touchAxis && Math.max(Math.abs(dx), Math.abs(dy)) > 10) {
+        touchAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+        isDraggedRef.current = true
       }
 
-      if (isHorizontalSwipe) {
-        if (e.cancelable) e.preventDefault()
-        const scrollAmount = -dx * 5.5
-        window.scrollTo(0, touchStartScrollY + scrollAmount)
-      }
+      if (touchAxis && e.cancelable) e.preventDefault()
     }
 
-    const onTouchEnd = () => {
+    const onTouchEnd = e => {
+      if (!activeTouch) return
       activeTouch = false
+      const touch = e.changedTouches?.[0]
+      if (!touch || !touchAxis) return
+
+      const dx = touch.clientX - touchStartX
+      const dy = touch.clientY - touchStartY
+      const distance = touchAxis === 'x' ? dx : dy
+
+      if (Math.abs(distance) >= MOBILE_SWIPE_THRESHOLD) {
+        const direction = distance < 0 ? 1 : -1
+        const target = touchStartIndex + direction
+
+        if (target >= 0 && target < N) {
+          scrollToIndex(target)
+        } else if (touchAxis === 'y') {
+          // At either end, a vertical gesture must still let the visitor
+          // leave the sticky choreography instead of trapping the page.
+          window.scrollBy({
+            top: direction * (window.innerHeight || 1) * 0.72,
+            behavior: 'smooth',
+          })
+        }
+      }
+
+      setTimeout(() => {
+        isDraggedRef.current = false
+      }, 50)
     }
 
     stage.addEventListener('mousedown', onMouseDown)
@@ -746,7 +769,7 @@ export default function Carousel({ navigate }) {
     fRef.current = f
     // The hero handoff is intentionally artwork-only. Once its ghost has
     // disappeared into the first real card, reveal the live title and support
-    // copy over a quiet one-second beat. Reset immediately when reverse-scroll
+    // copy over a near-immediate beat. Reset immediately when reverse-scroll
     // re-enters the handoff so no clipped type can reappear on the moving card.
     const sectionTop = sectionRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
     const handoffIsMoving = heroHandoff.ghostOpacity > 0.01
@@ -759,13 +782,13 @@ export default function Carousel({ navigate }) {
       firstCardCopyRef.current = 0
     }
     const firstCardCopyReveal = easeInOutCubic(firstCardCopyRef.current)
-    // The incoming hero card remains portrait through the familiar opening
-    // beat. As its ghost reaches the services stage, the shared handoff value
-    // opens both copies into a wider canvas. The local driver keeps the deck
-    // fully open after the first card begins moving toward card two.
+    // The hero finishes opening card zero before the swap. Keep the deck wide
+    // after that point; localOpen also supports direct links into this section.
     const localOpen = mobile ? 0 : easeInOutCubic(clamp01(f / 0.36))
     const expansion = mobile ? 0 : Math.max(heroHandoff.cardExpansion || 0, localOpen)
-    const geometry = mobile ? null : desktopCardGeometry(vw, window.innerHeight || 1, expansion)
+    const geometry = mobile
+      ? null
+      : desktopCardGeometry(vw, window.innerHeight || 1, expansion)
     if (geometry) {
       const half = `${(geometry.height / 2).toFixed(1)}px`
       if (stageVarRef.current !== half) {
@@ -795,7 +818,6 @@ export default function Carousel({ navigate }) {
           Math.min(SPACING_WIDE_X, vw * SPACING_WIDE_VW),
           expansion,
         )
-    const rotMax = ROT_MAX
     for (let i = 0; i < N; i++) {
       const el = cardRefs.current[i]
       if (!el) continue
@@ -838,7 +860,7 @@ export default function Carousel({ navigate }) {
       // position and opacity still communicate which card is next.
       const x = mobile ? Math.round(d * spacing) : d * spacing
       const z = mobile ? 0 : -Math.min(ad, MAX_DEPTH_STEPS) * DEPTH_Z
-      const ry = mobile ? 0 : clamp(-d * ROT_DEG, -rotMax, rotMax)
+      const ry = mobile ? 0 : clamp(-d * ROT_DEG, -ROT_MAX, ROT_MAX)
       let op = clamp01((OPACITY_GONE - ad) / (OPACITY_GONE - OPACITY_FULL))
       // the hero's ghost card becomes this card — keep the real one hidden
       // until the ghost has landed in the slot (complementary cross-fade)
