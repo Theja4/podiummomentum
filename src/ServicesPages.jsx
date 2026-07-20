@@ -527,7 +527,7 @@ export function ServiceDetail({ slug, navigate }) {
         </div>
       </section>
 
-      {slug === 'ai-agents' && <VoiceAgent />}
+      {slug === 'ai-agents' && <VoiceAgent navigate={navigate} />}
       
       <section className="svc-detail-intro" id="service-intro" data-reveal="panel">
         <div className="svc-container svc-detail-intro-grid">

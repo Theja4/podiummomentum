@@ -410,53 +410,6 @@ html {
   justify-content: center;
 }
 
-.va-book-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 28px;
-  border-radius: 999px;
-  background: var(--ink, #080808);
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s;
-  box-shadow: 0 4px 14px rgba(8, 8, 8, 0.1);
-}
-
-.va-book-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 26px rgba(8, 8, 8, 0.18);
-}
-
-.va-book-btn svg {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.va-book-btn:hover svg {
-  transform: translateX(3px);
-}
-
-.va-restart-btn {
-  padding: 12px 24px;
-  border-radius: 999px;
-  border: 1px solid #d0d5d8;
-  background: var(--paper, #fff);
-  color: var(--ink, #080808);
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.va-restart-btn:hover {
-  background: var(--ink, #080808);
-  color: #fff;
-  border-color: var(--ink, #080808);
-  transform: translateY(-2px);
-}
-
 /* ─── Error ────────────────────────────────────────────────────────────────── */
 
 .va-error {
@@ -530,11 +483,8 @@ html {
     width: 100%;
   }
 
-  .va-book-btn,
-  .va-restart-btn {
+  .va-ended-actions .pill {
     width: 100%;
-    justify-content: center;
-    text-align: center;
   }
 }
 
@@ -550,8 +500,6 @@ html {
   }
 
   .va-start-btn,
-  .va-book-btn,
-  .va-restart-btn,
   .va-ctrl-btn,
   .va-orb-play {
     transition: none;

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@blandsdk/client':
+        specifier: ^1.0.1
+        version: 1.0.1(react@18.3.1)(ws@8.21.1)
       '@vitejs/plugin-react':
         specifier: 4.3.4
         version: 4.3.4(vite@5.4.11)
@@ -112,6 +115,12 @@ packages:
   '@babel/types@7.29.7':
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
+
+  '@blandsdk/client@1.0.1':
+    resolution: {integrity: sha512-Tnxzf0lA5HnVjCpb30QupwdbqHtVGNPkdmLVGa3P1S1zOBC6YLWbi/25/VtTD88lwm8fLtqiZ21F+M7C7JsLGA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: '>=18'
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -517,6 +526,11 @@ packages:
     resolution: {integrity: sha512-QRbvDIbx6YklUe6RxeTeleMR0yv3cYH6PsPZHcnVn7xv7zO1BHN8r0XETu8n6Ye3Q+ahtSarc3WgtNWmehIBfA==}
     engines: {node: '>=18'}
 
+  isomorphic-ws@5.0.0:
+    resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==}
+    peerDependencies:
+      ws: '*'
+
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -798,6 +812,13 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
+  '@blandsdk/client@1.0.1(react@18.3.1)(ws@8.21.1)':
+    dependencies:
+      isomorphic-ws: 5.0.0(ws@8.21.1)
+      react: 18.3.1
+    transitivePeerDependencies:
+      - ws
+
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
 
@@ -1076,6 +1097,10 @@ snapshots:
   get-caller-file@2.0.5: {}
 
   get-east-asian-width@1.6.0: {}
+
+  isomorphic-ws@5.0.0(ws@8.21.1):
+    dependencies:
+      ws: 8.21.1
 
   js-tokens@4.0.0: {}
 

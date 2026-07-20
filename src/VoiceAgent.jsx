@@ -62,7 +62,7 @@ function TimerBadge({ secondsLeft }) {
 }
 
 // ─── Main VoiceAgent Section ───────────────────────────────────────────────────
-export default function VoiceAgent() {
+export default function VoiceAgent({ navigate }) {
   const [conversationState, setConversationState] = useState('idle')
   const [micPermission, setMicPermission] = useState('unknown')
   const [errorMsg, setErrorMsg] = useState('')
@@ -284,14 +284,24 @@ export default function VoiceAgent() {
                 That was a quick demo! Interested in having an AI agent for your business?
               </p>
               <div className="va-ended-actions">
-                <a href="/contact-us" className="va-book-btn">
-                  Book a call
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
+                <a
+                  className="pill pill-light"
+                  href="/contact-us"
+                  onClick={e => { e.preventDefault(); if (navigate) navigate('/contact-us') }}
+                >
+                  <span className="pill-wipe pill-wipe-dark" aria-hidden="true" />
+                  <span className="pill-label">Book a call</span>
+                  <span className="pill-icon-shell is-light" aria-hidden="true">
+                    <img className="pill-icon pill-handwave" src="/assets/hand-wave.avif" alt="" />
+                  </span>
                 </a>
-                <button className="va-restart-btn" onClick={resetConversation} type="button">
-                  Try demo again
+                <button className="pill pill-dark" onClick={resetConversation} type="button">
+                  <span className="pill-base" aria-hidden="true" />
+                  <span className="pill-wipe" aria-hidden="true" />
+                  <span className="pill-label">Try demo again</span>
+                  <span className="pill-icon-shell is-dark" aria-hidden="true">
+                    <img className="pill-icon pill-brand" src="/assets/brand-mark.svg" alt="" />
+                  </span>
                 </button>
               </div>
             </div>
@@ -300,8 +310,13 @@ export default function VoiceAgent() {
           {conversationState === 'error' && (
             <div className="va-error">
               <span>{errorMsg || 'Something went wrong.'}</span>
-              <button className="va-restart-btn" onClick={resetConversation} type="button">
-                Try again
+              <button className="pill pill-dark" onClick={resetConversation} type="button">
+                <span className="pill-base" aria-hidden="true" />
+                <span className="pill-wipe" aria-hidden="true" />
+                <span className="pill-label">Try again</span>
+                <span className="pill-icon-shell is-dark" aria-hidden="true">
+                  <img className="pill-icon pill-brand" src="/assets/brand-mark.svg" alt="" />
+                </span>
               </button>
             </div>
           )}
