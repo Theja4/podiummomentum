@@ -387,10 +387,10 @@
 .svc-page.is-detail .svc-cap-list .svc-cap-mark {
   position: absolute;
   z-index: 2;
-  top: 1.35rem;
-  right: 1.45rem;
-  width: 2.7rem;
-  height: 2.45rem;
+  top: 1.55rem;
+  right: 1.55rem;
+  width: 36px;
+  height: 32px;
   display: flex;
   align-items: flex-end;
   padding: 0;
@@ -401,7 +401,7 @@
 .svc-page.is-detail .svc-cap-list .svc-cap-mark i {
   --mark-rest-scale: .125;
   flex: 1 1 0;
-  height: 1rem;
+  height: 14px;
   background: #aff9c9;
   border-radius: .85rem 0 0 0;
   transform: scaleY(var(--mark-rest-scale));
@@ -411,14 +411,14 @@
 
 .svc-page.is-detail .svc-cap-list .svc-cap-mark i:nth-child(2) {
   --mark-rest-scale: .073;
-  height: 1.72rem;
+  height: 22px;
   background: #7cf0bd;
   transition-delay: .045s;
 }
 
 .svc-page.is-detail .svc-cap-list .svc-cap-mark i:nth-child(3) {
   --mark-rest-scale: .05;
-  height: 2.45rem;
+  height: 32px;
   background: #67e0a3;
   transition-delay: .09s;
 }

@@ -17,6 +17,47 @@ export default function Landing2({ navigate }) {
   }, [])
 
   useEffect(() => {
+    // On mobile, the browser's collapsing toolbar/navigation area exposes its
+    // theme colour around the visual viewport. Follow whichever section owns
+    // the viewport centre so the dark landing run never ends in a white bar.
+    const meta = document.querySelector('meta[name="theme-color"]')
+    const previousTheme = meta?.getAttribute('content') || '#ffffff'
+    let frame = 0
+    let dark = false
+
+    const updateViewportTheme = () => {
+      frame = 0
+      const center = document.elementFromPoint(
+        Math.max(0, window.innerWidth / 2),
+        Math.max(0, window.innerHeight / 2),
+      )
+      const nextDark = Boolean(center?.closest?.('.pm2-on-dark'))
+      if (nextDark === dark) return
+      dark = nextDark
+      document.body.classList.toggle('pm2-dark-viewport', dark)
+      meta?.setAttribute('content', dark ? '#040a07' : '#ffffff')
+    }
+
+    const requestUpdate = () => {
+      if (!frame) frame = requestAnimationFrame(updateViewportTheme)
+    }
+
+    updateViewportTheme()
+    window.addEventListener('scroll', requestUpdate, { passive: true })
+    window.addEventListener('resize', requestUpdate, { passive: true })
+    window.visualViewport?.addEventListener('resize', requestUpdate, { passive: true })
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', requestUpdate)
+      window.removeEventListener('resize', requestUpdate)
+      window.visualViewport?.removeEventListener('resize', requestUpdate)
+      document.body.classList.remove('pm2-dark-viewport')
+      meta?.setAttribute('content', previousTheme)
+    }
+  }, [])
+
+  useEffect(() => {
     // The shared footer carries the site-wide [data-reveal] entrance and sits
     // outside this root, so reveal it from here (same contract as LandingFx).
     const nodes = [...document.querySelectorAll('footer[data-reveal]')]

@@ -3,6 +3,21 @@
     "aidesigner": {
       "type": "http",
       "url": "https://api.aidesigner.ai/api/v1/mcp"
+    },
+    "gamma": {
+      "type": "stdio",
+      "command": "gamma-mcp",
+      "env": {
+        "GAMMA_API_KEY": "${input:gamma-api-key}"
+      }
     }
-  }
+  },
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "gamma-api-key",
+      "description": "Gamma API key (Settings > API)",
+      "password": true
+    }
+  ]
 }

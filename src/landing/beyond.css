@@ -272,6 +272,12 @@
 }
 
 @media (max-width: 600px) {
+  .pm2-beyond-stage {
+    /* Unlike svh, dvh grows when mobile browser controls collapse, avoiding
+       an exposed strip below this otherwise transparent dark stage. */
+    height: 100dvh;
+  }
+
   .pm2-beyond-word {
     font-size: clamp(42px, 12.8vw, 64px);
   }

@@ -162,15 +162,14 @@ export default function Hero({ navigate }) {
     const PROJECT = 0.16 // s of velocity look-ahead — a flick commits its way
 
     const anchors = () => {
-      if (reducedRef.current || mobileRef.current) return null
-      // the magnet is the desktop pinned journey; mobile flies the card through
-      // the seam on its own as you scroll, no snap
+      if (reducedRef.current) return null
+      // Both layouts use the same physical section boundaries. On mobile the
+      // section is no longer pinned, but the services top is still the exact
+      // end of the card handoff, so it remains the correct magnetic seat.
       const el = sectionRef.current
       const services = document.getElementById('services')
       if (!el || !services) return null
       const r = el.getBoundingClientRect()
-      const vh = window.innerHeight || 1
-      if (r.height - vh <= 0) return null
       // restY — hero at rest; seatY — card fully fallen into the coverflow's
       // first-card slot (only complete once services rises to the viewport top).
       const restY = window.scrollY + r.top

@@ -110,6 +110,34 @@ export default function VoiceAgent({ navigate }) {
     }
   }, [state])
 
+  // The React hook does not mirror remote websocket closures into its own
+  // state, so listen to the underlying client as well. This keeps the UI from
+  // getting stuck in the live state when the agent ends the conversation.
+  useEffect(() => {
+    if (!webchat?.on) return undefined
+
+    const handleClosed = () => {
+      if (!hasStartedRef.current) return
+      clearTimer()
+      setMuted(false)
+      setConversationState('ended')
+    }
+    const handleError = () => {
+      if (!hasStartedRef.current) return
+      clearTimer()
+      setMuted(false)
+      setErrorMsg('Connection failed. Please try again.')
+      setConversationState('error')
+    }
+
+    const unsubscribeClosed = webchat.on('closed', handleClosed)
+    const unsubscribeError = webchat.on('error', handleError)
+    return () => {
+      unsubscribeClosed?.()
+      unsubscribeError?.()
+    }
+  }, [webchat])
+
   // Check microphone permission on mount
   useEffect(() => {
     if (navigator.permissions?.query) {
@@ -188,10 +216,25 @@ export default function VoiceAgent({ navigate }) {
   }, [stop])
 
   const toggleMute = useCallback(() => {
-    if (!webchat?.micStream) return
-    const tracks = webchat.micStream.getAudioTracks()
+    // Bland's current public type omits the stream, but the browser client
+    // retains it for the lifetime of the call. Disabling its live audio track
+    // prevents samples from reaching the SDK audio worklet.
     const nextMuted = !muted
-    tracks.forEach(t => { t.enabled = !nextMuted })
+    const tracks = webchat?.micStream?.getTracks?.().filter(track => track.kind === 'audio' && track.readyState === 'live') || []
+    tracks.forEach(track => { track.enabled = !nextMuted })
+
+    // Some SDK builds do not expose their MediaStream at runtime. In that
+    // case, disconnect/reconnect the microphone source from the capture
+    // worklet so muting still changes the actual outbound audio path.
+    if (!tracks.length && webchat?.sourceNode && webchat?.micNode) {
+      try {
+        if (nextMuted) webchat.sourceNode.disconnect(webchat.micNode)
+        else webchat.sourceNode.connect(webchat.micNode)
+      } catch (err) {
+        console.warn('Unable to change microphone state', err)
+        return
+      }
+    }
     setMuted(nextMuted)
   }, [webchat, muted])
 
@@ -215,7 +258,7 @@ export default function VoiceAgent({ navigate }) {
         </div>
 
         {/* Agent Card — animates subtly when live */}
-        <div className={`va-agent-box ${isTalking ? 'va-agent-box--live' : ''}`} data-reveal="card">
+        <div className={`va-agent-box ${isTalking ? 'va-agent-box--live' : ''}`}>
           <AgentOrb active={isTalking} onClick={!isTalking && conversationState !== 'ended' ? requestMicAndStart : undefined} />
           <span className="va-card-sector">{AGENT.sector}</span>
           <strong className="va-card-title">{AGENT.title}</strong>
@@ -237,7 +280,7 @@ export default function VoiceAgent({ navigate }) {
         </div>
 
         {/* Controls */}
-        <div className="va-controls" data-reveal="up">
+        <div className="va-controls">
           {conversationState === 'idle' && (
             <button className="va-start-btn" onClick={requestMicAndStart} type="button">
               <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
@@ -255,6 +298,7 @@ export default function VoiceAgent({ navigate }) {
                 onClick={toggleMute}
                 type="button"
                 aria-label={muted ? 'Unmute microphone' : 'Mute microphone'}
+                aria-pressed={muted}
               >
                 {muted ? (
                   <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -268,6 +312,9 @@ export default function VoiceAgent({ navigate }) {
                   </svg>
                 )}
                 <span>{muted ? 'Unmute' : 'Mute'}</span>
+                <span className="va-sr-status" aria-live="polite">
+                  {muted ? 'Microphone muted' : 'Microphone active'}
+                </span>
               </button>
               <button className="va-ctrl-btn va-ctrl-btn--end" onClick={endConversation} type="button">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">

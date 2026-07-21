@@ -703,6 +703,204 @@ html[data-theme='dark'] .header .header-inner::before {
   }
 }
 
+/* Mobile navigation is a full-height scroll sheet. Open dropdowns become
+   edge-to-edge brand-green sections instead of nested rounded cards. */
+@media (max-width: 900px) {
+  html.mobile-nav-open,
+  body.mobile-nav-open {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+  }
+
+  .header .nav.open,
+  html body.pm2-active #root .header .nav.open {
+    bottom: 12px !important;
+    height: calc(100dvh - 90px) !important;
+    min-height: calc(100dvh - 90px) !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    scrollbar-width: none;
+  }
+
+  .header .nav.open::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header .nav.open > .nav-dropdown {
+    flex: 0 0 auto;
+    width: 100%;
+    overflow: hidden !important;
+    border-radius: 18px !important;
+    background: transparent;
+    transition: background-color .22s ease, box-shadow .22s ease;
+  }
+
+  .header .nav.open > .nav-dropdown.is-open {
+    background: var(--nav-brand) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .42),
+      0 12px 26px -20px rgba(8, 40, 24, .58);
+  }
+
+  .header .nav.open .nav-dropdown-trigger {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    min-height: 48px;
+    padding: 11px 8px !important;
+    justify-content: flex-start;
+    gap: 10px;
+    border: 0 !important;
+    border-radius: 18px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transition: background-color .22s ease, color .22s ease !important;
+  }
+
+  .header .nav.open .nav-dropdown.is-open .nav-dropdown-trigger,
+  .header .nav.open .nav-dropdown.is-open .nav-dropdown-trigger:hover,
+  html[data-theme='dark'] .header .nav.open .nav-dropdown.is-open .nav-dropdown-trigger,
+  html.pm-bubble-fx[data-theme] body #root .header .nav.open .nav-dropdown.is-open .nav-dropdown-trigger,
+  html.pm-bubble-fx[data-theme] body #root .header .nav.open .nav-dropdown.is-open .nav-dropdown-trigger:hover {
+    color: #06120b !important;
+    background: var(--nav-brand) !important;
+    border-radius: 18px 18px 0 0 !important;
+  }
+
+  .header .nav-dropdown-chevron {
+    width: 9px !important;
+    height: 9px !important;
+    margin: 2px 0 0 1px !important;
+    border-width: 0 1.5px 1.5px 0 !important;
+    flex: 0 0 auto;
+  }
+
+  .header .nav.open .nav-dropdown-panel,
+  .header .nav.open .nav-dropdown-panel--mega,
+  .header .nav.open .nav-dropdown-panel--grid {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-height: min(58dvh, 31rem);
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    border: 0 !important;
+    border-radius: 0 0 18px 18px !important;
+    background: var(--nav-brand) !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--nav-brand-deep) transparent;
+  }
+
+  .header .nav-dropdown-panel-card,
+  html body.pm2-active #root .header .nav-dropdown-panel-card {
+    width: 100%;
+    max-height: none;
+    padding: 12px !important;
+    gap: 4px;
+    overflow: visible;
+    border: 0 !important;
+    border-radius: 0 0 18px 18px !important;
+    background: var(--nav-brand) !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .header .nav-dropdown-panel-card::before,
+  .header .nav-dropdown-panel-card::after {
+    display: none !important;
+  }
+
+  .header .nav-dropdown-head {
+    min-height: 42px;
+    padding: 4px 4px 10px;
+    border-bottom: 1px solid rgba(6, 18, 11, .26) !important;
+  }
+
+  .header .nav-dropdown-eyebrow {
+    color: rgba(6, 18, 11, .68) !important;
+    font-size: 12px;
+  }
+
+  .header .nav-dropdown-all {
+    color: #06120b !important;
+    font-size: 14px;
+  }
+
+  .header .nav-dropdown-list {
+    display: grid;
+    gap: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .header .nav-dropdown-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+
+  .header .nav-dropdown-item,
+  .header .nav-dropdown-chip {
+    min-height: 48px;
+    padding: 10px 6px !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(6, 18, 11, .14) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .header .nav-dropdown-item:last-child,
+  .header .nav-dropdown-chip:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .header .nav-dropdown-item-bg {
+    display: none !important;
+  }
+
+  .header .nav-dropdown-item-copy b,
+  .header .nav-dropdown-chip b,
+  html[data-theme='dark'] .header .nav-dropdown-item-copy b,
+  html[data-theme='dark'] .header .nav-dropdown-chip b {
+    color: #06120b !important;
+    font-size: 17px;
+    line-height: 1.15;
+  }
+
+  .header .nav-dropdown-arrow {
+    width: 28px;
+    height: 28px;
+    color: #06120b !important;
+    border-color: rgba(6, 18, 11, .28) !important;
+    opacity: .8;
+    transform: none;
+  }
+
+  .header .nav-dropdown-item:active,
+  .header .nav-dropdown-chip:active {
+    background: rgba(255, 255, 255, .25) !important;
+  }
+
+  html[data-theme='dark'] .header .nav.open .nav-dropdown-panel,
+  html[data-theme='dark'] .header .nav-dropdown-panel-card {
+    background: var(--nav-brand) !important;
+    border-color: transparent !important;
+  }
+}
+
 /* Keep the desktop CTA comfortably inside the 60px glass rail. Using rem for
    its height made it outgrow the rail at wider responsive root font sizes. */
 @media (min-width: 901px) {

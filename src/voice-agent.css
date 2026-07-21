@@ -74,7 +74,20 @@ html {
   width: 100%;
   max-width: 320px;
   position: relative;
-  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  overflow: hidden;
+  isolation: isolate;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease, transform 0.4s ease;
+}
+
+.va-agent-box::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -35%;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.16), transparent 58%);
+  opacity: 0;
+  transform: scale(0.75);
+  pointer-events: none;
 }
 
 /* Live state — subtle breathing */
@@ -83,9 +96,19 @@ html {
   animation: va-breathe 3s ease-in-out infinite;
 }
 
+.va-agent-box--live::before {
+  opacity: 1;
+  animation: va-agent-glow 2.4s ease-in-out infinite;
+}
+
 @keyframes va-breathe {
   0%, 100% { box-shadow: 0 2px 16px rgba(8, 8, 8, 0.04); }
   50% { box-shadow: 0 6px 28px rgba(8, 8, 8, 0.09); }
+}
+
+@keyframes va-agent-glow {
+  0%, 100% { opacity: 0.45; transform: scale(0.78); }
+  50% { opacity: 1; transform: scale(1); }
 }
 
 /* Live indicator pill */
@@ -348,6 +371,18 @@ html {
   box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
 }
 
+.va-sr-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ─── Spinner / Live dot ───────────────────────────────────────────────────── */
 
 .va-spinner {
@@ -468,14 +503,73 @@ html {
 }
 
 @media (max-width: 480px) {
+  .va-section {
+    padding: 20px 0;
+  }
+
   .va-card {
     border-radius: 18px;
-    padding: 1.75rem 1rem;
+    padding: 28px 18px 32px;
+  }
+
+  .va-head {
+    margin-bottom: 28px;
+  }
+
+  .va-eyebrow {
+    font-size: 10px;
+    padding: 6px 16px;
+    margin-bottom: 14px;
+  }
+
+  .va-head h2 {
+    font-size: clamp(26px, 7.8vw, 30px);
+    line-height: 1.08;
+    margin-bottom: 10px;
+  }
+
+  .va-sub {
+    max-width: 33ch;
+    font-size: clamp(15px, 4vw, 17px);
+    line-height: 1.42;
   }
 
   .va-agent-box {
-    max-width: 240px;
-    padding: 1.5rem 1.25rem 1.25rem;
+    width: min(100%, 310px);
+    max-width: none;
+    min-height: 272px;
+    justify-content: center;
+    padding: 27px 24px 24px;
+  }
+
+  .va-orb {
+    width: 88px;
+    height: 88px;
+  }
+
+  .va-card-title {
+    font-size: 19px;
+  }
+
+  .va-card-desc {
+    max-width: 22ch;
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.35;
+  }
+
+  .va-controls {
+    margin-top: 20px;
+  }
+
+  .va-start-btn {
+    width: auto;
+    max-width: 270px;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 14px;
+    line-height: 1.2;
+    text-align: center;
   }
 
   .va-call-controls {
@@ -486,6 +580,12 @@ html {
   .va-ctrl-btn {
     width: 100%;
     justify-content: center;
+    min-height: 48px;
+    font-size: 15px;
+  }
+
+  .va-ended-msg {
+    font-size: 15px;
   }
 
   .va-ended-actions {
@@ -498,6 +598,14 @@ html {
   }
 }
 
+/* Interactive state changes happen after the page reveal observer has run.
+   Keep the live card and its controls visible across call/ended re-renders. */
+.motion-ready .svc-page .va-agent-box,
+.motion-ready .svc-page .va-controls {
+  opacity: 1;
+  transform: none;
+}
+
 /* ─── Reduced motion ───────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -505,7 +613,8 @@ html {
   .va-orb-wave span,
   .va-live-dot,
   .va-spinner,
-  .va-agent-box--live {
+  .va-agent-box--live,
+  .va-agent-box--live::before {
     animation: none;
   }
 

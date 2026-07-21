@@ -301,6 +301,23 @@ function Header({ industryPage = false, contactPage = false }) {
     if (interactionOpen) setHidden(false)
   }, [interactionOpen])
 
+  // The mobile navigation is its own scroll surface. Lock the document while
+  // it is open so vertical gestures stay inside the menu and its submenus.
+  useEffect(() => {
+    const syncMobileScrollLock = () => {
+      const shouldLock = open && window.innerWidth <= 900
+      document.documentElement.classList.toggle('mobile-nav-open', shouldLock)
+      document.body.classList.toggle('mobile-nav-open', shouldLock)
+    }
+    syncMobileScrollLock()
+    window.addEventListener('resize', syncMobileScrollLock)
+    return () => {
+      window.removeEventListener('resize', syncMobileScrollLock)
+      document.documentElement.classList.remove('mobile-nav-open')
+      document.body.classList.remove('mobile-nav-open')
+    }
+  }, [open])
+
   const svcRef = useRef(null)
   const indRef = useRef(null)
   const svcLeaveTimer = useRef(null)
@@ -504,8 +521,15 @@ function Header({ industryPage = false, contactPage = false }) {
       <button
         className="menu"
         type="button"
-        onClick={() => setOpen(!open)}
-        aria-label="Toggle menu"
+        onClick={() => {
+          const nextOpen = !open
+          setOpen(nextOpen)
+          if (!nextOpen) {
+            setSvcOpen(false)
+            setIndOpen(false)
+          }
+        }}
+        aria-label={open ? 'Close menu' : 'Open menu'}
         aria-controls="primary-navigation"
         aria-expanded={open}
       >

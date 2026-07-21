@@ -189,6 +189,13 @@ body.pm2-active {
   background: #fff !important;
 }
 
+/* Match Android/iOS browser chrome and any area revealed while the mobile
+   toolbar collapses to the dark section currently owning the viewport. */
+html:has(body.pm2-active.pm2-dark-viewport),
+body.pm2-active.pm2-dark-viewport {
+  background: #040a07 !important;
+}
+
 /* The shared footer stays a light card on every other route; on the landing
    it closes the dark run (work rail → gallery → footer) in the same forest
    near-black, full width — no card inset, no rounded top, same layout.

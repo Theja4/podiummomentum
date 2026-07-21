@@ -132,10 +132,13 @@ export default function Gallery() {
     const INPUT_GRACE = 70
     const ENGAGE_LO = 0.008
     const ENGAGE_HI = 0.86
-    const SEAT_PROGRESS = 0.87
+    // Seat beyond the video activation range. Snapping at CORE_IN[0] left the
+    // smoothed progress infinitesimally before playback, so the final frame
+    // looked frozen on both touch and wheel input.
+    const SEAT_PROGRESS = 0.95
 
     const anchors = () => {
-      if (reducedMotion() || window.matchMedia('(max-width: 900px)').matches) return null
+      if (reducedMotion()) return null
       const section = sectionRef.current
       if (!section) return null
       const rect = section.getBoundingClientRect()

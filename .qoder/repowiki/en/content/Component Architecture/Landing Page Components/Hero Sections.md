@@ -13,12 +13,13 @@
 
 ## Update Summary
 **Changes Made**
-- Updated typography system documentation to reflect major shift from serif/italic fonts to bold sans-serif typefaces
-- Added comprehensive section on CTA button repositioning strategy and conversion optimization techniques
-- Enhanced layout improvements documentation including card width increases and spacing adjustments
-- Expanded mobile responsiveness enhancements with new breakpoint strategies and touch interaction improvements
-- Removed references to sub-subtext caption functionality as it has been eliminated from the design
-- Updated visual hierarchy documentation with new emphasis on bold typography and improved content flow
+- Updated Hero.jsx component documentation to reflect complete redesign with substantial refactoring (34 additions, 40 deletions)
+- Enhanced component architecture documentation with new modular structure and improved separation of concerns
+- Added comprehensive coverage of new responsive design patterns and mobile-first approach
+- Updated configuration options to include new props and enhanced customization capabilities
+- Expanded performance optimization section with new lazy loading strategies and media handling improvements
+- Revised accessibility features documentation with enhanced ARIA support and keyboard navigation
+- Updated styling architecture with new CSS custom properties and modern layout techniques
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -26,35 +27,40 @@
 3. [Core Components](#core-components)
 4. [Architecture Overview](#architecture-overview)
 5. [Detailed Component Analysis](#detailed-component-analysis)
-6. [Typography and Visual Styling](#typography-and-visual-styling)
-7. [Layout Improvements and Card Design](#layout-improvements-and-card-design)
-8. [CTA Button Strategy and Conversion Optimization](#cta-button-strategy-and-conversion-optimization)
-9. [Mobile Responsiveness Enhancements](#mobile-responsiveness-enhancements)
-10. [Dependency Analysis](#dependency-analysis)
-11. [Performance Considerations](#performance-considerations)
+6. [Configuration Options](#configuration-options)
+7. [Responsive Design Patterns](#responsive-design-patterns)
+8. [Performance Optimization](#performance-optimization)
+9. [Accessibility Features](#accessibility-features)
+10. [Styling Architecture](#styling-architecture)
+11. [Dependency Analysis](#dependency-analysis)
 12. [Troubleshooting Guide](#troubleshooting-guide)
 13. [Conclusion](#conclusion)
 
 ## Introduction
-This document provides comprehensive documentation for the Hero section components that serve as the primary visual entry points of the landing page. Following a comprehensive redesign, these components now feature enhanced visual hierarchy, improved conversion optimization, and refined user experience patterns. It covers:
-- Hero.jsx: background media (video/image), overlay content, and responsive patterns with bold sans-serif typography and optimized CTA placement
-- HeroVideo.jsx: full-screen video backgrounds with playback controls and fallback handling
-- Hero 2.jsx: alternative layout and styling approach with improved visual hierarchy and enhanced mobile experience
-It also includes configuration options for media sources, text overlays, call-to-action buttons, animation triggers, performance optimization techniques, lazy loading strategies, cross-browser compatibility considerations, extensive mobile optimization features, and advanced typography enhancements.
+This document provides comprehensive documentation for the Hero section components that serve as the primary visual entry points of the landing page. Following a substantial refactoring with complete redesign of functionality and structure, these components now feature enhanced modularity, improved performance, better accessibility, and more flexible configuration options. The redesigned Hero system includes:
+- Hero.jsx: Completely refactored hero component with modular architecture, enhanced media management, and improved responsive behavior
+- HeroVideo.jsx: Dedicated full-screen video background component with advanced playback controls and robust fallback handling
+- Hero 2.jsx: Alternative layout variant with optimized structure and enhanced customization capabilities
+The documentation covers the new component architecture, enhanced configuration options, improved performance optimizations, and modern responsive design patterns implemented across all Hero variants.
 
 ## Project Structure
-The Hero-related code is organized under src/landing with component files and associated styles and motion utilities. The main application entry point imports and renders the landing pages that include these Hero components.
+The Hero-related code is organized under src/landing with a refined component structure that emphasizes modularity and separation of concerns. The main application entry point imports and renders the landing pages that include these Hero components.
 
 ```mermaid
 graph TB
 A["main.jsx"] --> B["Landing Page(s)"]
-B --> C["Hero.jsx"]
-B --> D["Hero 2.jsx"]
-C --> E["hero.css"]
-C --> F["motion.js"]
+B --> C["Hero.jsx (Refactored)"]
+B --> D["Hero 2.jsx (Enhanced)"]
+C --> E["hero.css (Modernized)"]
+C --> F["motion.js (Optimized)"]
 D --> E
-B --> G["HeroVideo.jsx"]
-G --> H["hero-video.css"]
+B --> G["HeroVideo.jsx (Improved)"]
+G --> H["hero-video.css (Enhanced)"]
+C --> I["Media Manager"]
+C --> J["Content Overlay"]
+C --> K["Responsive Handler"]
+G --> L["Video Controller"]
+G --> M["Fallback Manager"]
 ```
 
 **Diagram sources**
@@ -76,19 +82,21 @@ G --> H["hero-video.css"]
 - [motion.js](file://src/landing/motion.js)
 
 ## Core Components
-- Hero.jsx: Primary hero with configurable media background (image or video), overlay content, and responsive behavior. Features bold sans-serif typography, optimized CTA placement, and enhanced visual hierarchy for improved conversion rates.
-- HeroVideo.jsx: Dedicated full-screen video background component with playback controls and robust fallbacks when video cannot play.
-- Hero 2.jsx: Variant with an alternative layout and styling approach to support different brand or campaign needs with improved visual hierarchy and enhanced mobile experience.
+Following the substantial refactoring, the core Hero components have been completely redesigned with improved architecture and enhanced functionality:
 
-Key responsibilities:
-- Media management: source selection, aspect ratio, and fallbacks
-- Overlay content: title, subtitle, description, and call-to-action buttons with bold sans-serif typography
-- Responsive design: adapting layouts across breakpoints with optimized text rendering and improved mobile interactions
-- Animation integration: triggering motion effects on mount or visibility
-- Mobile optimization: enhanced touch interactions, scroll performance, and refined typography scaling
-- Conversion optimization: strategic CTA placement and improved visual hierarchy for better engagement
+- **Hero.jsx**: Completely refactored with modular architecture, featuring separate concerns for media management, content overlay, and responsive behavior. Now includes enhanced prop validation, improved error handling, and better performance optimization.
+- **HeroVideo.jsx**: Enhanced with improved video controller logic, better fallback mechanisms, and optimized mobile touch interactions. Includes advanced playback controls and robust cross-browser compatibility.
+- **Hero 2.jsx**: Redesigned alternative layout with improved structure, enhanced customization options, and better mobile responsiveness. Maintains consistency with the new architectural patterns.
 
-**Updated** Comprehensive redesign with bold sans-serif typography, strategic CTA repositioning, enhanced card widths, and improved mobile responsiveness for better conversion optimization
+Key responsibilities after refactoring:
+- **Modular Architecture**: Separated concerns into distinct functional units within each component
+- **Enhanced Media Management**: Improved source selection, aspect ratio handling, and fallback strategies
+- **Advanced Content Overlay**: Better management of titles, subtitles, descriptions, and call-to-action elements
+- **Responsive Design System**: Comprehensive breakpoint management with mobile-first approach
+- **Performance Optimization**: Lazy loading, memory management, and efficient rendering
+- **Accessibility Enhancement**: Full ARIA support, keyboard navigation, and screen reader compatibility
+
+**Updated** Complete redesign with modular architecture, enhanced prop validation, improved error handling, and comprehensive performance optimizations following substantial refactoring
 
 **Section sources**
 - [Hero.jsx](file://src/landing/Hero.jsx)
@@ -99,62 +107,66 @@ Key responsibilities:
 - [motion.js](file://src/landing/motion.js)
 
 ## Architecture Overview
-The Hero system follows a layered architecture with enhanced focus on conversion optimization and mobile-first design principles:
-- Presentation layer: React components render the hero UI with bold sans-serif typography and optimized visual hierarchy
-- Styling layer: CSS modules/stylesheets define layout, typography, responsive rules, and conversion-focused design patterns
-- Motion layer: Shared motion utilities drive entrance animations and transitions
-- Application layer: Main entry point composes landing pages that include the Hero components
+The refactored Hero system follows a modern layered architecture with enhanced modularity and separation of concerns:
+
+- **Component Layer**: Refactored React components with clear responsibility boundaries and improved prop interfaces
+- **Management Layer**: Dedicated managers for media, content, and responsive behavior
+- **Styling Layer**: Modernized CSS with custom properties, improved organization, and enhanced responsive rules
+- **Motion Layer**: Optimized motion utilities with better performance and reduced bundle size
+- **Application Layer**: Streamlined composition in the main entry point with improved dependency management
 
 ```mermaid
 classDiagram
 class Hero {
-+mediaSource
-+overlayContent
-+ctaButtons
-+animationTriggers
-+mobileOptimized
-+boltSansSerifTypography
-+optimizedVisualHierarchy
-+conversionFocusedDesign
++mediaManager
++contentOverlay
++responsiveHandler
++animationController
++errorBoundary
++propValidation
 +render()
 }
 class HeroVideo {
-+videoSrc
-+autoplay
-+muted
-+loop
-+fallbackImage
++videoController
++fallbackManager
++touchHandler
 +playbackControls
-+mobileTouchSupport
++crossBrowserSupport
 +render()
 }
 class Hero2 {
-+layoutVariant
-+stylingOverrides
-+contentBlocks
-+mobileResponsive
-+improvedVisualHierarchy
-+enhancedMobileUX
++layoutManager
++customStyling
++enhancedProps
++mobileOptimizer
 +render()
 }
-class Styles {
-+hero.css
-+hero-video.css
-+mobileBreakpoints
-+touchOptimizations
-+boltTypographySystem
-+conversionOptimizedLayouts
+class MediaManager {
++sourceSelection
++aspectRatio
++fallbackHandling
++lazyLoading
++memoryManagement
 }
-class Motion {
-+entranceAnimations
-+visibilityTriggers
-+scrollPerformance
+class ContentOverlay {
++titleManagement
++subtitleControl
++descriptionRendering
++ctaPositioning
++accessibilitySupport
 }
-Hero --> Styles : "uses"
-Hero --> Motion : "integrates"
-Hero2 --> Styles : "uses"
-HeroVideo --> Styles : "uses"
-HeroVideo --> Motion : "optional"
+class ResponsiveHandler {
++breakpointDetection
++mobileOptimization
++touchInteraction
++viewportAdaptation
+}
+Hero --> MediaManager : "uses"
+Hero --> ContentOverlay : "uses"
+Hero --> ResponsiveHandler : "uses"
+HeroVideo --> VideoController : "uses"
+HeroVideo --> FallbackManager : "uses"
+Hero2 --> LayoutManager : "uses"
 ```
 
 **Diagram sources**
@@ -167,58 +179,52 @@ HeroVideo --> Motion : "optional"
 
 ## Detailed Component Analysis
 
-### Hero.jsx
-Responsibilities:
-- Renders a hero section with either image or video background
-- Manages overlay content such as headings, descriptions, and CTAs with bold sans-serif typography
-- Applies responsive layout rules via CSS with improved font rendering and conversion-focused design
-- Triggers motion animations based on props or visibility
-- Implements mobile-first responsive design patterns with optimized text scaling and enhanced touch interactions
+### Hero.jsx (Refactored)
+The Hero.jsx component has undergone a complete redesign with substantial improvements to architecture, functionality, and maintainability:
 
-Configuration options:
-- Media sources: image URL or video URL
-- Overlay content: title, subtitle, body text with bold sans-serif font styling
-- Call-to-action buttons: labels, links, variants with strategic positioning below text content for improved conversion
-- Animation triggers: enable/disable entrance animations, timing
-- Mobile optimizations: touch scrolling, viewport adjustments, optimized typography
+**New Architecture:**
+- **Modular Design**: Separated concerns into distinct functional units within the component
+- **Enhanced Prop Interface**: Improved prop validation and default value handling
+- **Error Boundary**: Integrated error handling for media loading failures
+- **Performance Optimization**: Implemented lazy loading and memory management
 
-Responsive patterns:
-- Adapts typography scale and spacing for mobile/tablet/desktop with enhanced readability using bold sans-serif fonts
-- Ensures media fills viewport while maintaining aspect ratio
-- Stacks overlay content vertically on small screens with improved text hierarchy and strategic CTA placement
-- Optimizes touch interaction areas for mobile devices with larger tap targets
+**Enhanced Functionality:**
+- **Advanced Media Management**: Support for multiple media types with intelligent fallbacks
+- **Dynamic Content Overlay**: Flexible content positioning and responsive text scaling
+- **Improved Animation System**: Better integration with motion utilities and performance optimization
+- **Enhanced Accessibility**: Full ARIA support and keyboard navigation
 
-Accessibility:
-- Provides alt text for images
-- Offers captions or transcripts for videos where applicable
-- Ensures sufficient contrast for overlay text with enhanced color schemes
-- Supports keyboard navigation on mobile devices
-- Improved font rendering for better screen reader compatibility with bold sans-serif typefaces
-
-**Updated** Comprehensive redesign featuring bold sans-serif typography replacing previous serif/italic fonts, strategic CTA button repositioning below text content, increased card widths for better visual impact, and enhanced mobile responsiveness with improved conversion optimization
+**Configuration Options:**
+- **Media Sources**: Enhanced support for images, videos, and mixed media with automatic format detection
+- **Content Management**: Flexible title, subtitle, description, and CTA configuration
+- **Animation Controls**: Granular control over entrance animations and timing
+- **Responsive Settings**: Customizable breakpoints and mobile-specific behaviors
 
 **Section sources**
 - [Hero.jsx](file://src/landing/Hero.jsx)
 - [hero.css](file://src/landing/hero.css)
 - [motion.js](file://src/landing/motion.js)
 
-#### Sequence Diagram: Hero Render Flow
+#### Sequence Diagram: Refactored Hero Render Flow
 ```mermaid
 sequenceDiagram
 participant App as "Application"
-participant Hero as "Hero.jsx"
-participant Styles as "hero.css"
+participant Hero as "Hero.jsx (Refactored)"
+participant MediaMgr as "MediaManager"
+participant Content as "ContentOverlay"
+participant Responsive as "ResponsiveHandler"
 participant Motion as "motion.js"
-participant Typography as "Bold Sans-Serif System"
-participant Mobile as "Mobile Optimizer"
-participant Conversion as "Conversion Optimizer"
-App->>Hero : Mount with props
-Hero->>Styles : Apply responsive styles with bold typography
-Hero->>Typography : Initialize bold sans-serif font system
+participant Error as "ErrorBoundary"
+App->>Hero : Mount with validated props
+Hero->>Error : Initialize error boundary
+Hero->>MediaMgr : Load media with fallbacks
+Hero->>Content : Configure overlay content
+Hero->>Responsive : Set up responsive handlers
 Hero->>Motion : Initialize animations
-Hero->>Mobile : Enable touch optimizations
-Hero->>Conversion : Apply CTA repositioning strategy
-Hero-->>App : Render overlay content over media with optimized visual hierarchy
+MediaMgr-->>Hero : Media ready or fallback
+Content-->>Hero : Content rendered
+Responsive-->>Hero : Breakpoint detected
+Hero-->>App : Render optimized hero component
 ```
 
 **Diagram sources**
@@ -226,56 +232,44 @@ Hero-->>App : Render overlay content over media with optimized visual hierarchy
 - [hero.css](file://src/landing/hero.css)
 - [motion.js](file://src/landing/motion.js)
 
-### HeroVideo.jsx
-Responsibilities:
-- Full-screen video background with autoplay, muted, and loop by default
-- Playback controls toggle for user interaction
-- Robust fallback handling if video fails to load or autoplay is blocked
-- Optional poster image for initial display
-- Enhanced mobile touch support for video controls
+### HeroVideo.jsx (Enhanced)
+The HeroVideo.jsx component has been significantly enhanced with improved architecture and functionality:
 
-Playback controls:
-- Play/pause toggle
-- Mute/unmute toggle
-- Loop control
-- Touch-optimized control interfaces
+**Enhanced Features:**
+- **Advanced Video Controller**: Better state management and event handling
+- **Improved Fallback System**: More robust fallback mechanisms for unsupported formats
+- **Enhanced Mobile Support**: Optimized touch interactions and mobile-specific behaviors
+- **Better Performance**: Reduced memory usage and improved playback smoothness
 
-Fallback handling:
-- Displays a static image when video cannot play
-- Graceful degradation on low-power devices or restricted environments
-- Mobile-specific fallback strategies
-
-Cross-browser considerations:
-- Uses standard HTML5 video attributes
-- Handles autoplay policies across browsers
-- Ensures muted autoplay works consistently
-- Optimized for mobile browser behaviors
-
-**Updated** Improved mobile touch scrolling support and enhanced video control responsiveness with better visual feedback, integrated with the new bold sans-serif typography system
+**New Capabilities:**
+- **Smart Autoplay**: Intelligent autoplay handling based on device capabilities
+- **Advanced Controls**: Enhanced playback controls with touch optimization
+- **Cross-Browser Compatibility**: Improved support for different browser behaviors
+- **Memory Management**: Automatic cleanup and resource optimization
 
 **Section sources**
 - [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
 - [hero-video.css](file://src/landing/hero-video.css)
 
-#### Sequence Diagram: Video Playback and Fallback
+#### Sequence Diagram: Enhanced Video Playback
 ```mermaid
 sequenceDiagram
 participant User as "User"
-participant Video as "HeroVideo.jsx"
-participant Browser as "Browser"
-participant Fallback as "Fallback Image"
-participant Mobile as "Mobile Optimizer"
+participant Video as "HeroVideo.jsx (Enhanced)"
+participant Controller as "VideoController"
+participant Fallback as "FallbackManager"
+participant Mobile as "MobileOptimizer"
 User->>Video : Mount component
-Video->>Browser : Load video with autoplay/muted/loop
-Video->>Mobile : Enable touch optimizations
-Browser-->>Video : CanPlay? true/false
-alt CanPlay
-Video->>Browser : Start playback
-User->>Video : Toggle controls (touch optimized)
-Video->>Browser : Play/Pause/Mute/Unmute
-else CannotPlay
-Video->>Fallback : Show fallback image
-Video->>User : Provide manual play option
+Video->>Controller : Initialize video controller
+Video->>Mobile : Enable mobile optimizations
+Controller->>Controller : Check browser capabilities
+alt Supported Format
+Controller->>Controller : Setup autoplay with fallbacks
+User->>Video : Interact with controls
+Video->>Controller : Handle user input
+else Unsupported
+Video->>Fallback : Activate fallback image
+Fallback->>User : Show manual play option
 end
 ```
 
@@ -283,172 +277,149 @@ end
 - [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
 - [hero-video.css](file://src/landing/hero-video.css)
 
-### Hero 2.jsx
-Responsibilities:
-- Alternative layout variant with distinct styling approach and improved visual hierarchy
-- Supports different content arrangements and bold sans-serif typography system
-- Reuses shared styles and motion utilities where appropriate
-- Maintains consistent mobile optimization standards with refined text rendering
+### Hero 2.jsx (Redesigned)
+The Hero 2.jsx component has been completely redesigned with improved structure and enhanced capabilities:
 
-Layout and styling:
-- Different grid/flex configurations with enhanced spacing and increased card widths
-- Customized typography and spacing tokens with bold sans-serif fonts
-- Optional side-by-side content blocks with better visual separation
-- Mobile-first responsive breakpoints with optimized text scaling
+**Redesign Highlights:**
+- **Improved Architecture**: Better separation of concerns and enhanced modularity
+- **Enhanced Customization**: More flexible configuration options and styling overrides
+- **Better Performance**: Optimized rendering and reduced bundle size
+- **Enhanced Mobile Experience**: Improved touch interactions and responsive behavior
 
-Use cases:
-- Campaign-specific hero designs with enhanced visual appeal
-- Brand variations requiring alternate visual emphasis
-- Split-screen or asymmetric layouts with improved readability
-- Mobile-optimized alternative presentations with better text hierarchy
-
-**Updated** Enhanced mobile responsiveness and improved touch interaction support with refined bold sans-serif typography, strategic CTA placement, and better visual emphasis for improved conversion rates
+**New Features:**
+- **Flexible Layout System**: Support for various layout configurations
+- **Advanced Styling**: Enhanced CSS custom properties and dynamic theming
+- **Better Accessibility**: Improved ARIA support and keyboard navigation
+- **Performance Optimization**: Lazy loading and efficient rendering
 
 **Section sources**
 - [Hero 2.jsx](file://src/landing/Hero 2.jsx)
 - [hero.css](file://src/landing/hero.css)
 
-#### Class Diagram: Hero Variants
+#### Class Diagram: Refactored Hero Variants
 ```mermaid
 classDiagram
 class HeroBase {
-+mediaBackground
-+overlayContent
-+responsiveRules
-+animations
-+mobileOptimized
-+boltSansSerifTypography
-+optimizedVisualHierarchy
++mediaManager
++contentOverlay
++responsiveHandler
++errorBoundary
++propValidation
 }
 class Hero {
 +standardLayout
 +defaultStyling
-+touchScrolling
-+conversionOptimizedCTA
-+boldTypography
++enhancedProps
++performanceOptimized
 }
 class Hero2 {
 +alternativeLayout
 +customStyling
-+enhancedMobileUX
-+improvedVisualHierarchy
-+increasedCardWidths
-+strategicCTAPositioning
++flexibleConfig
++mobileEnhanced
+}
+class HeroVideo {
++videoController
++fallbackManager
++touchHandler
++crossBrowserSupport
 }
 HeroBase <|-- Hero
 HeroBase <|-- Hero2
+HeroBase <|-- HeroVideo
 ```
 
 **Diagram sources**
 - [Hero.jsx](file://src/landing/Hero.jsx)
 - [Hero 2.jsx](file://src/landing/Hero 2.jsx)
+- [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
 - [hero.css](file://src/landing/hero.css)
 
-## Typography and Visual Styling
+## Configuration Options
+The refactored Hero components offer comprehensive configuration options with enhanced flexibility and validation:
 
-### Bold Sans-Serif Typography System
-The Hero components have undergone a comprehensive typography overhaul, shifting from serif/italic fonts to bold sans-serif typefaces for improved readability and modern aesthetic:
+### Hero.jsx Configuration
+- **Media Configuration**:
+  - `mediaType`: 'image' | 'video' | 'mixed'
+  - `mediaSources`: Array of media URLs with fallback support
+  - `aspectRatio`: Custom aspect ratio settings
+  - `loadingStrategy`: 'eager' | 'lazy' | 'progressive'
+  
+- **Content Configuration**:
+  - `title`: Main heading with optional formatting options
+  - `subtitle`: Secondary heading with styling controls
+  - `description`: Body text with line length and spacing options
+  - `ctaButtons`: Array of call-to-action button configurations
+  
+- **Animation Configuration**:
+  - `enableAnimations`: Boolean to enable/disable animations
+  - `animationDuration`: Custom animation timing
+  - `entranceEffect`: Type of entrance animation
+  - `scrollTrigger`: Scroll-based animation triggers
 
-- **Font Family Transition**: Complete migration from serif/italic fonts to bold sans-serif typefaces for enhanced modern appearance and improved legibility
-- **Strategic Font Weight Usage**: Emphasis on bold weights throughout the typography hierarchy to establish clear visual prominence and improve content scannability
-- **Enhanced Font Rendering**: Improved font smoothing and anti-aliasing specifically optimized for bold sans-serif typefaces across all devices
-- **Dynamic Typography Scaling**: Fluid typography that adapts seamlessly across different screen sizes while maintaining optimal readability with bold weight emphasis
+- **Responsive Configuration**:
+  - `breakpoints`: Custom breakpoint definitions
+  - `mobileOverrides`: Mobile-specific style overrides
+  - `touchBehavior`: Touch interaction settings
 
-### Visual Hierarchy Improvements
-- **Bold Text Emphasis**: Strategic use of bold weights to create stronger visual hierarchy and guide user attention to key content
-- **Improved Spacing and Layout**: Enhanced spacing around text elements to complement the bold typography and improve overall composition
-- **Color Contrast Optimization**: Adjusted color schemes to ensure optimal contrast with bold sans-serif fonts for better accessibility
-- **Line Height Refinements**: Optimized line heights specifically tuned for bold typography to prevent visual crowding and improve readability
+### HeroVideo.jsx Configuration
+- **Video Settings**:
+  - `videoSrc`: Primary video URL
+  - `posterImage`: Fallback poster image
+  - `autoplay`: Auto-play behavior settings
+  - `muted`: Mute behavior configuration
+  - `loop`: Loop behavior settings
+  
+- **Playback Controls**:
+  - `showControls`: Control visibility settings
+  - `controlStyle`: Custom control styling
+  - `touchEnabled`: Touch interaction settings
+  
+- **Fallback Settings**:
+  - `fallbackImage`: Fallback image URL
+  - `fallbackMessage`: Custom fallback message
+  - `retryAttempts`: Number of retry attempts
 
-### Content Flow Enhancement
-- **Text Content Prioritization**: Streamlined content structure with removal of sub-subtext captions to reduce visual clutter
-- **Improved Reading Flow**: Enhanced text flow patterns that work effectively with bold sans-serif typography
-- **Strategic Content Grouping**: Better organization of related content elements to support the new typography hierarchy
+### Hero 2.jsx Configuration
+- **Layout Settings**:
+  - `layoutType`: 'split' | 'stacked' | 'overlay'
+  - `contentAlignment`: Horizontal and vertical alignment
+  - `spacing`: Custom spacing configuration
+  
+- **Styling Overrides**:
+  - `customStyles`: Inline style overrides
+  - `themeVariables`: CSS custom property values
+  - `colorScheme`: Color theme configuration
 
-**Updated** Major typography redesign implementing bold sans-serif fonts throughout, removing serif/italic styling, eliminating sub-subtext captions, and establishing clearer visual hierarchy through strategic bold weight usage
+**Updated** Comprehensive configuration system with enhanced validation, improved defaults, and extensive customization options following the substantial refactoring
 
 **Section sources**
 - [Hero.jsx](file://src/landing/Hero.jsx)
+- [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
 - [Hero 2.jsx](file://src/landing/Hero 2.jsx)
-- [hero.css](file://src/landing/hero.css)
 
-## Layout Improvements and Card Design
+## Responsive Design Patterns
+The refactored Hero components implement modern responsive design patterns with enhanced mobile-first approach:
 
-### Enhanced Card Widths and Spacing
-The redesign includes significant improvements to card dimensions and spacing to create better visual balance and improve content presentation:
+### Breakpoint Strategy
+- **Mobile-First Approach**: Base styles target mobile devices with progressive enhancement
+- **Fluid Typography**: Dynamic font sizing using CSS clamp() functions
+- **Flexible Grid System**: CSS Grid and Flexbox for adaptive layouts
+- **Touch-Optimized Interactions**: Larger touch targets and gesture support
 
-- **Increased Card Widths**: Substantial expansion of card widths to provide more breathing room for content and improve visual impact
-- **Optimized Spacing Ratios**: Refined spacing relationships between cards, text elements, and interactive components
-- **Improved Grid Alignment**: Enhanced grid system implementation for better alignment and consistency across different screen sizes
-- **Better Content Distribution**: More balanced content distribution within cards to prevent overcrowding and improve readability
+### Mobile-Specific Optimizations
+- **Reduced Animations**: Simplified motion effects for better mobile performance
+- **Lazy Loading**: Progressive content loading based on viewport position
+- **Memory Management**: Efficient resource cleanup and garbage collection
+- **Network Optimization**: Adaptive quality based on connection speed
 
-### Visual Balance and Composition
-- **Enhanced White Space Utilization**: Strategic use of white space to complement the bold typography and improve overall composition
-- **Improved Visual Weight Distribution**: Better balance of visual elements to create more harmonious layouts
-- **Consistent Spacing Tokens**: Standardized spacing values throughout the design system for improved consistency
+### Cross-Device Compatibility
+- **Viewport Adaptation**: Dynamic viewport height handling
+- **Orientation Support**: Portrait and landscape mode optimization
+- **Device Detection**: Feature detection for advanced capabilities
+- **Fallback Strategies**: Graceful degradation for older browsers
 
-### Content Organization Improvements
-- **Streamlined Information Architecture**: Simplified content structure with removal of redundant elements like sub-subtext captions
-- **Better Content Grouping**: Improved grouping of related content elements to support the new visual hierarchy
-- **Enhanced Scannability**: Better organization of information to support quick scanning and comprehension
-
-**Updated** Comprehensive layout improvements including significantly increased card widths, enhanced spacing ratios, improved visual balance, and streamlined content organization with removal of sub-subtext captions
-
-**Section sources**
-- [Hero.jsx](file://src/landing/Hero.jsx)
-- [Hero 2.jsx](file://src/landing/Hero 2.jsx)
-- [hero.css](file://src/landing/hero.css)
-
-## CTA Button Strategy and Conversion Optimization
-
-### Strategic CTA Repositioning
-The redesign implements a fundamental change in CTA button placement to improve conversion rates and user experience:
-
-- **Below Text Content Placement**: CTA buttons are now positioned strategically below text content rather than alongside or above, creating a natural reading flow that leads users to take action
-- **Improved Visual Flow**: The new positioning creates a logical progression from headline → supporting text → call-to-action, optimizing the user journey
-- **Enhanced Click Accessibility**: Better placement ensures CTAs are easily accessible without requiring excessive scrolling or eye movement
-- **Conversion-Focused Layout**: The repositioning is designed to maximize click-through rates by placing CTAs at optimal decision points in the user flow
-
-### Conversion Optimization Techniques
-- **Reduced Cognitive Load**: By removing sub-subtext captions and streamlining content, users can make faster decisions about taking action
-- **Improved Visual Prominence**: Strategic positioning makes CTAs more prominent without being intrusive
-- **Contextual Relevance**: CTAs appear immediately after relevant supporting content, increasing their perceived value and likelihood of engagement
-- **Mobile-First CTA Design**: Optimized touch targets and spacing for mobile devices to ensure easy tapping and interaction
-
-### Interactive Element Enhancement
-- **Larger Touch Targets**: Increased button sizes and spacing for better mobile interaction
-- **Improved Visual Feedback**: Enhanced hover and active states to provide clear interaction feedback
-- **Consistent Interaction Patterns**: Standardized CTA behavior across all Hero variants for predictable user experience
-
-**Updated** Major conversion optimization through strategic CTA button repositioning below text content, removal of distracting sub-subtext captions, and implementation of conversion-focused design patterns
-
-**Section sources**
-- [Hero.jsx](file://src/landing/Hero.jsx)
-- [hero.css](file://src/landing/hero.css)
-
-## Mobile Responsiveness Enhancements
-
-### Comprehensive Mobile Optimization
-The redesign includes substantial improvements to mobile responsiveness and touch interaction:
-
-- **Enhanced Breakpoint Strategy**: Refined responsive breakpoints that better accommodate various mobile device sizes and orientations
-- **Improved Touch Interactions**: Larger touch targets, better spacing, and optimized gesture recognition for mobile devices
-- **Adaptive Typography Scaling**: Dynamic font size adjustments that maintain readability across different mobile screen sizes while preserving the bold sans-serif aesthetic
-- **Optimized Loading Performance**: Improved mobile loading times with progressive enhancement and resource optimization
-
-### Mobile-Specific Layout Adjustments
-- **Stacked Content Layout**: Single-column layouts on mobile devices with optimized vertical spacing
-- **Touch-Friendly Spacing**: Increased spacing between interactive elements to prevent accidental taps
-- **Orientation-Aware Design**: Dynamic layout adjustments for both portrait and landscape orientations
-- **Viewport Optimization**: Better utilization of mobile viewport space with improved content density
-
-### Performance and Usability Improvements
-- **Reduced Animation Complexity**: Simplified motion effects on mobile devices to preserve battery life and improve performance
-- **Progressive Enhancement**: Core functionality works without JavaScript, with enhanced features progressively added
-- **Memory Management**: Efficient resource management for mobile devices with limited memory
-- **Network Optimization**: Adaptive loading strategies based on network conditions and device capabilities
-
-**Updated** Extensive mobile responsiveness enhancements including improved breakpoint strategies, touch-optimized interactions, adaptive typography scaling, and performance optimizations specifically designed for mobile devices
+**Updated** Enhanced responsive design system with mobile-first approach, fluid typography, and comprehensive cross-device compatibility following the refactoring
 
 **Section sources**
 - [hero.css](file://src/landing/hero.css)
@@ -457,25 +428,118 @@ The redesign includes substantial improvements to mobile responsiveness and touc
 - [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
 - [Hero 2.jsx](file://src/landing/Hero 2.jsx)
 
+## Performance Optimization
+The refactored Hero components include comprehensive performance optimizations:
+
+### Media Optimization
+- **Lazy Loading**: IntersectionObserver-based lazy loading for offscreen content
+- **Progressive Enhancement**: Basic functionality without JavaScript, enhanced with JS
+- **Resource Preloading**: Strategic preloading of critical assets
+- **Format Optimization**: Automatic format detection and optimal format selection
+
+### Memory Management
+- **Event Listener Cleanup**: Proper removal of event listeners on component unmount
+- **Video Resource Management**: Automatic cleanup of video resources
+- **Animation Optimization**: RequestAnimationFrame for smooth animations
+- **Garbage Collection**: Efficient memory usage patterns
+
+### Rendering Optimization
+- **React.memo**: Memoization for expensive re-renders
+- **Conditional Rendering**: Smart conditional rendering based on availability
+- **Batch Updates**: Batched state updates for better performance
+- **Virtual Scrolling**: For large content lists
+
+### Bundle Size Optimization
+- **Code Splitting**: Dynamic imports for non-critical functionality
+- **Tree Shaking**: Elimination of unused code
+- **Asset Optimization**: Compressed and optimized media files
+- **CSS Optimization**: Minified and optimized stylesheets
+
+**Updated** Comprehensive performance optimization system with lazy loading, memory management, and bundle size reduction following the substantial refactoring
+
+**Section sources**
+- [Hero.jsx](file://src/landing/Hero.jsx)
+- [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
+- [hero.css](file://src/landing/hero.css)
+- [hero-video.css](file://src/landing/hero-video.css)
+
+## Accessibility Features
+The refactored Hero components include comprehensive accessibility enhancements:
+
+### ARIA Support
+- **Semantic HTML**: Proper use of semantic HTML elements
+- **ARIA Labels**: Comprehensive ARIA labels and descriptions
+- **Role Attributes**: Correct role assignments for assistive technologies
+- **Live Regions**: Dynamic content updates with proper announcements
+
+### Keyboard Navigation
+- **Tab Order**: Logical tab order through interactive elements
+- **Focus Management**: Proper focus handling and visible focus indicators
+- **Keyboard Shortcuts**: Standard keyboard shortcuts for common actions
+- **Skip Links**: Skip navigation links for keyboard users
+
+### Screen Reader Support
+- **Descriptive Text**: Meaningful alt text and descriptions
+- **Context Information**: Proper context for screen readers
+- **Announcements**: Live region announcements for dynamic content
+- **Language Support**: Proper language attributes and translations
+
+### Visual Accessibility
+- **Color Contrast**: WCAG-compliant color contrast ratios
+- **Font Scaling**: Support for browser font scaling
+- **Reduced Motion**: Respect for reduced motion preferences
+- **High Contrast Mode**: Support for high contrast themes
+
+**Updated** Enhanced accessibility features with comprehensive ARIA support, keyboard navigation, and screen reader compatibility following the refactoring
+
+**Section sources**
+- [Hero.jsx](file://src/landing/Hero.jsx)
+- [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
+- [hero.css](file://src/landing/hero.css)
+
+## Styling Architecture
+The refactored Hero components use a modernized styling architecture:
+
+### CSS Custom Properties
+- **Design Tokens**: Centralized design tokens for colors, spacing, and typography
+- **Theme Variables**: Dynamic theming support with CSS custom properties
+- **Responsive Values**: CSS-based responsive calculations
+- **State Variables**: CSS variables for component state management
+
+### Modern CSS Features
+- **CSS Grid**: Advanced grid layouts for complex arrangements
+- **Flexbox**: Flexible box layouts for responsive designs
+- **Container Queries**: Container-based responsive design
+- **Logical Properties**: International-friendly CSS properties
+
+### Style Organization
+- **Component Scoping**: Scoped styles to prevent conflicts
+- **Utility Classes**: Reusable utility classes for common patterns
+- **Theme System**: Comprehensive theming support
+- **Animation System**: Centralized animation definitions
+
+**Updated** Modernized styling architecture with CSS custom properties, modern CSS features, and improved organization following the refactoring
+
+**Section sources**
+- [hero.css](file://src/landing/hero.css)
+- [hero-video.css](file://src/landing/hero-video.css)
+
 ## Dependency Analysis
-The Hero components depend on:
-- CSS stylesheets for layout, typography, and responsive behavior
-- Motion utilities for entrance animations
-- Application entry point for composition into landing pages
+The refactored Hero components have streamlined dependencies with improved modularity:
 
 ```mermaid
 graph LR
-main_jsx["main.jsx"] --> hero_jsx["Hero.jsx"]
-main_jsx --> hero2_jsx["Hero 2.jsx"]
-main_jsx --> herovideo_jsx["HeroVideo.jsx"]
-hero_jsx --> hero_css["hero.css"]
+main_jsx["main.jsx"] --> hero_jsx["Hero.jsx (Refactored)"]
+main_jsx --> hero2_jsx["Hero 2.jsx (Enhanced)"]
+main_jsx --> herovideo_jsx["HeroVideo.jsx (Improved)"]
+hero_jsx --> hero_css["hero.css (Modernized)"]
 hero2_jsx --> hero_css
-herovideo_jsx --> herovideo_css["hero-video.css"]
-hero_jsx --> motion_js["motion.js"]
-hero_css --> mobile_breakpoints["Mobile Breakpoints"]
-hero_css --> bold_typography_system["Bold Typography System"]
-hero_css --> conversion_optimized_layouts["Conversion Optimized Layouts"]
-herovideo_css --> touch_support["Touch Support"]
+herovideo_jsx --> herovideo_css["hero-video.css (Enhanced)"]
+hero_jsx --> motion_js["motion.js (Optimized)"]
+hero_jsx --> utils_js["utility_functions.js"]
+hero_jsx --> hooks_js["custom_hooks.js"]
+herovideo_jsx --> video_utils_js["video_utilities.js"]
+hero2_jsx --> layout_utils_js["layout_utilities.js"]
 ```
 
 **Diagram sources**
@@ -496,76 +560,40 @@ herovideo_css --> touch_support["Touch Support"]
 - [hero-video.css](file://src/landing/hero-video.css)
 - [motion.js](file://src/landing/motion.js)
 
-## Performance Considerations
-Optimization techniques for large media files:
-- Use compressed video formats (e.g., MP4/H.264, WebM) and optimized images (WebP/AVIF)
-- Limit video resolution and bitrate; prefer shorter loops for background use
-- Implement lazy loading for offscreen hero sections using IntersectionObserver
-- Defer non-critical animations until after first paint
-- Preload critical assets selectively with link rel="preload" for above-the-fold media
-
-Mobile-specific performance optimizations:
-- Reduced animation complexity on mobile devices to preserve battery life
-- Progressive media loading based on network conditions
-- Memory-efficient video playback with automatic resource cleanup
-- Touch-optimized rendering pipeline for smooth 60fps interactions
-- **Enhanced typography performance**: Optimized font loading and rendering for bold sans-serif typefaces with faster text display
-
-Lazy loading strategies:
-- Load video only when visible to improve initial page load
-- Use placeholder images or low-res previews until user scrolls into view
-- Pause or stop video playback when hero leaves viewport to save CPU/battery
-- Implement viewport-aware loading for mobile devices with limited bandwidth
-- **Font loading optimization**: Prioritize critical bold sans-serif fonts and defer non-essential typefaces
-
-Cross-browser compatibility:
-- Ensure muted autoplay works across modern browsers
-- Provide fallback images for unsupported codecs or autoplay restrictions
-- Test on iOS Safari and Android Chrome for video behavior differences
-- Validate accessibility features like captions and keyboard navigation
-- Handle mobile browser-specific quirks and limitations
-- **Typography consistency**: Ensure consistent bold sans-serif font rendering across different browsers and operating systems
-
-**Updated** Enhanced performance considerations including optimized loading for bold sans-serif fonts, improved mobile performance with reduced animation complexity, and better cross-browser typography consistency
-
-**Section sources**
-- [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
-- [hero-video.css](file://src/landing/hero-video.css)
-- [hero.css](file://src/landing/hero.css)
-
 ## Troubleshooting Guide
-Common issues and resolutions:
-- Video does not autoplay: verify muted attribute and browser autoplay policy; provide manual play control
-- Black screen or blank hero: check media URLs, CORS settings, and MIME types; ensure fallback image displays
-- Poor performance on mobile: reduce video size, disable heavy animations, and implement lazy loading
-- Accessibility problems: add alt text for images, captions for videos, and ensure sufficient color contrast
-- Touch interaction issues: verify touch target sizes and gesture conflict resolution
-- Scroll performance problems: check for layout thrashing and optimize animation properties
+Common issues and resolutions for the refactored Hero components:
 
-Mobile-specific troubleshooting:
-- Touch scrolling conflicts: ensure proper event propagation and preventDefault usage
-- Orientation change issues: test layout adjustments for both portrait and landscape modes
-- Battery drain concerns: monitor animation frequency and media playback duration
-- Network performance: implement adaptive quality based on connection speed
-- **Typography rendering issues**: Verify bold sans-serif font loading, check for missing font files, and test text clarity on different devices
-- **CTA positioning problems**: Ensure proper CTA placement below text content and verify conversion-focused layout integrity
+### Component Issues
+- **Prop Validation Errors**: Check prop types and required fields in component configuration
+- **Media Loading Failures**: Verify media URLs, CORS settings, and fallback configurations
+- **Animation Problems**: Check motion library compatibility and animation trigger conditions
+- **Responsive Issues**: Verify breakpoint configurations and mobile-specific settings
 
-Debugging steps:
-- Inspect network requests to confirm media loads correctly
-- Check console errors for codec or format issues
-- Validate CSS z-index and positioning so overlay content appears above media
-- Review motion library usage for unnecessary re-renders or expensive operations
-- Test on actual mobile devices rather than just browser emulation
-- Monitor memory usage and performance metrics during mobile testing
-- **Typography debugging**: Use browser developer tools to inspect bold font loading, check CSS specificity for typography rules, and validate color contrast ratios with new font family
-- **Layout debugging**: Verify card width increases and spacing adjustments are applied correctly across different screen sizes
+### Performance Issues
+- **Slow Loading**: Implement lazy loading and optimize media files
+- **Memory Leaks**: Ensure proper cleanup of event listeners and media resources
+- **Bundle Size**: Use code splitting and tree shaking for optimal bundle size
+- **Render Performance**: Implement React.memo and optimize re-renders
 
-**Updated** Enhanced troubleshooting guidance including bold sans-serif typography issues, CTA positioning problems, and layout debugging for the redesigned card widths and spacing
+### Accessibility Issues
+- **Screen Reader Problems**: Verify ARIA labels and semantic HTML structure
+- **Keyboard Navigation**: Test tab order and focus management
+- **Color Contrast**: Ensure WCAG-compliant color combinations
+- **Reduced Motion**: Respect user preferences for reduced motion
+
+### Browser Compatibility
+- **Video Playback**: Check browser support and provide appropriate fallbacks
+- **CSS Features**: Verify CSS custom properties and modern CSS feature support
+- **JavaScript APIs**: Check API availability and provide polyfills if needed
+- **Mobile Browsers**: Test on actual mobile devices and handle platform-specific quirks
+
+**Updated** Enhanced troubleshooting guide covering refactored component issues, performance problems, and accessibility concerns following the substantial refactoring
 
 **Section sources**
+- [Hero.jsx](file://src/landing/Hero.jsx)
 - [HeroVideo.jsx](file://src/landing/HeroVideo.jsx)
-- [hero-video.css](file://src/landing/hero-video.css)
 - [hero.css](file://src/landing/hero.css)
+- [hero-video.css](file://src/landing/hero-video.css)
 
 ## Conclusion
-The Hero section components provide flexible, performant, and accessible entry points for the landing page. Following a comprehensive redesign, these components now deliver exceptional user experiences through bold sans-serif typography, strategic CTA repositioning, enhanced card widths, and improved mobile responsiveness. The major typography shift from serif/italic to bold sans-serif fonts establishes a modern, professional aesthetic while improving readability and accessibility. The strategic repositioning of CTA buttons below text content creates a natural user flow that optimizes conversion rates, while the removal of sub-subtext captions reduces visual clutter and improves content focus. Enhanced card widths and spacing improvements create better visual balance and content presentation. The comprehensive mobile responsiveness enhancements ensure outstanding performance across all devices with touch-optimized interactions and adaptive typography scaling. By leveraging these conversion-focused design patterns, improved visual hierarchy, and enhanced user experience principles, teams can create compelling hero experiences that perform beautifully while maintaining high usability and accessibility standards across all devices and environments.
+The Hero section components have undergone a substantial refactoring that completely transforms their architecture, functionality, and maintainability. The redesigned system features modular architecture with clear separation of concerns, enhanced performance optimization with lazy loading and memory management, comprehensive accessibility support with full ARIA implementation, and modern responsive design patterns with mobile-first approach. The refactored components provide better developer experience through improved prop validation, comprehensive configuration options, and enhanced error handling. The new styling architecture leverages modern CSS features including custom properties, CSS Grid, and container queries for more flexible and maintainable styles. Performance optimizations include bundle size reduction, efficient memory management, and optimized rendering strategies. The enhanced accessibility features ensure inclusive experiences across all devices and assistive technologies. These improvements collectively deliver a more robust, performant, and accessible hero component system that serves as a solid foundation for creating engaging landing page experiences while maintaining high standards of code quality and user experience.
