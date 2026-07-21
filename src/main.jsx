@@ -386,7 +386,6 @@ function Header({ industryPage = false, contactPage = false }) {
       <nav id="primary-navigation" className={open ? 'nav open' : 'nav'}>
       <a href="/" onClick={e => { e.preventDefault(); navigate('/'); setOpen(false) }}>Home</a>
       <a href="#about" onClick={e => goHomeSection(e, '#about')}>About</a>
-      <a href="#work" onClick={e => goHomeSection(e, '#work')}>Works</a>
       <a href={getServicePath('ai-agents')} onClick={e => { e.preventDefault(); navigate(getServicePath('ai-agents')); setOpen(false); setSvcOpen(false); setIndOpen(false) }}>AI Agents</a>
       <div
         className={`nav-dropdown nav-dropdown--services ${svcOpen ? 'is-open' : ''}`}
