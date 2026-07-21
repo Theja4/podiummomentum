@@ -18,6 +18,7 @@ import {
 } from './servicesData.js'
 import { usePageMotion } from './usePageMotion.js'
 import VoiceAgent from './VoiceAgent.jsx'
+import AgentUseCases from './AgentUseCases.jsx'
 
 export { matchServicesRoute }
 import './services-pages.css'
@@ -528,6 +529,7 @@ export function ServiceDetail({ slug, navigate }) {
       </section>
 
       {slug === 'ai-agents' && <VoiceAgent navigate={navigate} />}
+      {slug === 'ai-agents' && <AgentUseCases />}
       
       <section className="svc-detail-intro" id="service-intro" data-reveal="panel">
         <div className="svc-container svc-detail-intro-grid">

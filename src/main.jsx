@@ -25,12 +25,16 @@ import './footer-redesign.css'
 import './enterprise-sharpness.css'
 import { installButtonBubble } from './buttonBubble.js'
 import BrandPreloader from './BrandPreloader.jsx'
+import { initAnalytics, trackPageView, trackCtaClick, trackNewsletterSubscribe } from './analytics.js'
+import PrivacyPolicy from './PrivacyPolicy.jsx'
 
 installButtonBubble()
+initAnalytics()
 
 const A = '/assets/'
 const BRAND = 'Podium Momentum'
 const CONTACT_PATH = '/contact-us'
+const PRIVACY_PATH = '/privacy-policy'
 
 function navigate(path) {
   if (!path || path === '#') return
@@ -1117,7 +1121,8 @@ function Footer() {
 
       setNewsletterEmail('')
       setNewsletterStatus('success')
-      setNewsletterMessage('You’re subscribed. Thank you!')
+      setNewsletterMessage("You're subscribed. Thank you!")
+      trackNewsletterSubscribe()
       newsletterResetTimer.current = window.setTimeout(() => {
         setNewsletterStatus('idle')
         setNewsletterMessage('')
@@ -1229,7 +1234,7 @@ function Footer() {
         )}
         <small>By signing up, you agree to our Privacy Policy. We respect your data.</small>
         <div className="footer-legal" aria-label="Legal information">
-          <b>Privacy Policy</b>
+          <a href={PRIVACY_PATH} onClick={e => { e.preventDefault(); navigate(PRIVACY_PATH) }}>Privacy Policy</a>
           <span>© 2026 {BRAND}. All rights reserved</span>
         </div>
       </form>
@@ -1538,6 +1543,11 @@ function App() {
   const servicesMatch = matchServicesRoute(path)
   const industryMatch = matchIndustryRoute(path)
 
+  // Track pageview on every SPA route change
+  useEffect(() => {
+    trackPageView(path)
+  }, [path])
+
   const withPreloader = content => (
     <>
       <BrandPreloader />
@@ -1596,6 +1606,15 @@ function App() {
       <>
         <Header industryPage />
         <IndustryPage key={industryMatch.slug} slug={industryMatch.slug} navigate={navigate} />
+        <Footer />
+      </>
+    )
+  }
+  if (path === PRIVACY_PATH || path === `${PRIVACY_PATH}/`) {
+    return (
+      <>
+        <Header contactPage />
+        <PrivacyPolicy />
         <Footer />
       </>
     )

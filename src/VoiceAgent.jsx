@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useWebchat } from '@blandsdk/client/react'
+import { trackVoiceCallStart, trackVoiceCallEnd } from './analytics.js'
 import './voice-agent.css'
 
 /**
@@ -15,7 +16,7 @@ const MAX_CALL_SECONDS = 60
 const AGENT = {
   sector: 'Healthcare',
   title: 'Clinic Reception',
-  description: 'Booking, rescheduling & clinic FAQs',
+  description: 'CRM connected · Books, reschedules & pulls up patient records',
 }
 
 // ─── Animated Orb ──────────────────────────────────────────────────────────────
@@ -71,6 +72,7 @@ export default function VoiceAgent({ navigate }) {
 
   const hasStartedRef = useRef(false)
   const timerRef = useRef(null)
+  const callStartRef = useRef(0)
 
   // Bland Webchat SDK hook
   const { state, start, stop, webchat } = useWebchat({
@@ -100,6 +102,8 @@ export default function VoiceAgent({ navigate }) {
       if (hasStartedRef.current) {
         setConversationState('ended')
         clearTimer()
+        const duration = Math.round((Date.now() - callStartRef.current) / 1000)
+        trackVoiceCallEnd(AGENT.title, duration)
       }
     } else if (state === 'error') {
       if (hasStartedRef.current) {
@@ -168,6 +172,7 @@ export default function VoiceAgent({ navigate }) {
           clearTimer()
           stop()
           setConversationState('ended')
+          trackVoiceCallEnd(AGENT.title, MAX_CALL_SECONDS)
           return 0
         }
         return prev - 1
@@ -201,6 +206,8 @@ export default function VoiceAgent({ navigate }) {
     try {
       await start()
       startTimer()
+      callStartRef.current = Date.now()
+      trackVoiceCallStart(AGENT.title)
     } catch (err) {
       setConversationState('error')
       setErrorMsg(err.message || 'Failed to start conversation.')
@@ -213,6 +220,8 @@ export default function VoiceAgent({ navigate }) {
     stop()
     setConversationState('ended')
     setMuted(false)
+    const duration = Math.round((Date.now() - callStartRef.current) / 1000)
+    trackVoiceCallEnd(AGENT.title, duration)
   }, [stop])
 
   const toggleMute = useCallback(() => {
@@ -254,7 +263,7 @@ export default function VoiceAgent({ navigate }) {
         <div className="va-head">
           <span className="va-eyebrow" data-reveal="up">Live clinic demo</span>
           <h2 id="va-heading" data-reveal="line">Talk to a clinic AI receptionist</h2>
-          <p className="va-sub" data-reveal="up">This is a live demo of an inbound AI receptionist for a clinic. Hit play and speak naturally, just like calling the clinic.</p>
+          <p className="va-sub" data-reveal="up">A live inbound agent demo. In production it connects to your CRM, pulls up patient records, books, and reschedules in real time. Hit play and talk to it.</p>
         </div>
 
         {/* Agent Card — animates subtly when live */}

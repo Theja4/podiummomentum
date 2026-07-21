@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ClientLogo from './ClientLogo.jsx'
 import { submitContactForm } from './contactForm.js'
+import { trackContactSubmit } from './analytics.js'
 
 const TC = '/assets/tc-contact/'
 const A = '/assets/'
@@ -373,6 +374,7 @@ function ContactForm() {
 
     try {
       await submitContactForm(new FormData(form))
+      trackContactSubmit({ submission_type: 'Contact brief' })
 
       form.reset()
       setSent(true)
