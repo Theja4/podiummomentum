@@ -23,10 +23,12 @@ import './section-card-motion.css'
 import './button-bubble.css'
 import './footer-redesign.css'
 import './enterprise-sharpness.css'
+import './about-page.css'
 import { installButtonBubble } from './buttonBubble.js'
 import BrandPreloader from './BrandPreloader.jsx'
 import { initAnalytics, trackPageView, trackCtaClick, trackNewsletterSubscribe } from './analytics.js'
 import PrivacyPolicy from './PrivacyPolicy.jsx'
+import AboutPage from './AboutPage.jsx'
 
 installButtonBubble()
 initAnalytics()
@@ -35,6 +37,7 @@ const A = '/assets/'
 const BRAND = 'Podium Momentum'
 const CONTACT_PATH = '/contact-us'
 const PRIVACY_PATH = '/privacy-policy'
+const ABOUT_PATH = '/about'
 
 function navigate(path) {
   if (!path || path === '#') return
@@ -44,9 +47,21 @@ function navigate(path) {
     else window.location.hash = path
     return
   }
+  const hashIndex = path.indexOf('#')
+  const targetHash = hashIndex >= 0 ? path.slice(hashIndex) : ''
   window.history.pushState({}, '', path)
   window.dispatchEvent(new PopStateEvent('popstate'))
-  window.scrollTo(0, 0)
+  if (targetHash) {
+    // A path + hash can either mount a new route or target the route already
+    // on screen. Wait through React's route paint, then scroll in both cases.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.querySelector(targetHash)?.scrollIntoView({ behavior: 'smooth' })
+      })
+    })
+  } else {
+    window.scrollTo(0, 0)
+  }
 }
 
 function usePathname() {
@@ -406,7 +421,7 @@ function Header({ industryPage = false, contactPage = false }) {
       {!contactPage && (
       <nav id="primary-navigation" className={open ? 'nav open' : 'nav'}>
       <a href="/" onClick={e => { e.preventDefault(); navigate('/'); setOpen(false) }}>Home</a>
-      <a href="#about" onClick={e => goHomeSection(e, '#about')}>About</a>
+      <a href={ABOUT_PATH} onClick={e => { e.preventDefault(); navigate(ABOUT_PATH); setOpen(false); setSvcOpen(false); setIndOpen(false) }}>About</a>
       <a href={getServicePath('ai-agents')} onClick={e => { e.preventDefault(); navigate(getServicePath('ai-agents')); setOpen(false); setSvcOpen(false); setIndOpen(false) }}>AI Agents</a>
       <div
         className={`nav-dropdown nav-dropdown--services ${svcOpen ? 'is-open' : ''}`}
@@ -1135,10 +1150,10 @@ function Footer() {
   }
 
   const companyLinks = [
-    { label: 'About', path: '/#about' },
+    { label: 'About', path: ABOUT_PATH },
     { label: 'Services', path: SERVICES_PATH },
     { label: 'Projects', path: '/#work' },
-    { label: 'Testimonials', path: '/#testimonials' },
+    { label: 'Testimonials', path: `${ABOUT_PATH}#testimonials` },
   ]
   const serviceLinks = serviceCatalog.map(s => ({ label: s.title, path: getServicePath(s.slug) }))
   const industryLinks = industryList.map(item => ({ label: item.label, path: item.path }))
@@ -1615,6 +1630,15 @@ function App() {
       <>
         <Header contactPage />
         <PrivacyPolicy />
+        <Footer />
+      </>
+    )
+  }
+  if (path === ABOUT_PATH || path === `${ABOUT_PATH}/`) {
+    return (
+      <>
+        <Header />
+        <AboutPage navigate={navigate} />
         <Footer />
       </>
     )
