@@ -1,0 +1,9 @@
+schema_version: 1
+module_path: mcp2099
+title: MCP-2099 Retro-Futuristic Developer Platform Showcase
+scope:
+    - src/mcp2099/MCP2099.jsx
+    - src/mcp2099/mcp2099.css
+source_files: []
+depends_on: []
+related_to: []

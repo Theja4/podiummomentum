@@ -3,7 +3,7 @@ schema_version: 1
 locale: en-US
 branch: main
 nodes_managed: true
-exported_at: "2026-07-21T18:51:02Z"
+exported_at: "2026-07-23T12:27:33Z"
 modules:
     "":
         dir_name: Podium Momentum SPA Root
@@ -38,6 +38,7 @@ modules:
             - agent_use_cases
             - analytics
             - api
+            - mcp2099
             - privacy_policy
         depends_on: []
         related_to: []
@@ -50,8 +51,7 @@ modules:
         source_files: []
         children: []
         depends_on: []
-        related_to:
-            - path: api
+        related_to: []
     analytics:
         dir_name: Unified Analytics Tracking Layer (GA4 + PostHog)
         title: Unified Analytics Tracking Layer (GA4 + PostHog)
@@ -60,8 +60,7 @@ modules:
         source_files: []
         children: []
         depends_on: []
-        related_to:
-            - path: privacy_policy
+        related_to: []
     api:
         dir_name: Bland AI Agent Session Token Minting
         title: Bland AI Agent Session Token Minting
@@ -70,8 +69,17 @@ modules:
         source_files: []
         children: []
         depends_on: []
-        related_to:
-            - path: agent_use_cases
+        related_to: []
+    mcp2099:
+        dir_name: MCP-2099 Retro-Futuristic Developer Platform Showcase
+        title: MCP-2099 Retro-Futuristic Developer Platform Showcase
+        scope:
+            - src/mcp2099/MCP2099.jsx
+            - src/mcp2099/mcp2099.css
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []
     privacy_policy:
         dir_name: Privacy Policy Page
         title: Privacy Policy Page
@@ -81,5 +89,4 @@ modules:
         source_files: []
         children: []
         depends_on: []
-        related_to:
-            - path: analytics
+        related_to: []

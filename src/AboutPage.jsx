@@ -146,7 +146,7 @@ export default function AboutPage({ navigate }) {
 
   return (
     <main className="about-page">
-      <section className="about-hero" aria-labelledby="about-title">
+      <section className="about-hero" aria-labelledby="about-title" data-reveal="panel">
         <div className="about-hero-copy">
           <p className="about-kicker" data-reveal="up">About Podium Momentum · Incorporated 2025</p>
           <h1 id="about-title" data-split="words">Built to move the numbers that matter.</h1>

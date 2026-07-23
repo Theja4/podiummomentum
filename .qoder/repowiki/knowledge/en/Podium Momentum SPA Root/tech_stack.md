@@ -1,0 +1,1 @@
+React 18 + Vite 5 (`appType: 'spa'`) across all children; shared runtime deps include GSAP, Three.js + React Three Fiber, Lucide icons, PostHog, and the Bland Web Agent SDK.

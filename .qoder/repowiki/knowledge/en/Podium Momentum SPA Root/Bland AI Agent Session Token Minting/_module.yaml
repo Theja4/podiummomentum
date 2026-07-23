@@ -5,5 +5,4 @@ scope:
     - api/agent-authorize.js
 source_files: []
 depends_on: []
-related_to:
-    - path: agent_use_cases
+related_to: []

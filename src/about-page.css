@@ -530,6 +530,17 @@
   max-width: 12ch;
 }
 
+/* The dark CTA wipes to the same green as this panel on hover, so its global
+   elevation would read as a stray dark outline instead of useful depth. */
+html[data-theme] body #root .about-page .about-close .pill-dark:hover {
+  background: var(--about-green) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme] body #root .about-page .about-close .pill-dark:hover .pill-base {
+  background: var(--about-green) !important;
+}
+
 .motion-ready .about-page [data-reveal]:not(.is-inview) {
   opacity: 0;
   transform: translate3d(0, 36px, 0);
@@ -693,12 +704,6 @@
     min-height: 22rem;
   }
 
-  .motion-ready .about-page [data-reveal],
-  .motion-ready .about-page [data-reveal]:not(.is-inview) {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
 }
 
 @media (max-width: 520px) {

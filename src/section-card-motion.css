@@ -1,14 +1,16 @@
 /*
- * Shared section-card entrance for Services and Industries.
+ * Shared section-card entrance for Services, Industries, and About.
  *
  * The landing page treats each large white section as the animated surface:
  * it enters oversized and low, then shrinks and settles into the grey canvas.
  * Keep this scoped to direct child sections so nested project/stat cards can
- * retain their own staggered reveals. Hero surfaces are intentionally omitted.
+ * retain their own staggered reveals. The Services hub hero keeps its own
+ * route-specific treatment; the About hero is part of the shared card motion.
  */
 .motion-ready .svc-page > section[data-reveal="panel"]:not(.svc-hub-hero),
 .motion-ready .ind-main > section[data-reveal="panel"],
-.motion-ready .ind-main > .ind-who[data-reveal="who-section"] {
+.motion-ready .ind-main > .ind-who[data-reveal="who-section"],
+.motion-ready .about-page > section[data-reveal="panel"]:not(.is-inview) {
   opacity: 0;
   transform: translate3d(0, 96px, 0) scale(1.08);
   transform-origin: center top;
@@ -20,7 +22,8 @@
 
 .motion-ready .svc-page > section[data-reveal="panel"]:not(.svc-hub-hero).is-inview,
 .motion-ready .ind-main > section[data-reveal="panel"].is-inview,
-.motion-ready .ind-main > .ind-who[data-reveal="who-section"].is-inview {
+.motion-ready .ind-main > .ind-who[data-reveal="who-section"].is-inview,
+.motion-ready .about-page > section[data-reveal="panel"].is-inview {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
   will-change: auto;
@@ -29,7 +32,8 @@
 @media (max-width: 900px) {
   .motion-ready .svc-page > section[data-reveal="panel"]:not(.svc-hub-hero),
   .motion-ready .ind-main > section[data-reveal="panel"],
-  .motion-ready .ind-main > .ind-who[data-reveal="who-section"] {
+  .motion-ready .ind-main > .ind-who[data-reveal="who-section"],
+  .motion-ready .about-page > section[data-reveal="panel"]:not(.is-inview) {
     transform: translate3d(0, 56px, 0) scale(1.045);
   }
 }
@@ -37,7 +41,8 @@
 @media (prefers-reduced-motion: reduce) {
   .motion-ready .svc-page > section[data-reveal="panel"]:not(.svc-hub-hero),
   .motion-ready .ind-main > section[data-reveal="panel"],
-  .motion-ready .ind-main > .ind-who[data-reveal="who-section"] {
+  .motion-ready .ind-main > .ind-who[data-reveal="who-section"],
+  .motion-ready .about-page > section[data-reveal="panel"] {
     opacity: 1;
     transform: none;
     transition: none;

@@ -757,7 +757,11 @@
   transition: background .4s ease, transform .45s cubic-bezier(.16, 1, .3, 1);
 }
 
-.svc-process-toggle:hover { transform: scaleX(.97); background: var(--svc-accent); }
+.svc-process-toggle:hover { transform: scaleX(.97); }
+
+.svc-process-grid article[data-expanded='true'] .svc-process-toggle {
+  background: var(--svc-accent);
+}
 
 .svc-process-toggle i,
 .svc-process-toggle i:after {

@@ -18,7 +18,8 @@ import { useEffect, useRef, useState } from 'react'
 import { GALLERY } from './data.js'
 import {
   useRafLoop,
-  getScroll,
+  useProgress,
+  useVisible,
   clamp01,
   lerp,
   range,
@@ -105,12 +106,23 @@ export default function Gallery() {
   const bgRef = useRef(null)
   const flags = useRef({ reduced: false, cleared: false, warmed: false, videoReady: false })
   const cam = useRef({ vw: 0, vh: 0 })
-  const uRef = useRef(0) // smoothed pinned progress
   const [isReduced] = useState(reducedMotion)
+  const visible = useVisible(sectionRef, '100% 0px 100% 0px')
+  const visibleRef = useRef(true)
+  const progress = useProgress(sectionRef, {
+    mode: 'sticky',
+    smooth: 0.14,
+    maxSpeed: 0.76,
+    active: visible,
+  })
 
   useEffect(() => {
     flags.current.reduced = reducedMotion()
   }, [])
+
+  useEffect(() => {
+    visibleRef.current = visible
+  }, [visible])
 
   // Match the hero → Web Design handoff with an interruptible scroll magnet.
   // The gallery begins at exactly 80% of Recent Work; once the user releases
@@ -129,7 +141,8 @@ export default function Gallery() {
     let target = 0
 
     const OMEGA = 5.75
-    const INPUT_GRACE = 70
+    const INPUT_GRACE = 420
+    const STOPPED_VEL = 140
     const ENGAGE_LO = 0.008
     const ENGAGE_HI = 0.86
     // Seat beyond the video activation range. Snapping at CORE_IN[0] left the
@@ -180,12 +193,14 @@ export default function Gallery() {
       const instantaneous = (y - lastY) / (dt / 1000)
       lastY = y
       velocity = velocity * 0.55 + instantaneous * 0.45
+      if (!visibleRef.current) return
       const a = anchors()
       if (!a) return
       const progress = (y - a.restY) / a.runway
       if (progress <= ENGAGE_LO || progress >= ENGAGE_HI) return
       if (now - lastInputT < INPUT_GRACE) return
       if (velocity <= 0) return
+      if (velocity > STOPPED_VEL) return
 
       target = a.seatY
       springPos = y
@@ -215,6 +230,12 @@ export default function Gallery() {
       scrollEl.style.scrollBehavior = ''
     }
   }, [])
+
+  useEffect(() => {
+    if (!visible && videoRef.current && !videoRef.current.paused) {
+      videoRef.current.pause()
+    }
+  }, [visible])
 
   // The video's first frame IS the zoom surface. As soon as the clip can
   // render frame 0 (identical pixels to the still) it takes over wholesale;
@@ -304,8 +325,6 @@ export default function Gallery() {
     const f = flags.current
     const target = targetRef.current
     if (!target) return
-    const { vw, vh } = getScroll()
-    const mobile = vw <= MOBILE_BP
 
     if (f.reduced) {
       if (!f.cleared) {
@@ -326,19 +345,18 @@ export default function Gallery() {
       }
       return
     }
+    if (!visible) return
     f.cleared = false
 
+    const vw = window.innerWidth || 1
+    const vh = window.innerHeight || 1
+    const mobile = vw <= MOBILE_BP
     const c = measure(vw, vh)
 
     // —— pinned progress (smoothed): the section begins at exactly 80% of
     // the work rail's sticky journey, so the Intelligence card choreography
     // starts there and snaps cleanly into its final framed state.
-    const rect = sectionRef.current.getBoundingClientRect()
-    const pRaw = clamp01(-rect.top / Math.max(1, rect.height - vh))
-    if (pRaw === 0 && uRef.current < 0.001) uRef.current = 0
-    else if (pRaw === 1 && uRef.current > 0.999) uRef.current = 1
-    else uRef.current = lerp(uRef.current, pRaw, 0.14)
-    const pPin = uRef.current
+    const pPin = progress.current
     const copyIn = mobile ? [0.84, 0.94] : COPY_IN
 
     // —— phase scalars ——————————————————————————————————————————
@@ -408,8 +426,7 @@ export default function Gallery() {
     const coreIn = easeInOutCubic(range(pPin, CORE_IN[0], CORE_IN[1]))
     if (vid) {
       vid.style.opacity = showVideo ? '1' : '0'
-      const offscreen = rect.bottom < 0 || rect.top > vh
-      if (showVideo && coreIn > 0.003 && !offscreen) {
+      if (showVideo && coreIn > 0.003) {
         if (vid.paused) vid.play().catch(() => {})
       } else if (!vid.paused) vid.pause()
     }

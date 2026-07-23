@@ -1,0 +1,1 @@
+React + `@react-three/fiber` + `@react-three/drei` + `three` for WebGL shader scenes; `gsap` for scroll-triggered staggered animations; `lucide-react` for iconography; CSS variables + `backdrop-filter` for glassmorphism.

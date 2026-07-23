@@ -15,13 +15,17 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   useRafLoop,
-  useProgress,
+  useRafRead,
   usePointer,
   clamp01,
   lerp,
   range,
   easeInOutCubic,
+  easeInOutSine,
+  easeOutCubic,
   easeOutBack,
+  smoothToward,
+  useVisible,
 } from './motion.js'
 import Sparkle from './Sparkle.jsx'
 import HeroVideo from './HeroVideo.jsx'
@@ -65,7 +69,19 @@ const CARD_PARALLAX = { translate: 0, rotate: 0, lerp: 0.12 } // px / deg / per-
 // (parallax disabled: any residual sub-pixel rotate/translate composites the
 // card face soft — the user wants it razor sharp; the float + journey motion
 // already carry the liveliness)
-const PROGRESS_SMOOTH = 0.14
+// ONE smoothed clock drives the ENTIRE desktop choreography — panel spin,
+// copy exit, card journey, wide-morph, final slide and the seat swap. It is
+// built from raw scroll pixels across the whole rest→seat span and smoothed
+// once (exponential, τ ms, frame-rate independent). The old code smoothed the
+// sticky progress but drove the morph/expansion/swap from the RAW services
+// position: at speed the two clocks diverged, so the swap fired while the
+// card was still huge and mid-flight — the landing chop this replaces.
+const CLOCK_TAU = 70
+// A full rest→seat catch-up can never complete faster than ~1.1s, even after
+// a large trackpad flick or scrollbar jump. Normal, deliberate scrolling is
+// unchanged because its requested velocity stays below this ceiling.
+const CLOCK_MAX_SPEED = 0.9 // normalized choreography progress / second
+const MOBILE_CLOCK_MAX_SPEED = 1.8
 // The mobile journey — the same film compressed into the seam between the
 // hero and the services deck, all driven by that section's rise (0→1 as its
 // top crosses the viewport): the mint face wipes up over the resting card,
@@ -90,7 +106,12 @@ const DESKTOP_WIDE_CARD = {
   vw: 0.60,
   maxH: 550,
   vh: 0.63,
-  openFrom: 0.72,
+  // The opening spans most of the services rise, with a sine ease. The old
+  // window (0.72→0.965, cubic) squeezed ~320px of width into ~50px of
+  // scroll at its steepest — every wheel tick commanded a visible size jump
+  // no renderer could hide. Slope now peaks under ~1px of width per px of
+  // scroll: the same open, spread long and even.
+  openFrom: 0.30,
   openTo: 0.965,
 }
 
@@ -106,8 +127,33 @@ export default function Hero({ navigate }) {
   const carouselRef = useRef(null)
   const card0Ref = useRef(null)
 
-  const sticky = useProgress(sectionRef, { mode: 'sticky', smooth: PROGRESS_SMOOTH })
   const pointer = usePointer()
+
+  // Every layout measurement for the frame, gathered in the shared READ
+  // phase (clean layout — no forced reflow), plus the unified clock.
+  const measured = useRef({
+    init: false,
+    heroTop: 0,
+    heroLeft: 0,
+    heroHeight: 0,
+    servicesTop: Infinity,
+    hasServices: false,
+    slotX: 0,
+    slotY: 0,
+    slotW: 0,
+    hasSlot: false,
+    cardW: 1,
+    cardH: 1,
+    cardL: 0,
+    cardT: 0,
+    wrapR: null,
+    u: 0, // smoothed unified clock, 0 at hero rest → 1 at the seat
+    s: 0, // derived: pinned-phase progress (was the smoothed sticky)
+    rise: 0, // derived: services-rise progress, SAME clock as s
+    rawRise: 0, // unsmoothed rise — the mobile journey stays scroll-locked
+    mobileRise: 0,
+    mobileInit: false,
+  })
 
   const cardCur = useRef({ x: 0, y: 0, r: 0 })
   // Per-frame write dedupe: geometry writes (width/height/margin) invalidate
@@ -132,6 +178,7 @@ export default function Hero({ navigate }) {
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches,
   )
+  const visible = useVisible(sectionRef, '120% 0px 120% 0px')
 
   useEffect(() => {
     const scrollEl = document.scrollingElement || document.documentElement
@@ -144,6 +191,7 @@ export default function Hero({ navigate }) {
     let target = 0
     let springPos = 0
     let springVel = 0 // px/s
+    let springDir = 0 // sign of (target − start): crossing it ends the spring
 
     // A critically damped spring drives the magnet — NOT a time-based tween.
     // It carries the incoming scroll velocity and uses the closed-form update,
@@ -155,28 +203,44 @@ export default function Hero({ navigate }) {
     //     seat with no overshoot wobble — the old easeOutBack bounced right at
     //     the pixel-identical card swap, which read as chop at the very end.
     const OMEGA = 5.75 // rad/s — half the old frequency (~1s settle, 2× longer)
-    const INPUT_GRACE = 70 // ms since last real input before the magnet engages
+    // A slow, deliberate scroll emits SPARSE wheel events (gaps well past
+    // 70ms) — the old short grace let the magnet engage between the user's
+    // own ticks and yank the page they were still driving: a tug-of-war that
+    // read as chop through the whole handoff band. Engage only after a real
+    // stop: a long quiet window AND near-zero measured velocity.
+    const INPUT_GRACE = 450 // ms since last real input before the magnet engages
+    const STOPPED_VEL = 140 // px/s — above this the page is still travelling
     const ENGAGE_LO = 0.05
     const ENGAGE_HI = 0.95
     const MID = 0.5
     const PROJECT = 0.16 // s of velocity look-ahead — a flick commits its way
 
-    const anchors = () => {
-      if (reducedRef.current) return null
-      // Both layouts use the same physical section boundaries. On mobile the
-      // section is no longer pinned, but the services top is still the exact
-      // end of the card handoff, so it remains the correct magnetic seat.
+    // Both layouts use the same physical section boundaries. On mobile the
+    // section is no longer pinned, but the services top is still the exact
+    // end of the card handoff, so it remains the correct magnetic seat.
+    // restY — hero at rest; seatY — card fully fallen into the coverflow's
+    // first-card slot (only complete once services rises to the viewport top).
+    let anchorCache = null
+    const measureAnchors = () => {
       const el = sectionRef.current
       const services = document.getElementById('services')
       if (!el || !services) return null
-      const r = el.getBoundingClientRect()
-      // restY — hero at rest; seatY — card fully fallen into the coverflow's
-      // first-card slot (only complete once services rises to the viewport top).
-      const restY = window.scrollY + r.top
+      const restY = window.scrollY + el.getBoundingClientRect().top
       const seatY = window.scrollY + services.getBoundingClientRect().top
       const span = seatY - restY
       if (span <= 0) return null
       return { restY, seatY, span }
+    }
+    // Both sections are viewport-sized, so the anchors only move when the
+    // viewport does — cache them and keep the per-frame band check free of
+    // layout reads (this loop runs outside the shared read/write pump).
+    const anchors = () => {
+      if (reducedRef.current) return null
+      if (!anchorCache) anchorCache = measureAnchors()
+      return anchorCache
+    }
+    const invalidateAnchors = () => {
+      anchorCache = null
     }
 
     const endSpring = () => {
@@ -199,12 +263,26 @@ export default function Hero({ navigate }) {
         const decay = Math.exp(-OMEGA * dtf)
         springPos = target + (displacement + velocityTerm * dtf) * decay
         springVel = (springVel - OMEGA * velocityTerm * dtf) * decay
-        window.scrollTo(0, springPos)
-        lastY = window.scrollY // our own write must not read back as user velocity
-        if (Math.abs(springPos - target) < 0.4 && Math.abs(springVel) < 10) {
+        // Carried inertia can push the closed-form solution past the anchor.
+        // The seat is a hard, intentional stop: land exactly on it, never
+        // sail past and pull back — that bounce read as shake at the landing.
+        if (springDir !== 0 && Math.sign(target - springPos) !== springDir) {
           window.scrollTo(0, target)
           endSpring()
+          return
         }
+        // Land in ONE exact step while the motion still masks it. The old
+        // tail (until 0.4px / 10px/s) kept writing sub-pixel scrolls for
+        // ~half a second after the card looked seated; every device-pixel
+        // rounding crossing shifted the whole page 1px for a single frame —
+        // an isolated full-screen text shimmer.
+        if (Math.abs(springPos - target) < 1.5 && Math.abs(springVel) < 60) {
+          window.scrollTo(0, target)
+          endSpring()
+          return
+        }
+        window.scrollTo(0, springPos)
+        lastY = window.scrollY // our own write must not read back as user velocity
         return
       }
 
@@ -219,13 +297,19 @@ export default function Hero({ navigate }) {
       const progress = (y - a.restY) / a.span
       if (progress <= ENGAGE_LO || progress >= ENGAGE_HI) return
       if (now - lastInputT < INPUT_GRACE) return // user is still driving
+      if (Math.abs(velPPS) > STOPPED_VEL) return // still coasting — wait it out
 
+      // engage: re-measure once so the seat is pixel-exact, then commit.
       // flick-to-commit: project where the residual velocity is headed so a
       // decisive flick toward the seat completes even from just under halfway
-      const projected = progress + (velPPS * PROJECT) / a.span
-      target = projected >= MID ? a.seatY : a.restY
+      anchorCache = measureAnchors()
+      const fresh = anchorCache
+      if (!fresh) return
+      const projected = progress + (velPPS * PROJECT) / fresh.span
+      target = projected >= MID ? fresh.seatY : fresh.restY
       springPos = y
       springVel = velPPS // seamless: carry the incoming inertia into the spring
+      springDir = Math.sign(target - springPos)
       scrollEl.style.scrollBehavior = 'auto' // own the scroll; CSS smooth would fight
       mode = 'spring'
     }
@@ -244,6 +328,7 @@ export default function Hero({ navigate }) {
     window.addEventListener('touchmove', onInput, { passive: true })
     window.addEventListener('pointerdown', onInput, { passive: true })
     window.addEventListener('keydown', onInput)
+    window.addEventListener('resize', invalidateAnchors, { passive: true })
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('wheel', onInput)
@@ -251,6 +336,7 @@ export default function Hero({ navigate }) {
       window.removeEventListener('touchmove', onInput)
       window.removeEventListener('pointerdown', onInput)
       window.removeEventListener('keydown', onInput)
+      window.removeEventListener('resize', invalidateAnchors)
       scrollEl.style.scrollBehavior = ''
     }
   }, [])
@@ -276,7 +362,110 @@ export default function Hero({ navigate }) {
     }
   }, [])
 
+  // —— READ PHASE: every DOM measurement the frame needs, taken while layout
+  // is still clean from the previous frame's render (no forced reflow), plus
+  // the unified clock update. The write loop below only consumes. ——
+  useRafRead(dt => {
+    const m = measured.current
+    if (!visible) return
+    const card = cardRef.current
+    const vh = window.innerHeight || 1
+
+    const el = sectionRef.current
+    const heroR = el ? el.getBoundingClientRect() : null
+    m.heroTop = heroR ? heroR.top : 0
+    m.heroLeft = heroR ? heroR.left : 0
+    m.heroHeight = heroR ? heroR.height : vh
+
+    if (!carouselRef.current) carouselRef.current = document.getElementById('services')
+    const cEl = carouselRef.current
+    m.hasServices = Boolean(cEl)
+    m.servicesTop = cEl ? cEl.getBoundingClientRect().top : Infinity
+    m.servicesH = cEl ? cEl.offsetHeight : 0
+
+    if (card) {
+      m.cardW = card.offsetWidth || 1
+      m.cardH = card.offsetHeight || 1
+      m.cardL = card.offsetLeft
+      m.cardT = card.offsetTop
+    }
+
+    // the coverflow's first-card slot, tracked from its ACTUAL rendered rect
+    // so the ghost lands exactly on it at any scroll speed
+    m.hasSlot = false
+    if (cEl) {
+      if (!card0Ref.current || !card0Ref.current.isConnected) {
+        card0Ref.current = cEl.querySelector('.pm2-carousel-card')
+      }
+      if (card0Ref.current) {
+        const r = card0Ref.current.getBoundingClientRect()
+        if (r.width > 1) {
+          m.slotX = r.left + r.width / 2
+          m.slotY = r.top + r.height / 2
+          m.slotW = r.width
+          m.hasSlot = true
+        }
+      }
+    }
+
+    m.wrapR =
+      staticRef.current && slotRef.current ? slotRef.current.getBoundingClientRect() : null
+
+    // —— the unified clock: the pinned scrub and the services rise are
+    // sequential spans of the same physical scroll, so weight them by their
+    // real pixel lengths and smooth the combined value ONCE. Every driver
+    // derives from this clock — the choreography cannot tear at any speed.
+    const stickySpan = Math.max(1, m.heroHeight - vh)
+    const rawS = clamp01(-m.heroTop / stickySpan)
+    m.rawRise = cEl ? clamp01((vh - m.servicesTop) / vh) : 0
+    const total = stickySpan + vh
+    const rawU = clamp01((stickySpan * rawS + vh * m.rawRise) / total)
+    if (!m.init) {
+      // a restored scroll position must not play a catch-up flight on load
+      m.init = true
+      m.u = rawU
+    } else if (rawU === 0 && m.u < 0.001) {
+      m.u = 0 // exact bounds so resting transforms clear and text is crisp
+    } else if (rawU === 1 && m.u > 0.999) {
+      m.u = 1
+    } else {
+      // NEVER snap mid-range: gluing the clock to raw between the bounds
+      // replays the wheel's discrete deltas as visible steps on the card —
+      // the exponential is precisely what absorbs that staircase.
+      const clockSmooth = 1 - Math.exp(-16.667 / CLOCK_TAU)
+      // The speed ceiling shapes large MID-journey jumps. Once the raw
+      // scroll has fully arrived at a bound, the choreography must be free
+      // to finish promptly — a capped, second-long tail would hold the
+      // ghost hostage while the deck starts scrubbing beneath it.
+      const atBound = rawU <= 0.001 || rawU >= 0.999
+      m.u = smoothToward(m.u, rawU, clockSmooth, dt, atBound ? Infinity : CLOCK_MAX_SPEED)
+    }
+    if (!m.mobileInit) {
+      m.mobileInit = true
+      m.mobileRise = m.rawRise
+    } else if (m.rawRise === 0 && m.mobileRise < 0.001) {
+      m.mobileRise = 0
+    } else if (m.rawRise === 1 && m.mobileRise > 0.999) {
+      m.mobileRise = 1
+    } else {
+      // same bound release as the desktop clock: once raw has arrived the
+      // compressed mobile journey must finish promptly, not drift capped
+      const mobileAtBound = m.rawRise <= 0.001 || m.rawRise >= 0.999
+      m.mobileRise = smoothToward(
+        m.mobileRise,
+        m.rawRise,
+        0.2,
+        dt,
+        mobileAtBound ? Infinity : MOBILE_CLOCK_MAX_SPEED,
+      )
+    }
+    const split = stickySpan / total
+    m.s = clamp01(m.u / split)
+    m.rise = clamp01((m.u - split) / (1 - split))
+  })
+
   useRafLoop(() => {
+    if (!visible) return
     const panel = panelRef.current
     const card = cardRef.current
     const wipe = wipeRef.current
@@ -334,13 +523,15 @@ export default function Hero({ navigate }) {
       const M = MOBILE_JOURNEY
       const vw = window.innerWidth || 1
       const vh = window.innerHeight || 1
+      const meas = measured.current
 
       // Rest geometry: the card is BUILT at the coverflow's exact mobile
       // card size and scale-fitted into the slot the panel reserves for it
-      // (measured live — the wrapper never transforms, so its rect is safe).
-      const wrapR = slotRef.current ? slotRef.current.getBoundingClientRect() : null
-      const cw = card.offsetWidth || 1
-      const ch = card.offsetHeight || 1
+      // (measured in the read phase — the wrapper never transforms, so its
+      // rect is safe).
+      const wrapR = meas.wrapR
+      const cw = meas.cardW
+      const ch = meas.cardH
       const restS = wrapR
         ? Math.min(M.restMaxS, Math.max(M.restMinS, Math.min(wrapR.width / cw, wrapR.height / ch)))
         : 0.6
@@ -363,29 +554,16 @@ export default function Hero({ navigate }) {
         return
       }
 
-      // —— the mobile journey: driven by the services section's rise ——
-      if (!carouselRef.current) carouselRef.current = document.getElementById('services')
-      const cEl = carouselRef.current
-      const rise = cEl ? clamp01((vh - cEl.getBoundingClientRect().top) / vh) : 0
+      // —— the mobile journey: driven by the services section's rise. The
+      // section is not pinned here, so the raw (scroll-locked) rise IS the
+      // single coherent clock — no smoothing, no tearing. ——
+      const rise = meas.mobileRise
 
       // the coverflow's first-card slot, tracked live from its ACTUAL rect —
       // so the ghost lands exactly on it at any scroll speed
-      let slotX = vw / 2
-      let slotY = vh / 2
-      let seatS = 1
-      if (cEl) {
-        if (!card0Ref.current || !card0Ref.current.isConnected) {
-          card0Ref.current = cEl.querySelector('.pm2-carousel-card')
-        }
-        if (card0Ref.current) {
-          const r = card0Ref.current.getBoundingClientRect()
-          if (r.width > 1) {
-            slotX = r.left + r.width / 2
-            slotY = r.top + r.height / 2
-            seatS = r.width / cw
-          }
-        }
-      }
+      const slotX = meas.hasSlot ? meas.slotX : vw / 2
+      const slotY = meas.hasSlot ? meas.slotY : vh / 2
+      const seatS = meas.hasSlot ? meas.slotW / cw : 1
 
       const w = easeInOutCubic(range(rise, M.wipeFrom, M.wipeTo))
       const e = easeInOutCubic(range(rise, M.flyFrom, M.flyTo))
@@ -431,37 +609,24 @@ export default function Hero({ navigate }) {
     const vh = window.innerHeight || 1
     frame.staticCleared = false
 
-    // —— frame reads: every layout query happens up front, before any style
-    // write in this loop, so no read can force a mid-frame reflow. ———
-    if (!carouselRef.current) carouselRef.current = document.getElementById('services')
-    let rise = 0
-    let slotX = vw / 2
-    let slotY = vh / 2
-    if (carouselRef.current) {
-      const cEl = carouselRef.current
-      rise = clamp01((vh - cEl.getBoundingClientRect().top) / vh)
-      if (!card0Ref.current || !card0Ref.current.isConnected) {
-        card0Ref.current = cEl.querySelector('.pm2-carousel-card')
-      }
-      if (card0Ref.current) {
-        const r = card0Ref.current.getBoundingClientRect()
-        if (r.width > 1) {
-          slotX = r.left + r.width / 2
-          slotY = r.top + r.height / 2
-        }
-      }
-    }
-    const heroR = sectionRef.current ? sectionRef.current.getBoundingClientRect() : null
-    const cardW = card ? card.offsetWidth || 1 : 1
-    const cardH = card ? card.offsetHeight || 1 : 1
-    const cardL = card ? card.offsetLeft : 0
-    const cardT = card ? card.offsetTop : 0
+    // —— every measurement comes from the shared read phase; s and rise are
+    // two sequential windows of the SAME smoothed clock, so the panel, the
+    // card journey, the wide-morph and the seat swap can never drift apart
+    // no matter how hard the visitor scrolls. ———
+    const meas = measured.current
+    const rise = meas.rise
+    const slotX = meas.hasSlot ? meas.slotX : vw / 2
+    const slotY = meas.hasSlot ? meas.slotY : vh / 2
+    const cardW = meas.cardW
+    const cardH = meas.cardH
+    const cardL = meas.cardL
+    const cardT = meas.cardT
 
-    // —— panel spin (sticky progress 0→1): flat ~90° clockwise rotation ——
+    // —— panel spin (clock progress 0→1): flat ~90° clockwise rotation ——
     // NOTE: the panel carries ALL the hero copy, so it never 3D-tilts on
     // pointer idle (any non-identity 3D transform composited the panel and
     // rasterized its text soft). Pointer parallax lives on the card only.
-    const s = sticky.current
+    const s = meas.s
     const e = easeInOutCubic(range(s, TILT.spinFrom, TILT.spinTo))
     const idle = 1 - range(s, 0, IDLE_TILT_RANGE)
     const px = pointer.current.x
@@ -517,10 +682,29 @@ export default function Hero({ navigate }) {
       // Restore the local-main choreography: the familiar slanted portrait
       // opens into the wider services canvas during the final merge. Real
       // dimensions reflow the artwork instead of stretching it with scaleX.
-      const cardExpansion = easeInOutCubic(
+      const journeyExpansion = easeInOutSine(
         range(rise, DESKTOP_WIDE_CARD.openFrom, DESKTOP_WIDE_CARD.openTo),
       )
+      // Mirror the deck's own localOpen (Carousel.jsx): once the deck is
+      // scrubbing past the seat, card zero widens on the deck's clock — the
+      // ghost must match it or the forced swap during a violent blast (and
+      // the reappearance when reverse-scrolling out of the deck) changes
+      // card width by tens of pixels in one frame.
+      const deckF =
+        meas.servicesTop < 0 && meas.servicesH
+          ? clamp01(-meas.servicesTop / Math.max(1, meas.servicesH - vh)) *
+            (SERVICE_CARDS.length - 1)
+          : 0
+      const deckOpen = easeInOutCubic(clamp01(deckF / 0.36))
+      const cardExpansion = Math.max(journeyExpansion, deckOpen)
       heroHandoff.cardExpansion = cardExpansion
+      // The GHOST's box is real, continuous layout — its white edge rides
+      // over the dark deck, and any texture-resample bridge (stepped layout
+      // + corrective scale) makes that high-contrast edge shimmer as the
+      // compositor re-filters it at a different fractional scale each frame.
+      // The five deck cards keep the cheap coarse-step bridge (Carousel.jsx);
+      // one card's relayout per frame is affordable now that the loops share
+      // a read phase and nothing forces mid-frame reflows.
       const portraitW = Math.min(490, Math.max(360, vw * 0.26))
       const portraitH = Math.min(portraitW * 1.27, vh * 0.70)
       const wideW = Math.min(DESKTOP_WIDE_CARD.maxW, vw * DESKTOP_WIDE_CARD.vw)
@@ -546,23 +730,33 @@ export default function Hero({ navigate }) {
 
       // Rest geometry is MEASURED (offsetLeft/offsetTop are layout values,
       // unaffected by the transforms we write), never mirrored from CSS —
-      // read once in the frame's read phase above.
-      const stickySpan = heroR ? heroR.height - vh : 0
+      // taken in the shared read phase.
+      const stickySpan = Math.max(0, meas.heroHeight - vh)
       // sticky stage: pinned at 0 while the section scrolls through, then
       // scrolls up with it after release
-      const stageTop = heroR ? (heroR.top > -stickySpan ? 0 : heroR.top + stickySpan) : 0
-      const stageLeft = heroR ? heroR.left : 0
-      const restCX = stageLeft + cardL + cardW / 2
+      const stageTop = meas.heroTop > -stickySpan ? 0 : meas.heroTop + stickySpan
+      const stageLeft = meas.heroLeft
+      // The card is RIGHT-anchored, so a width step moves its layout centre;
+      // the measured offsets are one frame stale. The right edge, however, is
+      // invariant under width changes — derive this frame's true centre from
+      // it and the width being written now, so a layout step can never pop
+      // the translate compensation. (Vertically the -height/2 margin keeps
+      // the centre invariant, so the stale measure is already exact.)
+      const restCX = stageLeft + cardL + cardW - liveW / 2
       const restCY = stageTop + cardT + cardH / 2
-      // the coverflow card it will become (mirrors carousel.css card sizing —
-      // the hero card is built at the same size, so the seat scale lands 1.0;
-      // short desktop viewports use the compact card tune)
-      const seatS = liveW / cardW
+      // The card's real box IS written to the target size every frame, so the
+      // seated scale is exactly 1. (It was liveW / measured-offsetWidth, but
+      // the measure is one frame stale: during the width morph that ratio
+      // swings a few percent each frame — box and scale shrink TOGETHER, then
+      // the scale pops back — a sawtooth that read as chop at the seat.)
+      const seatS = 1
 
       // ONE simultaneous motion with the panel's spin: slide + grow + swivel
       const eG = easeInOutCubic(range(s, CARD_JOURNEY.slideFrom, CARD_JOURNEY.slideTo))
       const eUp = easeInOutCubic(range(s, CARD_JOURNEY.uprightFrom, CARD_JOURNEY.uprightTo))
-      const eS = easeOutBack(range(s, CARD_JOURNEY.seatFrom, CARD_JOURNEY.seatTo)) // soft snap
+      // pure deceleration into the seat — easeOutBack's overshoot made the
+      // scale wobble right at the pixel-identical swap, which read as chop
+      const eS = easeOutCubic(range(s, CARD_JOURNEY.seatFrom, CARD_JOURNEY.seatTo))
       // grown size is capped so the card never fills/stretches past the window
       const gsMax = Math.min(
         CARD_JOURNEY.growScale,
@@ -608,8 +802,15 @@ export default function Hero({ navigate }) {
       const gy = cy - restCY + (goalY - vh / 2) + c.y * idle
       // content morph: the coverflow face slides over the ghost's own mid-fall
       const m = easeInOutCubic(range(rise, 0.38, 0.94))
-      // the faces are pixel-identical by now — a hard one-frame swap
-      const cOp = rise < 0.96 ? 1 : 0
+      // the faces are pixel-identical by now — a hard one-frame swap. If a
+      // violent scroll has blasted DEEP past the seat and the deck is
+      // genuinely scrubbing, finish the handoff now: the real card is
+      // leaving the slot (gaining coverflow rotation), and only it can
+      // represent that motion. The margin is generous so a small flick
+      // overshoot (which the magnet pulls back) never trips it — with the
+      // clock uncapped at the bound, the normal swap wins the race anyway.
+      const deckScrubbing = meas.servicesTop <= -0.12 * vh
+      const cOp = rise < 0.96 && !deckScrubbing ? 1 : 0
 
       // same rest rule as the panel: identity transforms are cleared so the
       // resting card (and everything it contains) rasterizes crisp
@@ -625,6 +826,8 @@ export default function Hero({ navigate }) {
         card.style.transform = ''
         card.style.opacity = ''
       } else {
+        // no corrective fit here: the ghost's box IS continuous layout, so a
+        // plain scale keeps its high-contrast edge crisp (no texture resample)
         card.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0) rotate(${gr.toFixed(3)}deg) scale(${cardScale.toFixed(4)})`
         card.style.opacity = cOp.toFixed(3)
       }

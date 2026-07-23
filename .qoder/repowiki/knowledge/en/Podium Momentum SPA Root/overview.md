@@ -1,1 +1,1 @@
-Repository root scaffolding for the Podium Momentum single-page app, wiring Vite dev proxy and Vercel rewrites around the client source and the sibling `api/` serverless function.
+Vite + React single-page app root that wires the client, a local Bland token-minting dev proxy, and Vercel rewrites around the sibling `api/` serverless function.

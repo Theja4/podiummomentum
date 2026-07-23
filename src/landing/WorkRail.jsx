@@ -11,7 +11,9 @@ import {
   getScroll,
   reducedMotion,
   useProgress,
+  useRafRead,
   useRafLoop,
+  useVisible,
 } from './motion.js'
 import './work.css'
 
@@ -56,45 +58,68 @@ export default function WorkRail({ navigate }) {
     }
   }, [])
 
-  const progress = useProgress(sectionRef, { mode: 'sticky', smooth: SMOOTH })
+  const visible = useVisible(sectionRef, '100% 0px 100% 0px')
+  const progress = useProgress(sectionRef, {
+    mode: 'sticky',
+    smooth: SMOOTH,
+    maxSpeed: 0.65,
+    active: visible,
+  })
 
   // —— scrub loop (desktop only) ————————————————————————————————
   const xPrevRef = useRef(0)
   const cardResetRef = useRef(false)
-  useRafLoop(() => {
-    if (simple) return
+  const readState = useRef({
+    ready: false,
+    vw: 1,
+    maxX: 0,
+    exit: 0,
+    baseLeft: 0,
+    cardCenters: [],
+  })
+  useRafRead(() => {
+    if (!visible || simple) return
     const stage = stageRef.current
     const track = trackRef.current
-    if (!stage || !track) return
+    const section = sectionRef.current
+    if (!stage || !track || !section) return
 
-    // —— reads: every layout query happens before any style write, so the
-    // loop never forces a mid-frame reflow. ——
+    const state = readState.current
     const vw = stage.clientWidth || 1
-    const p = progress.current
-    // Measure the track every frame — never hardcode travel distance.
-    const maxX = Math.max(0, track.offsetWidth - vw)
-    // Exit continuation: once the rail unpins, keep drifting the cards left
-    // while the section leaves the viewport, so the horizontal motion hands
-    // off into the gallery's diagonal pan with no dead beat.
     const { vh } = getScroll()
-    const sr = sectionRef.current.getBoundingClientRect()
-    const exit = clamp01((vh - sr.bottom) / vh)
-    // The track rect still carries LAST frame's transform; subtracting the
-    // previous x recovers the untransformed left edge without a post-write
-    // rect read (which forced a reflow every frame).
-    const baseLeft = track.getBoundingClientRect().left - xPrevRef.current
+    state.ready = true
+    state.vw = vw
+    state.maxX = Math.max(0, track.offsetWidth - vw)
+    state.exit = clamp01((vh - section.getBoundingClientRect().bottom) / vh)
+    state.baseLeft = track.getBoundingClientRect().left - xPrevRef.current
+    state.cardCenters.length = WORKS.length
+    for (let i = 0; i < WORKS.length; i += 1) {
+      const card = cardsRef.current[i]
+      state.cardCenters[i] = card ? card.offsetLeft + card.offsetWidth / 2 : 0
+    }
+  })
+
+  useRafLoop(() => {
+    if (!visible) return
+    if (simple) return
+    const track = trackRef.current
+    const state = readState.current
+    if (!track || !state.ready) return
+
+    const vw = state.vw
+    const p = progress.current
     // Whole-pixel rail movement keeps the tag-pill type crisp while the
     // active card is resting in the viewport.
-    const x = Math.round(-(p * maxX + easeOutCubic(exit) * 0.35 * vw))
-    const trackLeft = baseLeft + x
+    const x = Math.round(
+      -(p * state.maxX + easeOutCubic(state.exit) * 0.35 * vw),
+    )
+    const trackLeft = state.baseLeft + x
     const mid = vw / 2
     let best = 0
     let bestDist = Infinity
     const imgX = []
     for (let i = 0; i < WORKS.length; i += 1) {
-      const card = cardsRef.current[i]
-      if (!card) continue
-      const center = trackLeft + card.offsetLeft + card.offsetWidth / 2
+      const center = trackLeft + state.cardCenters[i]
       const rel = (center - mid) / vw
       const dist = Math.abs(rel)
       if (dist < bestDist) {

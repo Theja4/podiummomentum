@@ -8,6 +8,9 @@ export const clamp = (v, min, max) => Math.min(max, Math.max(min, v))
 export const lerp = (a, b, t) => a + (b - a) * t
 export const easeOutCubic = t => 1 - Math.pow(1 - t, 3)
 export const easeInOutCubic = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+// Gentler S-curve: peak slope ~1.57 vs cubic's 3 — for scroll-driven size
+// morphs where a steep middle amplifies every wheel tick into a size jump.
+export const easeInOutSine = t => (1 - Math.cos(Math.PI * clamp01(t))) / 2
 export const easeOutQuart = t => 1 - Math.pow(1 - t, 4)
 export const easeOutBack = t => {
   const c1 = 1.70158
@@ -23,10 +26,14 @@ export const reducedMotion = () =>
 
 // —— rAF loop ————————————————————————————————————————————————
 // useRafLoop((dt, now) => { ... }) — dt clamped to 50ms, runs until unmount.
-// All subscribers share ONE requestAnimationFrame pump: a dozen independent
-// rAF callbacks per frame cost scheduler overhead and, worse, interleave in
-// arbitrary order. A single pump runs them in mount order (progress/pointer
-// hooks before their component's write loop) with one shared timestamp.
+// All subscribers share ONE requestAnimationFrame pump in TWO phases:
+//   1. read phase (useRafRead)  — every DOM measurement, on layout that is
+//      still clean from the previous frame's render, so no read ever forces
+//      a mid-frame reflow;
+//   2. write phase (useRafLoop) — every style write.
+// Interleaved read→write→read across components was forcing multiple
+// synchronous layouts per frame right at the hero→services handoff.
+const rafReads = new Set()
 const rafSubs = new Set()
 let rafId = 0
 let rafLast = 0
@@ -34,23 +41,48 @@ function rafPump(now) {
   rafId = requestAnimationFrame(rafPump)
   const dt = Math.min(50, now - rafLast)
   rafLast = now
+  rafReads.forEach(cb => cb(dt, now))
   rafSubs.forEach(cb => cb(dt, now))
 }
-export function useRafLoop(callback) {
+function useRafPhase(set, callback) {
   const cbRef = useRef(callback)
   cbRef.current = callback
   useEffect(() => {
     const cb = (dt, now) => cbRef.current(dt, now)
-    rafSubs.add(cb)
-    if (rafSubs.size === 1) {
+    set.add(cb)
+    if (rafReads.size + rafSubs.size === 1) {
       rafLast = performance.now()
       rafId = requestAnimationFrame(rafPump)
     }
     return () => {
-      rafSubs.delete(cb)
-      if (rafSubs.size === 0) cancelAnimationFrame(rafId)
+      set.delete(cb)
+      if (rafReads.size + rafSubs.size === 0) cancelAnimationFrame(rafId)
     }
   }, [])
+}
+export function useRafLoop(callback) {
+  useRafPhase(rafSubs, callback)
+}
+export function useRafRead(callback) {
+  useRafPhase(rafReads, callback)
+}
+
+// Frame-rate independent smoothing: `smooth` keeps its historical meaning of
+// "lerp fraction per 60Hz frame", corrected for the real dt so a 120Hz
+// display converges at the same speed (in ms) as a 60Hz one — before this,
+// ProMotion screens ran every scroll lag at literally twice the stiffness.
+export const smoothFactor = (smooth, dt) => 1 - Math.pow(1 - smooth, dt / 16.667)
+
+// Exponential smoothing absorbs discrete wheel/trackpad steps, but on its own
+// it still lets a large scroll jump produce a very fast first frame. Cap the
+// follower's velocity as well so every scrubbed sequence has a predictable
+// maximum visual speed, independent of the input device or refresh rate.
+export function smoothToward(current, target, smooth, dt, maxSpeed = Infinity) {
+  const desired = (target - current) * smoothFactor(smooth, dt)
+  const maxDelta = Number.isFinite(maxSpeed)
+    ? maxSpeed * (Math.min(50, Math.max(0, dt)) / 1000)
+    : Infinity
+  return current + clamp(desired, -maxDelta, maxDelta)
 }
 
 // —— global scroll state (one listener set for the whole page) ————————————
@@ -80,9 +112,15 @@ export function getScroll() {
 //   viewport bottom. Use this for pinned/scrubbed sequences.
 // mode 'enter': 0 -> 1 while the section rises through the bottom 65% of the
 //   viewport; good for one-way reveals.
-export function useProgress(ref, { smooth = 0.16, mode = 'travel' } = {}) {
+export function useProgress(
+  ref,
+  { smooth = 0.16, mode = 'travel', maxSpeed = 0.9, active = true } = {},
+) {
   const out = useRef(0)
-  useRafLoop(() => {
+  // Read phase: rect reads land on clean layout, and every write-phase
+  // consumer sees this frame's fresh value regardless of mount order.
+  useRafRead(dt => {
+    if (!active) return
     const el = ref.current
     if (!el) return
     const r = el.getBoundingClientRect()
@@ -94,7 +132,7 @@ export function useProgress(ref, { smooth = 0.16, mode = 'travel' } = {}) {
     // Snap to bounds so resting states are exact.
     if (raw === 0 && out.current < 0.001) out.current = 0
     else if (raw === 1 && out.current > 0.999) out.current = 1
-    else out.current = lerp(out.current, raw, smooth)
+    else out.current = smoothToward(out.current, raw, smooth, dt, maxSpeed)
   })
   return out
 }
@@ -111,10 +149,11 @@ export function usePointer(smooth = 0.075) {
     window.addEventListener('pointermove', onMove, { passive: true })
     return () => window.removeEventListener('pointermove', onMove)
   }, [])
-  useRafLoop(() => {
+  useRafRead(dt => {
     const p = out.current
-    p.x = lerp(p.x, p.tx, smooth)
-    p.y = lerp(p.y, p.ty, smooth)
+    const k = smoothFactor(smooth, dt)
+    p.x = lerp(p.x, p.tx, k)
+    p.y = lerp(p.y, p.ty, k)
   })
   return out
 }

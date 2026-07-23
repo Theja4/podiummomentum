@@ -1,0 +1,5 @@
+- All class names follow the `mcp-` / `mcp2099` BEM-like prefix so styles never leak outside the module's root container.
+- 3D scene components expose a uniform pattern: `useRef` for mesh/material, `useMemo` for a `{ uTime, uColorA, uColorB }` uniforms object, and a `useFrame` loop that updates `uniforms.uTime.value = state.clock.elapsedTime` each frame.
+- GLSL shaders are kept as inline template-literal strings near the top of the file and passed directly to `<shaderMaterial vertexShader=... fragmentShader=... />` rather than loaded from external files.
+- Section entrance animations use a shared `useEffect` + `gsap.fromTo(children, { opacity: 0, y: N }, { ...stagger })` pattern on a `ref` pointing at the grid/container element.
+- Dark/light theming is driven by toggling a `light-mode` class on the root `.mcp2099` div while all colors come from `--mcp-*` CSS variables overridden in the `.mcp2099.light-mode` selector.

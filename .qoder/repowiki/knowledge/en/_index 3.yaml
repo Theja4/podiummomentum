@@ -3,11 +3,11 @@ schema_version: 1
 locale: en-US
 branch: main
 nodes_managed: true
-exported_at: "2026-07-21T12:08:21Z"
+exported_at: "2026-07-21T18:51:02Z"
 modules:
     "":
-        dir_name: Podium Momentum Vite_React SPA Root
-        title: Podium Momentum Vite/React SPA Root
+        dir_name: Podium Momentum SPA Root
+        title: Podium Momentum SPA Root
         scope:
             - .gitignore
             - .mcp.json
@@ -35,9 +35,33 @@ modules:
             - solutions-single-line-header.png
         source_files: []
         children:
+            - agent_use_cases
+            - analytics
             - api
+            - privacy_policy
         depends_on: []
         related_to: []
+    agent_use_cases:
+        dir_name: AI Agents Growth Loop Section
+        title: AI Agents Growth Loop Section
+        scope:
+            - src/AgentUseCases.jsx
+            - src/agent-use-cases.css
+        source_files: []
+        children: []
+        depends_on: []
+        related_to:
+            - path: api
+    analytics:
+        dir_name: Unified Analytics Tracking Layer (GA4 + PostHog)
+        title: Unified Analytics Tracking Layer (GA4 + PostHog)
+        scope:
+            - src/analytics.js
+        source_files: []
+        children: []
+        depends_on: []
+        related_to:
+            - path: privacy_policy
     api:
         dir_name: Bland AI Agent Session Token Minting
         title: Bland AI Agent Session Token Minting
@@ -46,4 +70,16 @@ modules:
         source_files: []
         children: []
         depends_on: []
-        related_to: []
+        related_to:
+            - path: agent_use_cases
+    privacy_policy:
+        dir_name: Privacy Policy Page
+        title: Privacy Policy Page
+        scope:
+            - src/PrivacyPolicy.jsx
+            - src/privacy-policy.css
+        source_files: []
+        children: []
+        depends_on: []
+        related_to:
+            - path: analytics

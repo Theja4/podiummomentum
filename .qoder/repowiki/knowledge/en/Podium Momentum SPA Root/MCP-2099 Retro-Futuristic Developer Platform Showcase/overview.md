@@ -1,0 +1,1 @@
+A single-page cinematic showcase for the MCP-2099 developer platform, featuring WebGL shader scenes, a live log terminal, and a glassmorphic dashboard UI.

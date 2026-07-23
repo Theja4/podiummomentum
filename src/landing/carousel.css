@@ -97,6 +97,9 @@
   backface-visibility: hidden;
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
+  /* the deck animates real width/height during the handoff morph — bound
+     each step's layout work to this card's own subtree */
+  contain: layout;
 }
 
 /* Full-bleed generated artwork. The scrim is deliberately strongest behind

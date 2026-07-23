@@ -31,20 +31,21 @@ import {
   reducedMotion,
   usePointer,
   useProgress,
+  useRafRead,
   useRafLoop,
   useVisible,
 } from './motion.js'
 import './beyond.css'
 
 // —— tunables ————————————————————————————————————————————————————————
-const COUNT_DESKTOP = 22000 // particle budget on desktop
-const COUNT_MOBILE = 9000 // small screens / high-DPR phones
+const COUNT_DESKTOP = 14000 // enough density without saturating mid-range GPUs
+const COUNT_MOBILE = 5200 // phones trade invisible overdraw for steadier frames
 const MOBILE_QUERY = '(max-width: 700px)'
 const RING_RADIUS = 2.2 // major radius of the torus
 const TUBE_RADIUS = 0.62 // tube radius — fat galaxy ring around a dark core
 const DUST_FRACTION = 0.28 // share of points scattered as loose stardust
 const POINT_SIZE = 14 // base gl_PointSize factor
-const MAX_DPR = 1.75
+const MAX_DPR = 1.5
 const CAM_FOV = 45
 const CAM_Z_START = 8.2 // ring framed tight so it fits inside the bloom star
 const CAM_Z_END = 7.2 // gentle push-in while the shell disperses
@@ -160,13 +161,28 @@ export default function Beyond({ navigate } = {}) {
     return reducedRef.current
   }
 
-  const prog = useProgress(rootRef, { mode: 'sticky', smooth: 0.09 })
-  const ptr = usePointer(0.075)
   const visible = useVisible(rootRef)
+  const prog = useProgress(rootRef, {
+    mode: 'sticky',
+    smooth: 0.09,
+    maxSpeed: 0.72,
+    active: visible,
+  })
+  const ptr = usePointer(0.075)
   const visibleRef = useRef(true)
   useEffect(() => {
     visibleRef.current = visible
   }, [visible])
+  const readState = useRef({ stageTop: Infinity, wipeSize: 1 })
+  useRafRead(() => {
+    if (!visibleRef.current) return
+    const stage = stageRef.current
+    const wipe = wipeRef.current
+    readState.current.stageTop = stage
+      ? stage.getBoundingClientRect().top
+      : window.innerHeight || 1
+    readState.current.wipeSize = wipe?.clientWidth || 1
+  })
 
   // Initial states for the scripted path (skipped for reduced motion, where
   // CSS defaults already show the final static layout).
@@ -393,8 +409,7 @@ export default function Beyond({ navigate } = {}) {
     // Entry progress: 0 when the section top touches the viewport bottom,
     // 1 when the stage pins at the top. Raw (unsmoothed) so the wipe tracks
     // the wheel exactly; overlaps the carousel's scroll-away tail.
-    const stage = stageRef.current
-    const stageTop = stage ? stage.getBoundingClientRect().top : vh
+    const stageTop = readState.current.stageTop
     const enterP = clamp01((vh - stageTop) / vh)
 
     // The bloom is viewport-anchored (fixed) while the stage rises over the
@@ -422,7 +437,7 @@ export default function Beyond({ navigate } = {}) {
     // last of the page — the signature beat of the reference transition.
     const wipe = wipeRef.current
     if (wipe) {
-      const size = wipe.clientWidth || 1
+      const size = readState.current.wipeSize
       const cover = (Math.hypot(window.innerWidth || 1, vh) * 0.54) / (WAIST * size)
       const s = lerp(Math.max(0.05, WIPE_START_PX / size), cover, Math.pow(enterP, WIPE_EXP))
       wipe.style.transform = `translate(-50%, -50%) scale(${s.toFixed(4)})`

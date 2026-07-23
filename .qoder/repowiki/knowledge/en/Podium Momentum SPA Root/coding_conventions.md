@@ -1,0 +1,2 @@
+- Server-side secrets (e.g. `BLAND_API_KEY`) are consumed exclusively from environment variables inside Vite plugins and Vercel functions — never read in browser code.
+- Client-side analytics events are emitted through the shared `analytics` facade rather than calling GA4 or PostHog directly.

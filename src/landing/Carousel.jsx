@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   useProgress,
   useRafLoop,
+  useRafRead,
   useVisible,
   clamp,
   clamp01,
@@ -36,7 +37,15 @@ const MOBILE_BP = 900
 const OPACITY_FULL = 0.35 // |d| fully opaque inside this
 const OPACITY_GONE = 1.85 // |d| invisible beyond this — neighbours fade fast …
 const ACTIVE_D = 0.5 // |d| below which a card counts as centred/clickable
-const SNAP_IDLE_MS = 180 // scroll quiet time before the deck glides to a slot
+// Sparse wheel/trackpad events often arrive more than 180ms apart. Wait for a
+// genuine stop so the deck never starts snapping while the visitor is still
+// driving the page.
+const SNAP_IDLE_MS = 420 // scroll quiet time before the deck glides to a slot
+// Coarse layout steps for the deck's expansion morph. The deck cards afford
+// the stepped-layout + corrective-scale bridge because their edges are
+// hidden (card zero, under the ghost), faded or 3D-rotated; the hero ghost
+// itself uses continuous real layout so its high-contrast edge stays crisp.
+const GEOM_STEPS = 12
 const SNAP_MIN_OFF = 0.02 // dead zone: already close enough to a slot
 const FIRST_CARD_COPY_REVEAL_MS = 131.25
 const MOBILE_SWIPE_THRESHOLD = 28
@@ -595,8 +604,13 @@ export default function Carousel({ navigate }) {
     row.style.cursor = ''
   }
 
-  const progress = useProgress(sectionRef, { mode: 'sticky', smooth: SMOOTH })
   const visible = useVisible(sectionRef)
+  const progress = useProgress(sectionRef, {
+    mode: 'sticky',
+    smooth: SMOOTH,
+    maxSpeed: 0.68,
+    active: visible,
+  })
 
   // —— idle snap: any scroll (user or our own glide) stamps this; once the
   // page has been quiet for SNAP_IDLE_MS and the deck rests between slots,
@@ -760,7 +774,51 @@ export default function Carousel({ navigate }) {
     event.currentTarget.style.removeProperty('--card-shift-y')
   }
 
-  useRafLoop((dt, now) => {
+  // —— READ PHASE: the section rect, the cursor hit-test and the idle-snap
+  // decision all need layout — they run here, on clean layout, so the write
+  // loop below never forces a mid-frame reflow. ——
+  const readState = useRef({ sectionTop: Infinity })
+  useRafRead((dt, now) => {
+    if (isReduced || !visible) return
+    const el = sectionRef.current
+    if (!el) return
+    const vh = window.innerHeight || 1
+    const top = el.getBoundingClientRect().top
+    readState.current.sectionTop = top
+
+    // Cards continue moving beneath a stationary pointer while the page
+    // scrolls, so keep the cursor label in sync without requiring a mouse
+    // nudge after a new card reaches the centre slot. elementFromPoint is a
+    // hit-test (needs layout) — run it here, and only when the pointer or
+    // the deck has actually moved since the last sync.
+    if (cursorInsideStageRef.current) {
+      const { x, y } = cursorMoveRef.current
+      const sync = cursorSyncRef.current
+      const f = fRef.current
+      if (sync.x !== x || sync.y !== y || Math.abs(sync.f - f) > 0.001) {
+        sync.x = x
+        sync.y = y
+        sync.f = f
+        syncCursorAction(x, y, document.elementFromPoint(x, y))
+      }
+    }
+
+    // —— idle snap: glide to the nearest slot once scrolling rests off-slot.
+    // Raw scroll position (not the lerped f) decides the target, so the snap
+    // aims where the page actually stopped, not where the lag is passing.
+    if (now - lastScrollAt.current > SNAP_IDLE_MS) {
+      const rangePx = Math.max(1, el.offsetHeight - vh)
+      const rawP = clamp01(-top / rangePx)
+      const rawF = rawP * (N - 1)
+      const target = Math.round(rawF)
+      if (rawP > 0.001 && rawP < 0.999 && Math.abs(rawF - target) > SNAP_MIN_OFF) {
+        lastScrollAt.current = now // re-arm only after the glide + next idle
+        scrollToIndex(target)
+      }
+    }
+  })
+
+  useRafLoop(dt => {
     if (isReduced || !visible) return
     const vw = window.innerWidth || 1
     const mobile = vw <= MOBILE_BP
@@ -771,7 +829,7 @@ export default function Carousel({ navigate }) {
     // disappeared into the first real card, reveal the live title and support
     // copy over a near-immediate beat. Reset immediately when reverse-scroll
     // re-enters the handoff so no clipped type can reappear on the moving card.
-    const sectionTop = sectionRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+    const sectionTop = readState.current.sectionTop
     const handoffIsMoving = heroHandoff.ghostOpacity > 0.01
     const handoffIsSeated = !handoffIsMoving && sectionTop <= (window.innerHeight || 1) * 0.08
     if (handoffIsSeated) {
@@ -786,18 +844,30 @@ export default function Carousel({ navigate }) {
     // after that point; localOpen also supports direct links into this section.
     const localOpen = mobile ? 0 : easeInOutCubic(clamp01(f / 0.36))
     const expansion = mobile ? 0 : Math.max(heroHandoff.cardExpansion || 0, localOpen)
+    // Mirror of the hero's coarse-step morph: the boxes are laid out at most
+    // GEOM_STEPS times across the whole expansion; a compositor-only
+    // corrective scale (cont/step) keeps every card's RENDERED size gliding
+    // at full display rate. Only that cheap transform changes per frame.
+    const geomE = Math.round(expansion * GEOM_STEPS) / GEOM_STEPS
     const geometry = mobile
       ? null
+      : desktopCardGeometry(vw, window.innerHeight || 1, geomE)
+    const contGeometry = mobile
+      ? null
       : desktopCardGeometry(vw, window.innerHeight || 1, expansion)
-    if (geometry) {
-      const half = `${(geometry.height / 2).toFixed(1)}px`
+    const fitX = geometry ? contGeometry.width / geometry.width : 1
+    const fitY = geometry ? contGeometry.height / geometry.height : 1
+    if (contGeometry) {
+      // the title/foot anchor around the card follows the CONTINUOUS height
+      // (two small elements — relayout is cheap; steps here would pop them)
+      const half = `${(contGeometry.height / 2).toFixed(1)}px`
       if (stageVarRef.current !== half) {
         stageVarRef.current = half
         sectionRef.current?.style.setProperty('--pm2-stage-card-half', half)
       }
     }
     const geomKey = geometry
-      ? `${geometry.width.toFixed(1)}|${geometry.height.toFixed(1)}|${expansion.toFixed(4)}`
+      ? `${geometry.width.toFixed(1)}|${geometry.height.toFixed(1)}|${geomE.toFixed(4)}`
       : 'mobile'
     const geomChanged = geomKeyRef.current !== geomKey
     if (geomChanged) geomKeyRef.current = geomKey
@@ -825,10 +895,10 @@ export default function Carousel({ navigate }) {
         if (geometry) {
           el.style.width = `${geometry.width.toFixed(1)}px`
           el.style.height = `${geometry.height.toFixed(1)}px`
-          el.style.setProperty('--pm2-card-pad', `${lerp(22, 30, expansion).toFixed(1)}px`)
-          el.style.setProperty('--pm2-card-radius', `${lerp(26, 34, expansion).toFixed(1)}px`)
-          el.style.setProperty('--pm2-card-title', `${lerp(36, 46, expansion).toFixed(1)}px`)
-          el.style.setProperty('--pm2-card-copy', `${lerp(14, 16, expansion).toFixed(1)}px`)
+          el.style.setProperty('--pm2-card-pad', `${lerp(22, 30, geomE).toFixed(1)}px`)
+          el.style.setProperty('--pm2-card-radius', `${lerp(26, 34, geomE).toFixed(1)}px`)
+          el.style.setProperty('--pm2-card-title', `${lerp(36, 46, geomE).toFixed(1)}px`)
+          el.style.setProperty('--pm2-card-copy', `${lerp(14, 16, geomE).toFixed(1)}px`)
         } else {
           el.style.removeProperty('width')
           el.style.removeProperty('height')
@@ -867,11 +937,14 @@ export default function Carousel({ navigate }) {
       if (i === 0) op = Math.min(op, 1 - clamp01(heroHandoff.ghostOpacity))
       // Keep side-card artwork and SVG text sharp at every point in the
       // coverflow; distance is communicated by depth and opacity.
+      // translate(-50%,-50%) keeps the centre invariant under width steps,
+      // and the corrective fit bridges the coarse layout to the continuous
+      // rendered size — matching the hero ghost exactly at the swap.
       el.style.transform = mobile
         ? `translate(-50%, -50%) translateX(${x}px)`
         : `translate(-50%, -50%) translate3d(${x.toFixed(
             1,
-          )}px, 0, ${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg)`
+          )}px, 0, ${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg) scale(${fitX.toFixed(4)}, ${fitY.toFixed(4)})`
       el.style.opacity = op.toFixed(3)
       el.style.filter = ''
       el.style.zIndex = String(100 - Math.round(ad * 10))
@@ -891,39 +964,6 @@ export default function Carousel({ navigate }) {
       }
     }
 
-    // Cards continue moving beneath a stationary pointer while the page
-    // scrolls, so keep the cursor label in sync without requiring a mouse
-    // nudge after a new card reaches the centre slot. elementFromPoint
-    // forces a hit-test (layout) — only re-run it when the pointer or the
-    // deck has actually moved since the last sync.
-    if (cursorInsideStageRef.current) {
-      const { x, y } = cursorMoveRef.current
-      const sync = cursorSyncRef.current
-      if (sync.x !== x || sync.y !== y || Math.abs(sync.f - f) > 0.001) {
-        sync.x = x
-        sync.y = y
-        sync.f = f
-        syncCursorAction(x, y, document.elementFromPoint(x, y))
-      }
-    }
-
-    // —— idle snap: glide to the nearest slot once scrolling rests off-slot.
-    // Raw scroll position (not the lerped f) decides the target, so the snap
-    // aims where the page actually stopped, not where the lag is passing.
-    if (now - lastScrollAt.current > SNAP_IDLE_MS) {
-      const el = sectionRef.current
-      if (el) {
-        const vh = window.innerHeight || 1
-        const rangePx = Math.max(1, el.offsetHeight - vh)
-        const rawP = clamp01(-el.getBoundingClientRect().top / rangePx)
-        const rawF = rawP * (N - 1)
-        const target = Math.round(rawF)
-        if (rawP > 0.001 && rawP < 0.999 && Math.abs(rawF - target) > SNAP_MIN_OFF) {
-          lastScrollAt.current = now // re-arm only after the glide + next idle
-          scrollToIndex(target)
-        }
-      }
-    }
   })
 
   // —— reduced motion: plain horizontal scroll-snap row ————————————————
