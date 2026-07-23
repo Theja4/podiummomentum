@@ -550,7 +550,7 @@ export default function IndustryPage({ slug, navigate }) {
             <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">02</span>
               <div className="ind-who-new-card-title">Ongoing Support and Maintenance</div>
-              <div className="ind-who-new-card-body">We provide continued assistance post-launch to ensure your solutions remain effective and up-to-date.</div>
+              <div className="ind-who-new-card-body">We provide continued assistance after launch to keep your solutions effective and current.</div>
             </div>
             <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">03</span>
@@ -561,7 +561,7 @@ export default function IndustryPage({ slug, navigate }) {
             <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">04</span>
               <div className="ind-who-new-card-title">Flexible Engagement Models</div>
-              <div className="ind-who-new-card-body">We offer flexible partnerships, ranging from project-based work to long-term retainers.</div>
+              <div className="ind-who-new-card-body">We offer flexible partnerships, from individual projects to lasting retainers.</div>
             </div>
             <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">05</span>
@@ -570,7 +570,7 @@ export default function IndustryPage({ slug, navigate }) {
             </div>
             <div className="ind-who-new-card" data-reveal="who-card">
               <span className="ind-who-new-card-num">06</span>
-              <div className="ind-who-new-card-title">User-Centric Design Philosophy</div>
+              <div className="ind-who-new-card-title">Design Centered on Users</div>
               <div className="ind-who-new-card-body">We prioritize user experience to enhance {industry.slug === 'healthcare' ? 'patient' : 'user'} engagement and satisfaction.</div>
             </div>
             <div className="ind-who-new-card" data-reveal="who-card">
@@ -594,7 +594,7 @@ export default function IndustryPage({ slug, navigate }) {
           <div>
             <DotLabel>Contact us</DotLabel>
             <h2 className="ind-h2">The right partner at the right moment changes everything.</h2>
-            <p>Tell us about your next stage in {industry.label.toLowerCase()} — brand, product, or growth.</p>
+            <p>Tell us about your next stage in {industry.label.toLowerCase()}, whether it is brand, product, or growth.</p>
           </div>
           <Pill href={CONTACT_PATH} onNavigate={navigate}>Start a conversation</Pill>
         </div>

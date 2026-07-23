@@ -442,7 +442,7 @@ export default function Gallery() {
               >
                 <img
                   src={data.image}
-                  alt={`${data.label} — ${data.sub}`}
+                  alt={`${data.label}, ${data.sub}`}
                   loading="lazy"
                   decoding="async"
                   draggable="false"

@@ -1,0 +1,10 @@
+schema_version: 1
+module_path: privacy_policy
+title: Privacy Policy Page
+scope:
+    - src/PrivacyPolicy.jsx
+    - src/privacy-policy.css
+source_files: []
+depends_on: []
+related_to:
+    - path: analytics

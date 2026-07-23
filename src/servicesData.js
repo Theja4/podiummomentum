@@ -13,13 +13,13 @@ const rawServiceCatalog = [
     shortTitle: 'Web Design',
     cardLine: 'Built to convert, not just impress.',
     hubBlurb:
-      'Get a high-performing website that captivates and converts. Our web design blends creativity and strategy for seamless digital experiences.',
+      'Get a website built to perform, captivate, and convert. Our web design blends creativity and strategy for seamless digital experiences.',
     heroEyebrow: 'Web Design',
     heroLead:
-      'Get a high-performing website that captivates and converts. Our web design blends creativity and strategy for seamless digital experiences.',
+      'Get a website built to perform, captivate, and convert. Our web design blends creativity and strategy for seamless digital experiences.',
     heroHeadline: 'Your Website Is More Than Just a Digital Presence',
     heroBody:
-      'Your website is your digital storefront, and often the first impression your audience has of your brand. A well-designed site goes beyond mere aesthetics—it builds trust, captures attention, and turns casual visitors into loyal customers.',
+      'Your website is your digital storefront and often the first impression your audience has of your brand. Thoughtful design goes beyond aesthetics. It builds trust, captures attention, and turns casual visitors into loyal customers.',
     heroImage: `${IP}technology-modern-vivo-3.avif`,
     stats: [
       { value: '500+', label: 'Websites Designed', note: 'We’ve crafted over 500 websites, blending aesthetics with strategy to create seamless digital experiences.' },
@@ -29,8 +29,8 @@ const rawServiceCatalog = [
     ],
     capabilities: [
       { title: 'Content writing', body: 'Crafting engaging and impactful content tailored to your brand and audience.' },
-      { title: 'Website Design', body: 'Creating visually stunning and user-friendly designs.' },
-      { title: 'Website Development', body: 'Building responsive and high-performance websites.' },
+      { title: 'Website Design', body: 'Creating visually striking designs that are easy to use.' },
+      { title: 'Website Development', body: 'Building responsive websites engineered for performance.' },
       { title: 'CMS Setup', body: 'Implementing a flexible content management system to streamline updates and workflows.' },
       { title: 'SEO', body: 'Optimizing your website to rank higher on search engines and drive organic traffic.' },
       { title: 'CRO', body: 'Enhancing your website’s user experience to maximize conversions and achieve business goals.' },
@@ -38,23 +38,23 @@ const rawServiceCatalog = [
     process: [
       { title: 'Discovery & Strategy', body: 'Understanding your goals and defining the vision.' },
       { title: 'Wireframing & UX Design', body: 'Structuring intuitive layouts for seamless navigation.' },
-      { title: 'Web Design & Style Guide', body: 'Crafting pixel-perfect designs that tell your story.' },
+      { title: 'Web Design & Style Guide', body: 'Crafting precise designs that tell your story.' },
       { title: 'Handover & Support', body: 'Delivering assets and guiding the transition to development.' },
     ],
     faqs: [
       { q: 'How long does it take to design a website?', a: 'Most full marketing sites run 4–10 weeks depending on scope, content readiness, and stakeholder cycles. We lock a timeline in discovery.' },
       { q: 'Can you align the design with my brand?', a: 'Yes. We either extend your system or rebuild the parts that no longer match your product and market position.' },
       { q: 'Do you also handle development?', a: 'We design for production and can partner on the build or hand off to your engineering team with clear specs and components.' },
-      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambition-led companies.' },
+      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambitious companies.' },
       { q: 'What do you need from me to start the project?', a: 'Business goals, audience notes, brand assets if any, competitor set, and access to product or leadership for a working session.' },
-      { q: 'How many design revisions do you offer?', a: 'Structured review rounds are built into the plan so feedback stays focused — not endless open loops.' },
+      { q: 'How many design revisions do you offer?', a: 'Structured review rounds are built into the plan so feedback stays focused, without endless open loops.' },
     ],
     related: ['branding', 'ux-ui', 'seo'],
     works: [
-      { name: 'Vanquish', year: '2024', image: '/assets/industry-projects/pattech-7.avif' },
-      { name: 'ContinuOS', year: '2024', image: '/assets/industry-projects/ai-continuos-0.avif' },
-      { name: 'Alpha Ledger', year: '2024', image: '/assets/industry-projects/alpha-ledger-0.avif' },
-      { name: 'Incipet', year: '2024', image: `${IP}incipet-2.avif` },
+      { name: 'Vanquish', year: '2026', image: '/assets/industry-projects/pattech-7.avif', link: '/mcp-2099' },
+      { name: 'ContinuOS', year: '2026', image: '/assets/industry-projects/ai-continuos-0.avif' },
+      { name: 'Alpha Ledger', year: '2026', image: '/assets/industry-projects/alpha-ledger-0.avif' },
+      { name: 'Incipet', year: '2026', image: `${IP}incipet-2.avif` },
     ],
   },
   {
@@ -62,15 +62,15 @@ const rawServiceCatalog = [
     title: 'Branding',
     shortTitle: 'Branding',
     cardLine: 'An identity people remember and trust.',
-    hubBlurb: 'We craft unique visual identities, logos, and messaging to build recognition, trust, and long-term success.',
+    hubBlurb: 'We craft unique visual identities, logos, and messaging to build recognition, trust, and lasting success.',
     heroEyebrow: 'Branding',
-    heroLead: 'We craft unique visual identities, logos, and messaging to build recognition, trust, and long-term success.',
+    heroLead: 'We craft unique visual identities, logos, and messaging to build recognition, trust, and lasting success.',
     heroHeadline: 'Build a brand the market remembers',
     heroBody:
-      'A strong brand is more than a logo — it’s how people recognize, trust, and choose you. We craft visual identities and messaging systems that create lasting equity.',
+      'A strong brand is more than a logo. It is how people recognize, trust, and choose you. We craft visual identities and messaging systems that create lasting equity.',
     heroImage: `${IP}taraxa-0.avif`,
     stats: [
-      { value: '40+', label: 'Brands shaped', note: 'From seed-stage to scale-up category leaders.' },
+      { value: '40+', label: 'Brands shaped', note: 'From early stage companies to established category leaders.' },
       { value: '4.9', label: 'Average client rating', note: 'Founders rate clarity of process as highly as craft.' },
       { value: '3×', label: 'Faster brand adoption', note: 'Systems that sales, product, and marketing actually use.' },
       { value: '8/10', label: 'Return for more', note: 'Identity work often continues into site and product UI.' },
@@ -79,9 +79,9 @@ const rawServiceCatalog = [
       { title: 'Positioning', body: 'Category, audience, and proof language that holds under diligence.' },
       { title: 'Logo & mark systems', body: 'Marks and lockups that scale from app icon to stage screen.' },
       { title: 'Visual language', body: 'Color, type, imagery, and motion rules that feel intentional.' },
-      { title: 'Voice & messaging', body: 'Narrative pillars, taglines, and page-level copy frameworks.' },
+      { title: 'Voice & messaging', body: 'Narrative pillars, taglines, and copy frameworks for every page.' },
       { title: 'Brand guidelines', body: 'Practical docs and templates teams can ship against.' },
-      { title: 'Launch kits', body: 'Social, deck, and site-ready assets for the first 90 days.' },
+      { title: 'Launch kits', body: 'Social, deck, and website assets ready for the first 90 days.' },
     ],
     process: [
       { title: 'Audit & insight', body: 'Current perception, competitive set, and internal ambition mapped side by side.' },
@@ -92,14 +92,14 @@ const rawServiceCatalog = [
     faqs: [
       { q: 'How long does branding take?', a: 'Focused identity systems usually take 4–8 weeks. Full repositioning with messaging and launch assets can run longer.' },
       { q: 'Do you rebrand or refine?', a: 'Both. We recommend the lightest intervention that closes the perception gap without discarding equity that works.' },
-      { q: 'Will this work for fundraising?', a: 'Yes — we design for investor-grade clarity: story, proof, and a visual system that feels ready for the next stage.' },
-      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambition-led companies.' },
+      { q: 'Will this work for fundraising?', a: 'Yes. We design for investor ready clarity through story, proof, and a visual system that feels ready for the next stage.' },
+      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambitious companies.' },
     ],
     related: ['website-design', 'content-creation', 'ux-ui'],
     works: [
-      { name: 'Taraxa', year: '2024', image: `${IP}taraxa-0.avif` },
-      { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
-      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
+      { name: 'Taraxa', year: '2026', image: `${IP}taraxa-0.avif` },
+      { name: 'Vertus', year: '2026', image: `${IP}vertus-ai-6.avif` },
+      { name: 'InnrevAI', year: '2026', image: `${IP}innrevai-1.avif` },
     ],
   },
   {
@@ -114,7 +114,7 @@ const rawServiceCatalog = [
       'We design intuitive, engaging interfaces that enhance usability, boost conversions, and create seamless digital experiences for your audience.',
     heroHeadline: 'Design that puts the user first',
     heroBody:
-      'Great design isn’t just about aesthetics — it’s about how users interact, navigate, and connect with your product. A well-crafted UX / UI enhances usability, builds trust, and keeps users engaged.',
+      'Great design is not just about aesthetics. It shapes how users interact, navigate, and connect with your product. Thoughtful UX and UI improve usability, build trust, and keep users engaged.',
     heroImage: `${IP}fintech-planet9-ui-ux-4.avif`,
     stats: [
       { value: '3M+', label: 'Impacted Users', note: 'Our designs have reached over 3 million people, enhancing digital experiences across multiple platforms.' },
@@ -124,31 +124,31 @@ const rawServiceCatalog = [
     ],
     capabilities: [
       { title: 'Web & Mobile App Design', body: 'Seamless, engaging experiences tailored for every device.' },
-      { title: 'Product Design', body: 'Research-driven design aligned with business and user goals.' },
+      { title: 'Product Design', body: 'Design informed by research and aligned with business and user goals.' },
       { title: 'Wireframing und Prototyping', body: 'Interactive blueprints to test and refine the user journey.' },
-      { title: 'Dashboard und SaaS UX/UI', body: 'Data-driven interfaces optimized for usability and insights.' },
+      { title: 'Dashboard und SaaS UX/UI', body: 'Interfaces shaped by data and optimized for usability and insight.' },
       { title: 'Design Systems & UI Kits', body: 'Scalable design frameworks for brand consistency.' },
       { title: 'Accessibility & Usability Optimization', body: 'Ensuring inclusive, frictionless digital experiences.' },
     ],
     process: [
       { title: 'Research & User Insights', body: 'We begin by understanding user behavior, business goals, and industry trends to build a solid foundation for design.' },
       { title: 'Wireframing & UX Strategy', body: 'Next, we structure intuitive user journeys to ensure seamless flow and an optimal experience.' },
-      { title: 'Visual Design & Prototyping', body: 'We then bring ideas to life with high-fidelity visuals and interactive prototypes aligned with your brand.' },
+      { title: 'Visual Design & Prototyping', body: 'We then bring ideas to life with polished visuals and interactive prototypes aligned with your brand.' },
       { title: 'Testing & Refinement', body: 'Finally, we validate usability, gather feedback, and refine the design to deliver a flawless user experience before handoff.' },
     ],
     faqs: [
       { q: 'How long does a UX/UI design project take?', a: 'Typical UX/UI engagements run 4–8 weeks depending on surface count, research depth, and engineering collaboration.' },
-      { q: 'Do you design for both web and mobile?', a: 'Yes — we design responsive web, native-feeling mobile, and hybrid product experiences.' },
+      { q: 'Do you design for both web and mobile?', a: 'Yes. We design responsive web, natural mobile, and hybrid product experiences.' },
       { q: 'Can you improve an existing product’s UX/UI?', a: 'Absolutely. We often start with activation, pricing, or onboarding where impact is fastest.' },
       { q: 'How many design revisions do you offer?', a: 'Structured review rounds are included so feedback stays focused and shippable.' },
       { q: 'What do you need from me to start the project?', a: 'Goals, current product access, analytics if available, brand assets, and stakeholders for working sessions.' },
-      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambition-led companies.' },
+      { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambitious companies.' },
     ],
     related: ['website-design', 'branding', 'landing-page'],
     works: [
-      { name: 'Planet9 UI/UX', year: '2024', image: '/assets/industry-projects/fintech-planet9-ui-ux-4.avif' },
+      { name: 'Planet9 UI/UX', year: '2026', image: '/assets/industry-projects/fintech-planet9-ui-ux-4.avif' },
       { name: 'Frado UI/UX', year: '2025', image: '/assets/industry-projects/frado-1.avif' },
-      { name: 'ContinuOS', year: '2024', image: '/assets/industry-projects/ai-continuos-0.avif' },
+      { name: 'ContinuOS', year: '2026', image: '/assets/industry-projects/ai-continuos-0.avif' },
     ],
   },
   {
@@ -157,13 +157,13 @@ const rawServiceCatalog = [
     shortTitle: 'SEO',
     cardLine: 'Found first, chosen faster.',
     hubBlurb:
-      'Boost rankings, increase organic traffic, and grow your business with expert SEO strategies, technical optimization, and content-driven results.',
+      'Boost rankings, increase organic traffic, and grow your business with expert SEO strategy, technical optimization, and content that delivers results.',
     heroEyebrow: 'SEO',
     heroLead:
-      'Boost rankings, increase organic traffic, and grow your business with expert SEO strategies, technical optimization, and content-driven results.',
+      'Boost rankings, increase organic traffic, and grow your business with expert SEO strategy, technical optimization, and content that delivers results.',
     heroHeadline: 'Organic growth built on structure and story',
     heroBody:
-      'We pair technical excellence with content that compounds — so your site earns attention for the queries that matter to revenue, not vanity volume.',
+      'We pair technical excellence with content that compounds, so your site earns attention for the queries that matter to revenue, not vanity volume.',
     heroImage: `${IP}vertus-ai-6.avif`,
     stats: [
       { value: '65%', label: 'Organic traffic lifts', note: 'Typical gains after technical + content systems.' },
@@ -173,8 +173,8 @@ const rawServiceCatalog = [
     ],
     capabilities: [
       { title: 'Technical audits', body: 'Crawl, indexation, speed, and structured data fixes.' },
-      { title: 'IA for search', body: 'Hub-and-spoke architectures that win topic ownership.' },
-      { title: 'On-page systems', body: 'Templates that keep titles, media, and CTAs consistent.' },
+      { title: 'IA for search', body: 'Topic clusters that build authority.' },
+      { title: 'Onsite systems', body: 'Templates that keep titles, media, and CTAs consistent.' },
       { title: 'Content strategy', body: 'Priority topics mapped to funnel stages and ICP pain.' },
       { title: 'Backlinks', body: 'Domain authority signals from trusted sites that boost search credibility and rankings.' },
       { title: 'Ongoing ops', body: 'Cadence for publishing, refreshing, and technical health.' },
@@ -188,14 +188,14 @@ const rawServiceCatalog = [
     faqs: [
       { q: 'Is SEO only content?', a: 'No. Technical health, structure, and page experience matter as much as words.' },
       { q: 'How soon do we see results?', a: 'Technical wins can show in weeks; content authority compounds over months.' },
-      { q: 'Do you write content?', a: 'We can own strategy and briefs, partner with your writers, or produce high-stakes pages in-house.' },
+      { q: 'Do you write content?', a: 'We can own strategy and briefs, partner with your writers, or produce critical pages with our internal team.' },
       { q: 'How does this connect to design?', a: 'Pages must convert. We design SEO templates with the same craft as marketing pages.' },
     ],
     related: ['content-creation', 'website-design', 'landing-page'],
     works: [
-      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
-      { name: 'Taraxa', year: '2024', image: `${IP}taraxa-0.avif` },
-      { name: 'Incipet', year: '2024', image: `${IP}incipet-2.avif` },
+      { name: 'InnrevAI', year: '2026', image: `${IP}innrevai-1.avif` },
+      { name: 'Taraxa', year: '2026', image: `${IP}taraxa-0.avif` },
+      { name: 'Incipet', year: '2026', image: `${IP}incipet-2.avif` },
     ],
   },
   {
@@ -213,34 +213,34 @@ const rawServiceCatalog = [
     stats: [
       { value: '42+', label: 'Articles in engines', note: 'Structured publishing that compounds SEO and trust.' },
       { value: '3×', label: 'Qualified engagement', note: 'When narrative and CTA design work together.' },
-      { value: '100%', label: 'Brand-system aligned', note: 'Voice and visuals locked to your identity.' },
+      { value: '100%', label: 'Aligned with your brand system', note: 'Voice and visuals locked to your identity.' },
       { value: 'Weekly', label: 'Ops cadence options', note: 'From launch packs to ongoing content engines.' },
     ],
     capabilities: [
       { title: 'Narrative frameworks', body: 'Pillars, proof, and story arcs for every channel.' },
       { title: 'Site & product copy', body: 'Pages that sell clarity, not filler.' },
       { title: 'Thought leadership', body: 'Articles and posts that signal category depth.' },
-      { title: 'Sales enablement', body: 'One-pagers, decks, and case narratives.' },
+      { title: 'Sales enablement', body: 'One page summaries, decks, and case narratives.' },
       { title: 'Visual content', body: 'Graphics and layouts that match the brand system.' },
       { title: 'Editorial ops', body: 'Calendars, workflows, and QA that keep quality high.' },
     ],
     process: [
-      { title: 'Voice & pillars', body: 'Define what only you can say — and how.' },
+      { title: 'Voice & pillars', body: 'Define what only you can say and how to say it.' },
       { title: 'Channel map', body: 'Where content must work hardest first.' },
       { title: 'Produce & design', body: 'Writing and visual craft in parallel.' },
       { title: 'Publish & refine', body: 'Performance review and iteration loops.' },
     ],
     faqs: [
-      { q: 'Do you only write long-form?', a: 'No — we cover site copy, campaigns, social systems, and long-form when it earns its place.' },
+      { q: 'Do you only write longer content?', a: 'No. We cover site copy, campaigns, social systems, and longer content when it earns its place.' },
       { q: 'Can you match our voice?', a: 'We extract and document voice so every piece sounds like you at your best.' },
-      { q: 'How do you measure content success?', a: 'Rankings, engagement, assisted conversions, and sales usage — not vanity metrics alone.' },
-      { q: 'Do you need subject-matter experts?', a: 'We interview your experts and turn depth into clear narratives without jargon overload.' },
+      { q: 'How do you measure content success?', a: 'We look at rankings, engagement, assisted conversions, and sales usage rather than vanity metrics alone.' },
+      { q: 'Do you need domain experts?', a: 'We interview your experts and turn depth into clear narratives without jargon overload.' },
     ],
     related: ['seo', 'branding', 'ux-ui'],
     works: [
-      { name: 'Vertus', year: '2024', image: `${IP}vertus-ai-6.avif` },
-      { name: 'Taraxa', year: '2024', image: `${IP}taraxa-0.avif` },
-      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
+      { name: 'Vertus', year: '2026', image: `${IP}vertus-ai-6.avif` },
+      { name: 'Taraxa', year: '2026', image: `${IP}taraxa-0.avif` },
+      { name: 'InnrevAI', year: '2026', image: `${IP}innrevai-1.avif` },
     ],
   },
   {
@@ -253,16 +253,16 @@ const rawServiceCatalog = [
     heroLead: 'Strategic, visually compelling landing pages that tell stories, capture leads, and maximize conversions.',
     heroHeadline: 'One page. One job. Maximum conversion.',
     heroBody:
-      'We design landing experiences for campaigns, launches, and product moments — focused narrative, proof, and frictionless next steps.',
+      'We design landing experiences for campaigns, launches, and product moments with a focused narrative, clear proof, and frictionless next steps.',
     heroImage: `${IP}incipet-2.avif`,
     stats: [
-      { value: '3.3×', label: 'Conversion lifts', note: 'When message-match and proof hierarchy are rebuilt.' },
-      { value: '2 wks', label: 'Fast-track builds', note: 'Scoped pages can move quickly when assets are ready.' },
+      { value: '3.3×', label: 'Conversion lifts', note: 'When message alignment and proof hierarchy are rebuilt.' },
+      { value: '2 wks', label: 'Faster builds', note: 'Scoped pages can move quickly when assets are ready.' },
       { value: 'A/B', label: 'Ready variants', note: 'Structured experiments without redesigning from zero.' },
-      { value: '100%', label: 'Mobile-first', note: 'Performance and layout engineered for real devices.' },
+      { value: '100%', label: 'Designed for mobile', note: 'Performance and layout engineered for real devices.' },
     ],
     capabilities: [
-      { title: 'Message-match design', body: 'Ad-to-page continuity that protects paid spend.' },
+      { title: 'Message alignment', body: 'Consistency from ad to page that protects paid spend.' },
       { title: 'Offer architecture', body: 'Hero, proof, objection handling, and CTA sequencing.' },
       { title: 'Visual storytelling', body: 'Layouts that feel premium and move fast.' },
       { title: 'Form & funnel UX', body: 'Lead capture that balances quality and completion.' },
@@ -277,15 +277,15 @@ const rawServiceCatalog = [
     ],
     faqs: [
       { q: 'How fast can a landing page ship?', a: 'Focused pages often ship in 1–3 weeks depending on content, legal review, and integrations.' },
-      { q: 'Do you handle copy?', a: 'Yes — offer narrative and CTAs are part of the design system, not an afterthought.' },
+      { q: 'Do you handle copy?', a: 'Yes. Offer narrative and CTAs are part of the design system, not an afterthought.' },
       { q: 'Can you integrate with our stack?', a: 'We design for your CRM, forms, and analytics tools or partner with your team on implementation.' },
-      { q: 'What about multi-variant tests?', a: 'We can design modular sections so testing does not require a full rebuild.' },
+      { q: 'What about testing multiple variants?', a: 'We can design modular sections so testing does not require a full rebuild.' },
     ],
     related: ['website-design', 'seo', 'content-creation'],
     works: [
-      { name: 'InnrevAI', year: '2024', image: `${IP}innrevai-1.avif` },
-      { name: 'Alpha Ledger', year: '2024', image: '/assets/industry-projects/alpha-ledger-0.avif' },
-      { name: 'Incipet', year: '2024', image: `${IP}incipet-2.avif` },
+      { name: 'InnrevAI', year: '2026', image: `${IP}innrevai-1.avif` },
+      { name: 'Alpha Ledger', year: '2026', image: '/assets/industry-projects/alpha-ledger-0.avif' },
+      { name: 'Incipet', year: '2026', image: `${IP}incipet-2.avif` },
     ],
   },
   {
@@ -294,23 +294,23 @@ const rawServiceCatalog = [
     shortTitle: 'AI Agents',
     cardLine: 'Always on, answering and booking.',
     hubBlurb:
-      'Deploy voice agents and chatbots that answer, qualify, book, and follow up around the clock — tuned to how your business actually operates.',
+      'Deploy voice agents and chatbots that answer, qualify, book, and follow up around the clock, tuned to how your business actually operates.',
     heroEyebrow: 'AI Agent Deployments',
     heroLead:
-      'Deploy AI agents that turn every call, chat, and follow-up into a better customer experience and a stronger pipeline.',
+      'Deploy AI agents that turn every call, chat, and continued conversation into a better customer experience and a stronger pipeline.',
     heroHeadline: 'Your best operator is always on',
     heroBody:
-      'We design and deploy inbound and outbound AI voice agents and chatbots for high-intent service businesses. From a clinic booking the next appointment to a real-estate team qualifying a new enquiry, your agent handles the first conversation with speed, context, and a distinctly human point of view.',
+      'We design and deploy inbound and outbound AI voice agents and chatbots for service businesses with serious customer demand. From a clinic booking the next appointment to a real estate team qualifying a new enquiry, your agent handles the first conversation with speed, context, and a distinctly human point of view.',
     heroImage: `${IP}ai-hybrid-mind-7.avif`,
     stats: [
-      { value: '24/7', label: 'Always-on coverage', note: 'Capture intent after hours, on weekends, and across every time zone.' },
+      { value: '24/7', label: 'Continuous coverage', note: 'Capture intent after hours, on weekends, and across every time zone.' },
       { value: '3×', label: 'More conversations', note: 'Handle more qualified inbound and outbound conversations without adding headcount.' },
       { value: '< 1 min', label: 'Lead response time', note: 'Move from missed enquiry to useful first response while intent is still warm.' },
-      { value: '1 system', label: 'Voice + chat', note: 'One operating layer across phone, web chat, CRM, calendar, and follow-up.' },
+      { value: '1 system', label: 'Voice + chat', note: 'One operating layer across phone, web chat, CRM, calendar, and continued outreach.' },
     ],
     capabilities: [
-      { title: 'Inbound voice agents', body: 'Answer FAQs, triage intent, route calls, take messages, and book appointments with a natural, on-brand voice.' },
-      { title: 'Outbound qualification', body: 'Follow up with leads, re-engage dormant enquiries, confirm details, and hand warm conversations to your team.' },
+      { title: 'Inbound voice agents', body: 'Answer FAQs, triage intent, route calls, take messages, and book appointments with a natural voice that fits your brand.' },
+      { title: 'Outbound qualification', body: 'Follow up with leads, reconnect with dormant enquiries, confirm details, and hand warm conversations to your team.' },
       { title: 'Website & WhatsApp chatbots', body: 'Guide visitors to the right service, capture context, and keep conversations moving beyond the first click.' },
       { title: 'CRM & calendar orchestration', body: 'Connect your agent to the tools your team already uses so every call creates a clean next action.' },
       { title: 'Conversation design', body: 'Scripts, guardrails, escalation paths, and knowledge bases shaped around real customer questions.' },
@@ -323,18 +323,18 @@ const rawServiceCatalog = [
       { title: 'Launch & tune', body: 'Your agent goes live with human oversight, analytics, and a steady optimisation rhythm after launch.' },
     ],
     faqs: [
-      { q: 'What kind of businesses are AI agents best for?', a: 'Any business with repeatable, high-intent conversations — especially clinics, real-estate agencies, education, home services, and professional services.' },
+      { q: 'What kind of businesses are AI agents best for?', a: 'Any business with repeatable conversations from serious prospects, especially clinics, real estate agencies, education, home services, and professional services.' },
       { q: 'Can an agent transfer to a human?', a: 'Yes. We define clear escalation rules and pass the conversation context along so your team can pick up without making the customer repeat themselves.' },
       { q: 'Can the agent book appointments?', a: 'Yes. We can connect the experience to your calendar, booking flow, CRM, or internal routing rules.' },
-      { q: 'Will it sound like a robot?', a: 'The experience is designed around natural turn-taking, concise answers, and a voice that fits your brand. We test real scenarios before launch.' },
+      { q: 'Will it sound like a robot?', a: 'The experience is designed around natural conversation rhythm, concise answers, and a voice that fits your brand. We test real scenarios before launch.' },
       { q: 'Do you build the chatbot and voice agent together?', a: 'That is often the strongest setup. Customers can move between web chat, phone, and human support without losing context.' },
       { q: 'How do we measure whether it is working?', a: 'We track response time, qualified conversations, bookings, handoffs, resolution, and the reasons people still need a human.' },
     ],
     related: ['website-design', 'landing-page', 'seo'],
     works: [
-      { name: 'InnrevAI', year: '2024', image: `${IP}ai-innrevai-1.avif` },
-      { name: 'The Virtual Slimming Clinic', year: '2024', image: `${IP}healthcare-sofia-therapy-3.avif` },
-      { name: 'Dubai Realty', year: '2024', image: `${IP}real-estate-dubai-realty-1.avif` },
+      { name: 'InnrevAI', year: '2026', image: `${IP}ai-innrevai-1.avif` },
+      { name: 'The Virtual Slimming Clinic', year: '2026', image: `${IP}healthcare-sofia-therapy-3.avif` },
+      { name: 'Dubai Realty', year: '2026', image: `${IP}real-estate-dubai-realty-1.avif` },
     ],
   },
 ]
@@ -350,8 +350,8 @@ export const serviceCatalog = rawServiceCatalog.map(service => ({
 export const hubIntro = {
   heroLine: 'Solutions to help your brand stand out and grow',
   title: 'Our Core Creative Offerings',
-  lead: 'Everything your brand needs to grow — under one roof.',
-  body: 'We combine years of expertise in UX/UI, branding, content, and web design to build high-performance digital experiences that look great and drive results.',
+  lead: 'Everything your brand needs to grow, under one roof.',
+  body: 'We combine years of expertise in UX/UI, branding, content, and web design to build digital experiences that look great, perform well, and drive results.',
   offeringsLabel: 'Our Services',
 }
 
@@ -383,7 +383,7 @@ export const hubFeatured = [
   },
   {
     name: 'OrbitNine',
-    year: '2024',
+    year: '2026',
     sector: 'Fintech',
     blurb: '',
     image: `${IP}fintech-planet9-ui-ux-4.avif`,
@@ -406,7 +406,7 @@ export const hubPartners = [
 export const hubExpertise = {
   label: 'Expertise',
   title: 'We solve real problems',
-  body: 'We combine strategy, branding, UX and UI, and web design to build high-performance digital experiences that not only look great but move the metrics that matter for ambitious brands.',
+  body: 'We combine strategy, branding, UX and UI, and web design to build digital experiences that look great, perform well, and move the metrics that matter for ambitious brands.',
   image: '/assets/selected-work/likeon-thumbnail-v2.png',
   imageAlt: 'Podium Momentum brand and web design work',
 }
@@ -414,7 +414,7 @@ export const hubExpertise = {
 export const hubNumbers = [
   { index: '01', value: '40+', label: 'Brands' },
   { index: '02', value: '4.9', label: 'Average Client Rating' },
-  { index: '03', value: '2.3×', label: 'Conversion Lift Post-Rebrand' },
+  { index: '03', value: '2.3×', label: 'Conversion Lift After Rebrand' },
   { index: '04', value: '$10M+', label: 'Raised By Clients' },
 ]
 
@@ -422,7 +422,7 @@ export const hubNumbersHead = {
   label: 'What makes us different?',
   title: 'Momentum\nin numbers',
   titleLines: ['Momentum', 'in numbers'],
-  body: 'Design is more than aesthetics — it’s about measurable impact. Here’s how we make a difference.',
+  body: 'Design is more than aesthetics. It is about measurable impact. Here is how we make a difference.',
 }
 
 export const hubClose = {
@@ -437,11 +437,11 @@ export const hubFaqs = [
   { q: 'Do you offer revisions?', a: 'Yes. Structured review rounds are built into every engagement so feedback stays focused and the work keeps moving.' },
   { q: 'How long does branding take?', a: 'Focused identity systems usually take 4–8 weeks. Full repositioning with messaging and launch assets can run longer.' },
   { q: 'What do you need from me to start the project?', a: 'Business goals, audience notes, brand assets if any, competitor set, and access to product or leadership for a working session.' },
-  { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambition-led companies.' },
+  { q: 'What industries do you specialize in?', a: 'We work across industries, including fintech, healthcare, hospitality, consumer, technology, and other ambitious companies.' },
   { q: 'How long does it take to design a website?', a: 'Most full marketing sites run 4–10 weeks depending on scope, content readiness, and stakeholder cycles.' },
   { q: 'How can my website enhance my branding?', a: 'Your site is the operating system of the brand online. When identity, messaging, and UX align, visitors feel the same quality as your product.' },
-  { q: 'What is user experience (UX) design?', a: 'Structure, flow, and interaction design that makes products understandable and usable — not just pretty screens.' },
-  { q: 'What is a content management system (CMS)?', a: 'A system that lets marketing update pages and content without breaking the design — we plan the content model so your team can run it.' },
+  { q: 'What is user experience (UX) design?', a: 'It is the structure, flow, and interaction design that makes products understandable and usable, not just visually attractive.' },
+  { q: 'What is a content management system (CMS)?', a: 'It lets marketing update pages and content without breaking the design. We plan the content model so your team can run it.' },
   { q: "How can I optimize my website's speed?", a: 'Asset discipline, clean structure, interaction budgets, and Core Web Vitals checks before and after launch.' },
   { q: 'Why is website design important?', a: 'It’s often the first impression of your brand. Strong design builds trust, captures attention, and turns visitors into customers.' },
 ]
@@ -450,7 +450,7 @@ export const hubFaqs = [
 export const hubTestimonials = [
   {
     quote:
-      'Podium Momentum rebuilt our brand into one that finally matches the operation behind it. They gave us a system — strategic pillars and a defined voice that the whole team now uses.',
+      'Podium Momentum rebuilt our brand into one that finally matches the operation behind it. They gave us strategic pillars and a defined voice that the whole team now uses.',
     name: 'Marcus Hale',
     role: 'CEO, VivaWell Clinic',
     image: '/assets/236e08442c17c9f5.avif',
@@ -464,7 +464,7 @@ export const hubTestimonials = [
   },
   {
     quote:
-      'The new website gets lots of trust — influencers and brand clients get convinced to work with us just by looking at the site.',
+      'The new website builds immediate trust. Influencers and brand clients feel ready to work with us just by looking at the site.',
     name: 'Claire Bennett',
     role: 'Associate Founder, LikeOn',
     image: '/assets/ef42fa7cfd41a7e6.avif',

@@ -1,0 +1,3 @@
+- Content is modelled as a plain `sections` array of objects with `title`, optional `body`, and optional `list` fields rather than inline JSX, keeping copy separate from rendering logic.
+- CSS class names use a consistent `pp-` prefix (e.g. `.pp-page`, `.pp-container`, `.pp-section`) to scope styles to this page only.
+- Brand identity values like `BRAND` and `LAST_UPDATED` are declared as module-level constants at the top of the file instead of being embedded directly in JSX.

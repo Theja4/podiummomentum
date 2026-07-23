@@ -1,0 +1,1 @@
+React section that renders the AI Agents page's three-step growth loop (Outbound → Inbound → Reviews) as animated cards with a closing feedback arrow.

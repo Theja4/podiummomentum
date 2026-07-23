@@ -227,7 +227,7 @@ export default function WorkRail({ navigate }) {
                     <img
                       className="pm2-work__cardImg"
                       src={work.image}
-                      alt={`${work.name} — ${work.meta}`}
+                      alt={`${work.name}, ${work.meta}`}
                       loading="lazy"
                       decoding="async"
                       draggable="false"

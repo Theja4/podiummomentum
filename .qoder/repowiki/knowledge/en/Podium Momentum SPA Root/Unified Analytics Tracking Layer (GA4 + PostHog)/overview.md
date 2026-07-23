@@ -1,0 +1,1 @@
+Single-page-app analytics facade that initializes and emits events to both Google Analytics 4 and PostHog from one import.

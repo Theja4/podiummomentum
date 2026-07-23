@@ -13,6 +13,13 @@
 - [scripts/qa-screenshots.mjs](file://scripts/qa-screenshots.mjs)
 </cite>
 
+## Update Summary
+**Changes Made**
+- Removed all references to the deleted configuration file 2.yaml
+- Updated configuration management section to reflect current approach using only Vite, Vercel, and package.json configurations
+- Streamlined environment variable management documentation to focus on active configuration files
+- Maintained comprehensive coverage of build pipeline, deployment process, and QA workflows
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Project Structure](#project-structure)
@@ -30,7 +37,7 @@ This document provides comprehensive build and deployment guidance for the Podiu
 
 ## Project Structure
 The repository follows a standard Vite + React layout with additional tooling for QA and deployment:
-- Root configuration files define build and deployment behavior.
+- Root configuration files define build and deployment behavior through Vite and Vercel configurations.
 - Source code resides under src/, organized by feature and assets.
 - Static assets are served from public/.
 - Scripts under scripts/ support QA workflows such as screenshots and parity checks.
@@ -68,7 +75,7 @@ Key responsibilities:
 - [index.html](file://index.html)
 
 ## Architecture Overview
-The application uses a static-site architecture powered by Vite and deployed to Vercel’s edge network. The build pipeline compiles and optimizes assets, while Vercel serves the resulting static files globally. QA scripts run locally or in CI to validate UI and content consistency.
+The application uses a static-site architecture powered by Vite and deployed to Vercel's edge network. The build pipeline compiles and optimizes assets, while Vercel serves the resulting static files globally. QA scripts run locally or in CI to validate UI and content consistency.
 
 ```mermaid
 graph TB
@@ -114,8 +121,8 @@ Deployment is driven by vercel.json, which typically includes:
 Best practices:
 - Define explicit rewrites for client-side routes.
 - Set cache-control headers for static assets and API responses.
-- Keep build commands minimal; rely on Vercel’s framework detection when possible.
-- Map environment variables securely through Vercel’s dashboard or CI secrets.
+- Keep build commands minimal; rely on Vercel's framework detection when possible.
+- Map environment variables securely through Vercel's dashboard or CI secrets.
 
 **Section sources**
 - [vercel.json](file://vercel.json)
@@ -172,6 +179,20 @@ index.html initializes the React application and loads the built entry. Ensure:
 **Section sources**
 - [index.html](file://index.html)
 
+### Configuration Management Approach
+**Updated** The project now uses a streamlined configuration approach without external YAML files. All configuration is managed through:
+- **vite.config.js**: Centralized build configuration, optimization settings, and plugin management
+- **vercel.json**: Deployment-specific settings, routing rules, and environment variable mapping
+- **package.json**: Dependency management and script definitions
+- **Environment variables**: Managed through .env files for local development and Vercel's dashboard for production
+
+This approach eliminates the complexity of managing multiple configuration files while maintaining clear separation of concerns between build-time and runtime configuration.
+
+**Section sources**
+- [vite.config.js](file://vite.config.js)
+- [vercel.json](file://vercel.json)
+- [package.json](file://package.json)
+
 ## Dependency Analysis
 At a high level:
 - Vite orchestrates the build and development experience.
@@ -212,7 +233,7 @@ Bundle analysis:
 - Focus on reducing first-contentful paint and total blocking time.
 
 Caching and delivery:
-- Leverage Vercel’s global edge cache.
+- Leverage Vercel's global edge cache.
 - Set appropriate cache-control headers for immutable assets.
 - Use CDN-friendly URLs and avoid query strings for static assets.
 
@@ -220,7 +241,7 @@ Caching and delivery:
 
 ## Troubleshooting Guide
 Common issues and resolutions:
-- Missing environment variables: Ensure they are set in Vercel’s dashboard or CI secrets and mapped in vercel.json if required.
+- Missing environment variables: Ensure they are set in Vercel's dashboard or CI secrets and mapped in vercel.json if required.
 - SPA routing errors: Verify rewrites in vercel.json to direct unknown routes to the index file.
 - Asset 404s: Confirm base path and public folder usage; ensure paths match build output.
 - Large bundles: Use bundle analysis to locate oversized dependencies and replace with lighter alternatives.
@@ -232,12 +253,17 @@ Environment configuration:
 - Use .env files for local development and platform-specific secret managers for production.
 - Avoid committing secrets; prefer CI/CD secret stores.
 
+**Updated** With the removal of external YAML configuration files, troubleshooting should focus on:
+- Ensuring all configuration is properly defined in vite.config.js and vercel.json
+- Verifying environment variables are correctly mapped in Vercel's dashboard
+- Checking that package.json scripts are properly configured for different environments
+
 **Section sources**
 - [vercel.json](file://vercel.json)
 - [package.json](file://package.json)
 
 ## Conclusion
-By centralizing build configuration in Vite, enforcing quality with QA scripts, and deploying to Vercel with explicit configuration, the PodiumMinds application achieves a reliable, performant, and maintainable delivery pipeline. Regular bundle analysis, strict environment management, and CI-integrated QA will keep the product stable and fast as it evolves.
+By centralizing build configuration in Vite, enforcing quality with QA scripts, and deploying to Vercel with explicit configuration, the PodiumMinds application achieves a reliable, performant, and maintainable delivery pipeline. The streamlined configuration approach eliminates external YAML dependencies while maintaining clear separation between build-time and runtime settings. Regular bundle analysis, strict environment management, and CI-integrated QA will keep the product stable and fast as it evolves.
 
 [No sources needed since this section summarizes without analyzing specific files]
 
@@ -262,6 +288,7 @@ By centralizing build configuration in Vite, enforcing quality with QA scripts, 
 - Client-only variables must be explicitly exposed to the browser by the build tool.
 - Server-only variables should never be injected into the client bundle.
 - Use distinct values per environment (dev, staging, prod).
+- **Updated** All environment configuration is now managed through .env files for local development and Vercel's dashboard for production environments.
 
 ### Custom Domain Setup (Vercel)
 - Add a custom domain in the Vercel dashboard.
@@ -274,5 +301,13 @@ By centralizing build configuration in Vite, enforcing quality with QA scripts, 
 - Cache dependencies to speed up builds.
 - Run QA scripts and fail the pipeline on regressions.
 - Promote builds to production via approvals or branch rules.
+
+### Configuration File Reference
+**Updated** Current configuration files and their purposes:
+- **vite.config.js**: Build configuration, optimization settings, plugins, and bundling options
+- **vercel.json**: Deployment configuration, routing rules, headers, and environment variable mapping
+- **package.json**: Dependencies, scripts, and project metadata
+- **.env files**: Local development environment variables (not committed to version control)
+- **index.html**: Application entry point and HTML template
 
 [No sources needed since this section provides general guidance]

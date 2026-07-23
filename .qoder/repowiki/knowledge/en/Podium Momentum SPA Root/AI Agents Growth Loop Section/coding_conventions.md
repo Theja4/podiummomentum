@@ -1,0 +1,4 @@
+- All visual elements are styled via BEM-style `auc-*` CSS classes defined in the sibling stylesheet rather than inline styles or CSS-in-JS.
+- Staggered animation timing is driven by CSS custom properties (`--auc-i`, `--step-i`) set on rendered elements instead of hard-coded per-item values.
+- Scroll-triggered transitions are implemented by toggling an `.is-inview` class through an `IntersectionObserver` inside a `useEffect`, with cleanup returning `io.disconnect()`.
+- Inline SVG icons are kept as small functional components (`LoopIcon`, connector, result star) and marked `aria-hidden="true"` when purely decorative.

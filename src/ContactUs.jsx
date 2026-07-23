@@ -10,14 +10,14 @@ const invertInDark = new Set(['d2c8ca3a50aba890', 'e72cc835698ff331'])
 
 const expectItems = [
   ['icon-website.svg', 'Website Performance Reality Check', 'We’ll walk through your current site and identify what’s not working.'],
-  ['icon-case.svg', 'Case Studies From Your Space', 'See before-and-after transformations from similar companies.'],
+  ['icon-case.svg', 'Case Studies From Your Space', 'See how similar companies transformed before and after working with us.'],
   ['icon-timeline.svg', 'Timeline & Investment Clarity', 'Get realistic timelines and a ballpark investment for your project.'],
 ]
 
 const testimonialsCol1 = [
   {
     logo: 'logo-amazon.svg', flag: 'flag-in.webp', tag: 'SAAS',
-    quote: 'The team is thoughtful, responsive, and has exceptional design sensibility. Bringing our collective brand vision to life wasn’t easy, but the results speak for themselves - it looks amazing!',
+    quote: 'The team is thoughtful, responsive, and has exceptional design sensibility. Bringing our collective brand vision to life wasn’t easy, but the results speak for themselves. It looks amazing!',
     avatar: 'person-pinto.webp', name: 'Jordan Ellis', role: 'Growth Marketing Manager, Amazon',
   },
   {
@@ -27,25 +27,25 @@ const testimonialsCol1 = [
   },
   {
     logo: 'logo-tripledart.png', flag: 'flag-in.webp', tag: 'SAAS',
-    quote: `"${BRAND} has been our go-to partner for numerous SaaS client projects. They tackle each challenge with unmatched expertise and creativity, exceeding our expectations."`,
-    avatar: 'person-shiyam.webp', name: 'Avery Thomas', role: 'Co-founder, Tripledart',
+    quote: `"${BRAND} has been our trusted partner for numerous SaaS client projects. They tackle each challenge with unmatched expertise and creativity, exceeding our expectations."`,
+    avatar: 'person-shiyam.webp', name: 'Avery Thomas', role: 'Cofounder, Tripledart',
   },
 ]
 
 const testimonialsCol2 = [
   {
     logo: 'logo-factors.svg', flag: 'flag-in.webp', tag: 'MARTECH',
-    quote: `"${BRAND} was always responsive, quick to act, and highly collaborative. The final output exceeded our expectations - modern, clean, and exactly what we envisioned."`,
+    quote: `"${BRAND} was always responsive, quick to act, and highly collaborative. The final output exceeded our expectations. It was modern, clean, and exactly what we envisioned."`,
     avatar: 'person-tanvi.jpeg', name: 'Rhea Kapoor', role: 'Product Marketing Lead, Factors AI',
   },
   {
     logo: 'logo-deductive.svg', flag: 'flag-in.webp', tag: 'AI',
     quote: `"${BRAND} made our brand and website communicate our product effectively. The feedback has been amazing; people keep telling us how polished and engaging the site and the brand looks."`,
-    avatar: 'person-sameer.webp', name: 'Devon Clarke', role: 'Co-Founder & CTO, Deductive.ai',
+    avatar: 'person-sameer.webp', name: 'Devon Clarke', role: 'Cofounder & CTO, Deductive.ai',
   },
   {
     logo: 'logo-skyroot.webp', flag: 'flag-in.webp', tag: 'SAAS',
-    quote: `"The result of working with ${BRAND} was instantly visible - the site is very unique to our industry and showcases all our capabilities well."`,
+    quote: `"The result of working with ${BRAND} was instantly visible. The site is unique to our industry and showcases all our capabilities well."`,
     avatar: 'person-sumil.jpg', name: 'Lucas Bennett', role: 'Skyroot Aerospace',
   },
 ]
@@ -53,17 +53,17 @@ const testimonialsCol2 = [
 const testimonialsCol3 = [
   {
     logo: 'logo-storylane.svg', flag: 'flag-in.webp', tag: 'MARTECH',
-    quote: `"The ${BRAND} team is responsive, meets deadlines, and goes beyond expectations - it's a solid partner for any B2B company looking to scale their brand."`,
+    quote: `"The ${BRAND} team is responsive, meets deadlines, and goes beyond expectations. It is a solid partner for any B2B company looking to scale their brand."`,
     avatar: 'person-anand.webp', name: 'Maya Sterling', role: 'Product Marketing, Outbound, Storylane',
   },
   {
     logo: 'logo-overpass.svg', flag: 'flag-uk.png', tag: 'SERVICES',
-    quote: `"${BRAND}'s speed of execution, high-quality work, and transparent communication make them stand out. It's rare to find an agency this reliable, and that's why we keep coming back."`,
-    avatar: 'person-matt.webp', name: 'Owen Hartley', role: 'Co-founder, Overpass Studio',
+    quote: `"${BRAND}'s speed of execution, quality of work, and transparent communication make them stand out. It's rare to find an agency this reliable, and that's why we keep coming back."`,
+    avatar: 'person-matt.webp', name: 'Owen Hartley', role: 'Cofounder, Overpass Studio',
   },
   {
     logo: 'logo-rezolv.svg', flag: 'flag-in.webp', tag: 'FINTECH',
-    quote: `As an early-stage company, we needed a clear brand identity and messaging before launching. ${BRAND} delivered exactly that: concise, impactful copy and branding that feels right.`,
+    quote: `As an early stage company, we needed a clear brand identity and messaging before launching. ${BRAND} delivered exactly that: concise, impactful copy and branding that feels right.`,
     avatar: 'person-karan.webp', name: 'Zara Collins', role: 'Founder, Rezolv',
   },
 ]
@@ -78,8 +78,8 @@ const withoutPoints = [
 const withPoints = [
   'Positioning that matches where the company actually is today',
   'A distinct brand that makes competitors look generic',
-  'Prospects show up to calls already half-sold',
-  "CRO-optimized pages with clear data on what's working",
+  'Prospects show up to calls already convinced',
+  "Pages optimized for conversion, with clear data on what's working",
 ]
 
 // Randomly picked from the landing-page client logos (accuracy isn't the point here).

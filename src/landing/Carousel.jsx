@@ -981,7 +981,7 @@ export default function Carousel({ navigate }) {
           className={`pm2-carousel-stage${cursorAction ? ' is-cursor-on' : ''}`}
           tabIndex={0}
           role="group"
-          aria-label="Services carousel — use arrow keys to browse"
+          aria-label="Services carousel. Use arrow keys to browse"
           onKeyDown={onStageKey}
           onClickCapture={onStageClickCapture}
           onPointerMove={onStagePointerMove}

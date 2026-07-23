@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal } from 'react-dom'
 import './styles.css'
@@ -29,6 +29,7 @@ import BrandPreloader from './BrandPreloader.jsx'
 import { initAnalytics, trackPageView, trackCtaClick, trackNewsletterSubscribe } from './analytics.js'
 import PrivacyPolicy from './PrivacyPolicy.jsx'
 import AboutPage from './AboutPage.jsx'
+const MCP2099 = lazy(() => import('./mcp2099/MCP2099.jsx'))
 
 installButtonBubble()
 initAnalytics()
@@ -37,6 +38,7 @@ const A = '/assets/'
 const BRAND = 'Podium Momentum'
 const CONTACT_PATH = '/contact-us'
 const PRIVACY_PATH = '/privacy-policy'
+const MCP2099_PATH = '/mcp-2099'
 const ABOUT_PATH = '/about'
 
 function navigate(path) {
@@ -113,7 +115,7 @@ const projects = [
     tags: ['#Branding', '#Website Design', '#Growth'],
     stack: 'Brand system, Webflow, CRO',
     timeline: '4 weeks',
-    description: "LikeOn is a fast-growing European influencer marketing platform with 100,000+ creators, major brand partnerships, and a product growing faster than its brand could keep up with.",
+    description: "LikeOn is a rapidly growing European influencer marketing platform with 100,000+ creators, major brand partnerships, and a product growing faster than its brand could keep up with.",
     stats: [['50%+', 'Order value growth'], ['100k+', 'Creators on platform'], ['4:1', 'ROAS delivered in 3 weeks']],
     results: ['50%+ order value growth', '100k+ creators on platform', '4:1 ROAS delivered in 3 weeks'],
   },
@@ -159,12 +161,12 @@ function RatingStars({ value = 4.9, max = 5 }) {
 }
 
 const compareRows = [
-  ['Consultative approach', 'A strategy partner that looks through your buyer’s lens and co-owns the result.', 'They build exactly what’s briefed, even when the story doesn’t hold together.'],
-  ['Premium service', 'Senior-led craft and strategy with one owner from kickoff to launch.', 'Packaged “deliverables” with limited senior time.'],
-  ['Mid-market & enterprise focus', 'Built for long buying cycles, stakeholder alignment, and high-stakes credibility.', 'Built for mixed client sizes; enterprise nuance gets missed.'],
-  ['Result-oriented strategy', 'We design for clarity, trust, and action, with outcomes you can track.', '“Looks great” is the finish line.'],
-  ['In-house strategy team', 'Positioning and messaging are set in-house before design begins.', 'Copy and strategy are outsourced or “added later.”'],
-  ['B2B industry expertise', 'B2B-first thinking tailored to evaluation-led buying.', 'Generalist exposure where B2B is one of many.'],
+  ['Consultative approach', 'A strategy partner that looks through your buyer’s lens and shares ownership of the result.', 'They build exactly what’s briefed, even when the story doesn’t hold together.'],
+  ['Premium service', 'Senior craft and strategy with one owner from kickoff to launch.', 'Packaged “deliverables” with limited senior time.'],
+  ['Enterprise focus', 'Built for long buying cycles, stakeholder alignment, and credibility when the stakes are high.', 'Built for mixed client sizes; enterprise nuance gets missed.'],
+  ['Strategy focused on results', 'We design for clarity, trust, and action, with outcomes you can track.', '“Looks great” is the finish line.'],
+  ['Internal strategy team', 'Our team sets positioning and messaging before design begins.', 'Copy and strategy are outsourced or “added later.”'],
+  ['B2B industry expertise', 'B2B thinking tailored to considered buying decisions.', 'Generalist exposure where B2B is one of many.'],
 ]
 
 function Logo({ variant = 'header', tone = 'light' }) {
@@ -626,7 +628,7 @@ function Hero() {
 }
 
 function MetricsMarquee() {
-  const items = ['$10M raised by clients', '+30% margin gain post-rebrand', '2.3x conversion lift post-rebrand', 'Operating tier upgrade · post-Podium']
+  const items = ['$10M raised by clients', '+30% margin gain after rebrand', '2.3x conversion lift after rebrand', 'Operating tier upgrade · after Podium']
   return <div className="marquee"><div className="marquee-track">{[...items, ...items].map((x, i) => <span key={i}>/ {x}</span>)}</div></div>
 }
 
@@ -772,7 +774,7 @@ function ShowreelPlayer({ variant = 'about', autoplayOnLoad = false }) {
 
   const shellClass = variant === 'hero' ? 'hero-video' : 'who-video'
   const videoSource = variant === 'hero' ? `${A}who-we-are-trimmed.mp4` : `${A}showreel.mp4`
-  const videoName = variant === 'hero' ? `${BRAND} showreel` : `${BRAND} — Who we are`
+  const videoName = variant === 'hero' ? `${BRAND} showreel` : `${BRAND}: Who we are`
   const media = (
     <div className={`${shellClass} ${playing ? 'is-playing' : ''} ${started ? 'is-started' : ''}`}>
       {!started && <ShowreelThumb label={variant === 'about' ? 'Learn more about' : 'Hi, we are'} />}
@@ -1055,7 +1057,7 @@ function Services() {
         <div className="services-agent-feature-copy">
           <span className="services-agent-feature-kicker">New capability · AI agent deployments</span>
           <h3>Put your next best conversation on autopilot.</h3>
-          <p>Inbound calls, outbound follow-ups, and website chat — designed around the way clinics, real-estate teams, and service businesses actually work.</p>
+          <p>Inbound calls, continued outreach, and website chat designed around the way clinics, real estate teams, and service businesses actually work.</p>
           <span className="services-agent-feature-link">Explore AI agents <i aria-hidden="true">↗</i></span>
         </div>
         <div className="services-agent-orbit" aria-hidden="true">
@@ -1642,6 +1644,9 @@ function App() {
         <Footer />
       </>
     )
+  }
+  if (path === MCP2099_PATH || path === `${MCP2099_PATH}/`) {
+    return <Suspense fallback={<div style={{ background: '#050505', minHeight: '100vh' }} />}><MCP2099 navigate={navigate} /></Suspense>
   }
   return withPreloader(<HomePage />)
 }

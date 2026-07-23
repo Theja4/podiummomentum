@@ -1,0 +1,3 @@
+- Each backend call is guarded by an explicit env-var presence check plus a `'XXXX'` placeholder guard before dispatching, so unconfigured providers are silently skipped.
+- Domain-specific tracking helpers are thin wrappers around `trackEvent` that supply stable event names and typed property objects rather than calling `gtag`/`posthog.capture` directly.
+- SPA pageview tracking is manual: both GA4 (`send_page_view: false`) and PostHog (`capture_pageview: false`) are configured to disable automatic capture, with `trackPageView` invoked explicitly on route changes.

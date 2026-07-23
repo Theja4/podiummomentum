@@ -157,7 +157,7 @@ function RailControls({ label, onPrevious, onNext, progressRef, showProgress = t
   )
 }
 
-function ProjectRail({ works, serviceTitle }) {
+function ProjectRail({ works, serviceTitle, navigate }) {
   const { ref, nudge, progressRef } = useAutoRail(0.72)
   const loopedWorks = [...works, ...works]
   return (
@@ -169,14 +169,20 @@ function ProjectRail({ works, serviceTitle }) {
         data-reveal-group="carousel"
       >
         {loopedWorks.map((p, i) => (
-          <article key={`${p.name}-${i}`} data-reveal="card" aria-hidden={i >= works.length ? 'true' : undefined}>
+          <article
+            key={`${p.name}-${i}`}
+            data-reveal="card"
+            aria-hidden={i >= works.length ? 'true' : undefined}
+            onClick={p.link && i < works.length ? () => go(p.link, navigate) : undefined}
+            style={p.link && i < works.length ? { cursor: 'pointer' } : undefined}
+          >
             <div className="svc-featured-media" data-project-label={p.name}>
               <img src={p.image} alt={i < works.length ? p.name : ''} loading="lazy" />
             </div>
             <div className="svc-work-strip-meta">
               <h3>
                 {p.name}
-                {p.year ? <span> — {p.year}</span> : null}
+                {p.year ? <span> · {p.year}</span> : null}
               </h3>
               <span className="svc-work-tag">{serviceTitle}</span>
             </div>
@@ -232,6 +238,22 @@ function ServiceProcess({ steps }) {
               data-expanded={open ? 'true' : 'false'}
               data-reveal="card"
               style={{ '--i': i }}
+              onPointerEnter={event => {
+                if (event.pointerType !== 'touch') setActive(i)
+              }}
+              onPointerLeave={event => {
+                if (event.pointerType !== 'touch') {
+                  setActive(current => current === i ? null : current)
+                }
+              }}
+              onFocus={event => {
+                if (event.target.matches(':focus-visible')) setActive(i)
+              }}
+              onBlur={event => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                  setActive(current => current === i ? null : current)
+                }
+              }}
             >
               <span>Step {i + 1}</span>
               <h3>{step.title}</h3>
@@ -239,7 +261,11 @@ function ServiceProcess({ steps }) {
                 type="button"
                 className="svc-process-toggle"
                 aria-expanded={open}
-                onClick={() => setActive(open ? null : i)}
+                onClick={event => {
+                  const pointerType = event.nativeEvent.pointerType
+                  if (pointerType === 'touch') setActive(open ? null : i)
+                  else setActive(i)
+                }}
               >
                 <i aria-hidden="true" />
                 <span className="sr-only">{open ? 'Hide' : 'Show'} step details</span>
@@ -311,7 +337,7 @@ function FeaturedCard({ p }) {
       <div className="svc-featured-meta">
         <div className="svc-featured-title-row">
           <h3>{p.name}</h3>
-          {p.year ? <span className="svc-featured-year">— {p.year}</span> : null}
+          {p.year ? <span className="svc-featured-year">· {p.year}</span> : null}
         </div>
         {p.tags?.length ? (
           <div className="svc-featured-tags">
@@ -582,7 +608,7 @@ export function ServiceDetail({ slug, navigate }) {
               </span>
             </div>
             <h2 data-split="words">
-              {service.title} Services — Seamless, Results-Driven Experiences
+              {service.title} Services for Seamless Experiences and Clear Results
             </h2>
           </div>
           <ol className="svc-cap-list" data-reveal-group="mosaic">
@@ -615,7 +641,7 @@ export function ServiceDetail({ slug, navigate }) {
             <DotLabel>Works</DotLabel>
             <h2 data-split="words">Selected projects</h2>
           </div>
-          <ProjectRail works={works} serviceTitle={service.shortTitle} />
+          <ProjectRail works={works} serviceTitle={service.shortTitle} navigate={navigate} />
         </div>
       </section>
 

@@ -81,7 +81,7 @@ export default function Landing2({ navigate }) {
   }, [])
 
   return (
-    <main className="pm2" aria-label="Podium Momentum — home">
+    <main className="pm2" aria-label="Podium Momentum home">
       <Hero navigate={navigate} />
       <Carousel navigate={navigate} />
       <Beyond />

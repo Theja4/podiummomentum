@@ -126,7 +126,7 @@ export const WORKS = [
   {
     name: 'JobPosted',
     sector: 'Career Tech',
-    meta: 'career tech · 2024 · Web Design · Development',
+    meta: 'career tech · 2025 · Web Design · Development',
     tags: ['Website', 'Development', 'UX Strategy'],
     result: '3.3× conversion increase',
     href: '/industry/technology',
@@ -137,7 +137,7 @@ export const WORKS = [
   {
     name: 'Rezoomed',
     sector: 'AI Product',
-    meta: 'ai product · 2024 · Brand · Motion · Web',
+    meta: 'ai product · 2025 · Brand · Motion · Web',
     tags: ['Branding', 'Motion', 'Website'],
     result: '1M+ resumes optimized',
     href: '/industry/ai',
@@ -148,7 +148,7 @@ export const WORKS = [
   {
     name: 'LikeOn',
     sector: 'Creator Economy',
-    meta: 'creator economy · 2023 · Social · Content',
+    meta: 'creator economy · 2025 · Social · Content',
     tags: ['Social', 'Content', 'Marketing'],
     result: '50% order value growth',
     href: '/industry/technology',
@@ -185,7 +185,7 @@ export const GALLERY = {
     image: '/assets/pm2gallery/target-frame.jpg',
     // Ambient loop generated from the still (Kling); plays once the zoom lands.
     video: '/assets/pm2gallery/target-loop.mp4',
-    alt: 'Momentum Core — the podium, lit',
+    alt: 'Momentum Core, the illuminated podium',
   },
   tiles: [
     { image: '/assets/pm2gallery/01.jpg', label: 'Signal', sub: 'See the signal in the noise' },
@@ -202,6 +202,6 @@ export const GALLERY = {
 export const FINALE = {
   line1: 'Build beyond',
   line2: 'all limits',
-  copy: 'Strategy, brand, and web that think ahead — start shipping momentum today.',
+  copy: 'Strategy, brand, and web that think ahead. Start building momentum today.',
   cta: { label: 'Book a strategy call', href: '/contact-us' },
 }

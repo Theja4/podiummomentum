@@ -1,0 +1,9 @@
+schema_version: 1
+module_path: analytics
+title: Unified Analytics Tracking Layer (GA4 + PostHog)
+scope:
+    - src/analytics.js
+source_files: []
+depends_on: []
+related_to:
+    - path: privacy_policy

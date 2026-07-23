@@ -30,7 +30,7 @@ const sections = [
   },
   {
     title: '4. Analytics and tracking',
-    body: `We use Google Analytics 4 and PostHog to understand how visitors use our site. These tools collect anonymised usage data including page views, clicks, scroll depth, and session recordings. You can opt out of Google Analytics via the Google Analytics Opt-out browser add-on. PostHog respects the Do Not Track browser setting.`,
+    body: `We use Google Analytics 4 and PostHog to understand how visitors use our site. These tools collect anonymised usage data including page views, clicks, scroll depth, and session recordings. You can opt out of Google Analytics through its browser extension. PostHog respects the Do Not Track browser setting.`,
   },
   {
     title: '5. Data sharing',
@@ -57,7 +57,7 @@ const sections = [
   },
   {
     title: '9. Security',
-    body: `We implement appropriate technical and organisational measures to protect your data, including encrypted connections (HTTPS), server-side API keys, and access controls. No method of transmission over the internet is 100% secure, but we take reasonable steps to safeguard your information.`,
+    body: `We implement appropriate technical and organisational measures to protect your data, including encrypted connections (HTTPS), protected API keys, and access controls. No method of transmission over the internet is 100% secure, but we take reasonable steps to safeguard your information.`,
   },
   {
     title: '10. Changes to this policy',

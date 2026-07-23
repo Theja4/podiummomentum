@@ -1,0 +1,1 @@
+Static React page that renders the company's privacy policy as a list of numbered sections with optional paragraphs and bullet lists.

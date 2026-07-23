@@ -1,0 +1,1 @@
+Google Analytics 4 via the gtag.js loader and PostHog via the `posthog-js` npm package; configuration comes from Vite env vars (`VITE_GA4_MEASUREMENT_ID`, `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`).
