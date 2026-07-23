@@ -43,9 +43,12 @@ const ACTIVE_D = 0.5 // |d| below which a card counts as centred/clickable
 const SNAP_IDLE_MS = 420 // scroll quiet time before the deck glides to a slot
 // Coarse layout steps for the deck's expansion morph. The deck cards afford
 // the stepped-layout + corrective-scale bridge because their edges are
-// hidden (card zero, under the ghost), faded or 3D-rotated; the hero ghost
-// itself uses continuous real layout so its high-contrast edge stays crisp.
-const GEOM_STEPS = 12
+// hidden (card zero, under the ghost), faded or 3D-rotated. The hero ghost
+// now shares this cadence so both layers stay visually identical at the swap.
+// Shared with the travelling hero card. Keeping both boxes on the same
+// geometry cadence lets the browser coalesce their relayout into one frame;
+// a continuous corrective scale bridges the steps visually.
+export const CARD_GEOM_STEPS = 12
 const SNAP_MIN_OFF = 0.02 // dead zone: already close enough to a slot
 const FIRST_CARD_COPY_REVEAL_MS = 131.25
 const MOBILE_SWIPE_THRESHOLD = 28
@@ -611,6 +614,7 @@ export default function Carousel({ navigate }) {
     maxSpeed: 0.68,
     active: visible,
   })
+  const handoffPhaseRef = useRef(heroHandoff.phase)
 
   // —— idle snap: any scroll (user or our own glide) stamps this; once the
   // page has been quiet for SNAP_IDLE_MS and the deck rests between slots,
@@ -806,7 +810,10 @@ export default function Carousel({ navigate }) {
     // —— idle snap: glide to the nearest slot once scrolling rests off-slot.
     // Raw scroll position (not the lerped f) decides the target, so the snap
     // aims where the page actually stopped, not where the lag is passing.
-    if (now - lastScrollAt.current > SNAP_IDLE_MS) {
+    if (
+      (window.innerWidth <= MOBILE_BP || heroHandoff.phase === 'deck') &&
+      now - lastScrollAt.current > SNAP_IDLE_MS
+    ) {
       const rangePx = Math.max(1, el.offsetHeight - vh)
       const rawP = clamp01(-top / rangePx)
       const rawF = rawP * (N - 1)
@@ -822,6 +829,16 @@ export default function Carousel({ navigate }) {
     if (isReduced || !visible) return
     const vw = window.innerWidth || 1
     const mobile = vw <= MOBILE_BP
+    const phase = mobile ? 'deck' : heroHandoff.phase
+    const justEnteredDeck =
+      phase === 'deck' && handoffPhaseRef.current !== 'deck'
+    if (!mobile && (phase === 'journey' || justEnteredDeck)) {
+      // Keep the real card at the exact unrotated origin while the ghost owns
+      // the journey. Reset once more on the transfer frame, then let the deck
+      // accelerate from zero on subsequent frames.
+      progress.current = 0
+    }
+    handoffPhaseRef.current = phase
     const p = progress.current
     const f = p * (N - 1)
     fRef.current = f
@@ -840,34 +857,38 @@ export default function Carousel({ navigate }) {
       firstCardCopyRef.current = 0
     }
     const firstCardCopyReveal = easeInOutCubic(firstCardCopyRef.current)
-    // The hero finishes opening card zero before the swap. Keep the deck wide
-    // after that point; localOpen also supports direct links into this section.
-    const localOpen = mobile ? 0 : easeInOutCubic(clamp01(f / 0.36))
-    const expansion = mobile ? 0 : Math.max(heroHandoff.cardExpansion || 0, localOpen)
-    // Mirror of the hero's coarse-step morph: the boxes are laid out at most
-    // GEOM_STEPS times across the whole expansion; a compositor-only
-    // corrective scale (cont/step) keeps every card's RENDERED size gliding
-    // at full display rate. Only that cheap transform changes per frame.
-    const geomE = Math.round(expansion * GEOM_STEPS) / GEOM_STEPS
+    // The journey owns the displayed size until the pixel-matched swap; the
+    // real deck then remains at its final wide geometry.
+    const expansion =
+      mobile ? 0 : phase === 'journey' ? heroHandoff.cardExpansion || 0 : 1
+    // Keep all five real deck cards at their final layout geometry throughout
+    // the handoff. A compositor fit presents the same continuous outer size,
+    // but rapid reversals no longer relayout five complex card subtrees at
+    // every geometry threshold.
     const geometry = mobile
       ? null
-      : desktopCardGeometry(vw, window.innerHeight || 1, geomE)
+      : desktopCardGeometry(vw, window.innerHeight || 1, 1)
     const contGeometry = mobile
       ? null
       : desktopCardGeometry(vw, window.innerHeight || 1, expansion)
     const fitX = geometry ? contGeometry.width / geometry.width : 1
     const fitY = geometry ? contGeometry.height / geometry.height : 1
-    if (contGeometry) {
-      // the title/foot anchor around the card follows the CONTINUOUS height
-      // (two small elements — relayout is cheap; steps here would pop them)
-      const half = `${(contGeometry.height / 2).toFixed(1)}px`
+    if (geometry) {
+      // The heading and CTA stay anchored to the final wide-card envelope.
+      // Keeping this surrounding chrome still means it never joins the card's
+      // layout animation; only the card edge moves toward it.
+      const finalGeometry = desktopCardGeometry(vw, window.innerHeight || 1, 1)
+      const half = `${(finalGeometry.height / 2).toFixed(1)}px`
       if (stageVarRef.current !== half) {
         stageVarRef.current = half
         sectionRef.current?.style.setProperty('--pm2-stage-card-half', half)
       }
+    } else if (stageVarRef.current) {
+      stageVarRef.current = ''
+      sectionRef.current?.style.removeProperty('--pm2-stage-card-half')
     }
     const geomKey = geometry
-      ? `${geometry.width.toFixed(1)}|${geometry.height.toFixed(1)}|${geomE.toFixed(4)}`
+      ? `${geometry.width.toFixed(1)}|${geometry.height.toFixed(1)}|desktop`
       : 'mobile'
     const geomChanged = geomKeyRef.current !== geomKey
     if (geomChanged) geomKeyRef.current = geomKey
@@ -895,10 +916,10 @@ export default function Carousel({ navigate }) {
         if (geometry) {
           el.style.width = `${geometry.width.toFixed(1)}px`
           el.style.height = `${geometry.height.toFixed(1)}px`
-          el.style.setProperty('--pm2-card-pad', `${lerp(22, 30, geomE).toFixed(1)}px`)
-          el.style.setProperty('--pm2-card-radius', `${lerp(26, 34, geomE).toFixed(1)}px`)
-          el.style.setProperty('--pm2-card-title', `${lerp(36, 46, geomE).toFixed(1)}px`)
-          el.style.setProperty('--pm2-card-copy', `${lerp(14, 16, geomE).toFixed(1)}px`)
+          el.style.setProperty('--pm2-card-pad', '30px')
+          el.style.setProperty('--pm2-card-radius', '34px')
+          el.style.setProperty('--pm2-card-title', '46px')
+          el.style.setProperty('--pm2-card-copy', '16px')
         } else {
           el.style.removeProperty('width')
           el.style.removeProperty('height')
@@ -933,8 +954,17 @@ export default function Carousel({ navigate }) {
       const ry = mobile ? 0 : clamp(-d * ROT_DEG, -ROT_MAX, ROT_MAX)
       let op = clamp01((OPACITY_GONE - ad) / (OPACITY_GONE - OPACITY_FULL))
       // the hero's ghost card becomes this card — keep the real one hidden
-      // until the ghost has landed in the slot (complementary cross-fade)
-      if (i === 0) op = Math.min(op, 1 - clamp01(heroHandoff.ghostOpacity))
+      // until the ghost has landed in the slot (complementary cross-fade).
+      if (i === 0) {
+        const ghostOwnsSlot = mobile
+          ? sectionTop > 0
+            ? 1
+            : clamp01(heroHandoff.ghostOpacity)
+          : phase === 'journey'
+            ? 1
+            : 0
+        op = Math.min(op, 1 - ghostOwnsSlot)
+      }
       // Keep side-card artwork and SVG text sharp at every point in the
       // coverflow; distance is communicated by depth and opacity.
       // translate(-50%,-50%) keeps the centre invariant under width steps,

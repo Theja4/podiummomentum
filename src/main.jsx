@@ -1101,7 +1101,7 @@ function Testimonials() {
   return <section id="testimonials" className="testimonials"><div className="testimonial-head"><div className="eyebrow" data-reveal="up">Testimonials</div><h2 data-reveal="line">What our clients say about working with us.</h2></div><div className="testimonial-track" ref={track}>{testimonials.map(([quote, name, role, img]) => <article key={name} data-reveal="card"><p>{quote}</p><div className="person"><img src={img} alt={name} /><div><b>{name}</b><span>{role}</span></div></div></article>)}</div><div className="track-control"><span></span><button onClick={() => slide(-1)} aria-label="Previous testimonial">←</button><button onClick={() => slide(1)} aria-label="Next testimonial">→</button></div></section>
 }
 
-function Footer() {
+function Footer({ animated = true }) {
   const path = usePathname()
   // The landing closes on a dark full-bleed footer (body.pm2-active); every
   // other route renders the footer as a white card, so the lockup must swap
@@ -1182,7 +1182,7 @@ function Footer() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
   return (
-    <footer data-reveal="footer">
+    <footer data-reveal={animated ? 'footer' : undefined}>
       <div className="footer-col">
         <b>Company:</b>
         {companyLinks.map((item, i) => (
@@ -1630,9 +1630,9 @@ function App() {
   if (path === PRIVACY_PATH || path === `${PRIVACY_PATH}/`) {
     return (
       <>
-        <Header contactPage />
+        <Header />
         <PrivacyPolicy />
-        <Footer />
+        <Footer animated={false} />
       </>
     )
   }

@@ -346,12 +346,12 @@
 }
 
 /* THE hero card — photo face on top, the mint brand face wiping in from the
-   bottom. Stage-level: escapes the panel's spin/fade. Positioning mirrors the
-   panel's card slot; JS measures rest geometry via offsetLeft/offsetTop
-   every frame. */
+   bottom. On desktop it is viewport-fixed and sits outside the sticky
+   perspective stage. Native scrolling can therefore never move it between
+   animation frames while it resizes and lands. */
 .pm2-hero-card {
   --pm2-card-radius: 26px;
-  position: absolute;
+  position: fixed;
   z-index: 3; /* above the panel */
   /* anchored to the composition box, not the viewport — on ultrawide the
      card follows the centered content instead of the far edge */
@@ -363,8 +363,18 @@
   height: min(560px, 74vh);
   margin-top: calc(min(560px, 74vh) / -2);
   border-radius: var(--pm2-card-radius);
+  /* SINGLE clip owner for the whole card. The old stack nested SEVEN rounded
+     clips (card clip-path+overflow, enter, float, reveal, video-wrap, wipe)
+     on the same box: at the fractional widths of the size morph each clip
+     antialiases its own last-pixel column, the coverages compound, and the
+     near-black float/video backgrounds fill the residue — a dark hairline
+     flickering on the card's right edge. One clip here + inner layers that
+     BLEED past it = one clean antialiased edge. */
   overflow: hidden;
-  clip-path: inset(0 round var(--pm2-card-radius));
+  /* the coverflow card's exact drop shadow: an element's OWN shadow paints
+     outside its clip without touching the edge antialiasing, and the seat
+     swap into card zero keeps an identical shadow */
+  box-shadow: 0 30px 80px -20px rgba(8, 19, 13, 0.35);
   transform: rotate(-4deg);
   will-change: transform, opacity;
   /* the journey animates real width/height (typography morph) — bound each
@@ -377,13 +387,19 @@
    background and face chrome are the card's own — the swap is invisible. */
 .pm2-hero-card-wipe {
   position: absolute;
-  inset: 0;
+  /* bleeds 1.5px past the card's right/bottom edge so its face background
+     always FULLY covers the card's fractional last-pixel column during the
+     size morph (the dark video face beneath can never grin through); the
+     card's single overflow clip owns the real edge. Padding compensates so
+     the flow content box — and the swap's pixel-identity with card zero —
+     is unchanged. */
+  inset: 0 -1.5px -1.5px 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
   padding: var(--pm2-card-pad, 22px);
-  border-radius: var(--pm2-card-radius, 26px);
-  overflow: hidden;
+  padding-right: calc(var(--pm2-card-pad, 22px) + 1.5px);
+  padding-bottom: calc(var(--pm2-card-pad, 22px) + 1.5px);
   color: #fff;
   clip-path: inset(100% 0 0 0 round var(--pm2-card-radius)); /* JS rises this to inset(0) */
   will-change: clip-path;
@@ -459,8 +475,7 @@
      this the float collapses to content height (the work stack is entirely
      absolutely positioned, so content height is ~zero) */
   height: 100%;
-  border-radius: inherit;
-  overflow: hidden;
+  /* no radius/overflow: the card element is the single clip owner */
   animation: pm2HeroCardEnter 1.15s var(--v-ease) 0.35s backwards;
 }
 
@@ -481,14 +496,17 @@
 .pm2-hero-card-float {
   position: relative;
   height: 100%;
+  /* radius kept for the background shape; no overflow clip — the card
+     element is the single clip owner */
   border-radius: inherit;
-  overflow: hidden;
   background: #08130d;
   transform: none;
-  box-shadow:
-    0 30px 80px -20px rgba(5, 10, 12, 0.5),
-    0 20px 55px -18px rgba(47, 191, 127, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  /* NO outward shadows here: they were always fully clipped by the card's
+     overflow (invisible), but their near-black paint sits exactly outside
+     the clip boundary, and at the morph's fractional widths the clip's
+     antialiased edge texel integrates it — a dark 1px line flickering on
+     the card's edge. The visible drop shadow lives on .pm2-hero-card. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
   will-change: auto;
 }
 
@@ -496,8 +514,8 @@
 .pm2-hero-card-reveal {
   width: 100%;
   height: 100%;
-  border-radius: inherit;
-  overflow: hidden;
+  /* no radius/overflow: its load reveal animates its own clip-path, and the
+     card element is the single clip owner afterwards */
   animation: pm2HeroCardReveal 1.5s cubic-bezier(0.65, 0, 0.15, 1) 0.5s backwards;
 }
 
@@ -904,7 +922,11 @@
   }
 
   .pm2-hero-card-wipe {
-    padding: 20px; /* mirrors the mobile coverflow card's padding */
+    /* mirrors the mobile coverflow card's padding; right/bottom compensate
+       the 1.5px bleed so the content box matches card zero exactly */
+    padding: 20px;
+    padding-right: 21.5px;
+    padding-bottom: 21.5px;
   }
 
   .pm2-hero-card-float {
@@ -1005,6 +1027,12 @@
     height: 100vh;
     height: 100svh;
     perspective: none;
+  }
+
+  .pm2-hero-card {
+    /* Reduced motion uses a normal, non-pinned hero. Keep its card in that
+       section instead of leaving a fixed layer over the following content. */
+    position: absolute;
   }
 
   .pm2-hero-row-drift {

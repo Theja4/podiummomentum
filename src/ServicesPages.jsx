@@ -19,6 +19,8 @@ import {
 import { usePageMotion } from './usePageMotion.js'
 import VoiceAgent from './VoiceAgent.jsx'
 import AgentUseCases from './AgentUseCases.jsx'
+import VoiceExperiences from './VoiceExperiences.jsx'
+import { WebsiteDesignShowcase } from './WebsiteDesignShowcase.jsx'
 
 export { matchServicesRoute }
 import './services-pages.css'
@@ -548,34 +550,39 @@ export function ServiceDetail({ slug, navigate }) {
             <h1 data-split="words">{service.heroHeadline}</h1>
             <div className="svc-detail-hero-bottom">
               <p className="svc-detail-lead" data-split="letters">{service.heroLead}</p>
-              <a className="svc-scroll-cue" href={slug === 'ai-agents' ? '#live-demo' : '#service-intro'} aria-label="Scroll to service overview">↓</a>
+              <a className="svc-scroll-cue" href={slug === 'ai-agents' ? '#voice-player' : '#service-intro'} aria-label="Scroll to service overview">↓</a>
             </div>
           </div>
         </div>
       </section>
 
+      {slug === 'website-design' && <WebsiteDesignShowcase />}
+
+      {slug === 'ai-agents' && <VoiceExperiences />}
       {slug === 'ai-agents' && <VoiceAgent navigate={navigate} />}
       {slug === 'ai-agents' && <AgentUseCases />}
       
-      <section className="svc-detail-intro" id="service-intro" data-reveal="panel">
-        <div className="svc-container svc-detail-intro-grid">
-          <div className="svc-detail-intro-media-wrap">
-            <DotLabel>{service.heroEyebrow}</DotLabel>
-            <div className="svc-detail-hero-media" data-reveal="card">
-              <img src={heroImg} alt={`${service.title} project preview`} loading="eager" />
+      {slug !== 'ai-agents' && slug !== 'website-design' ? (
+        <section className="svc-detail-intro" id="service-intro" data-reveal="panel">
+          <div className="svc-container svc-detail-intro-grid">
+            <div className="svc-detail-intro-media-wrap">
+              <DotLabel>{service.heroEyebrow}</DotLabel>
+              <div className="svc-detail-hero-media" data-reveal="card">
+                <img src={heroImg} alt={`${service.title} project preview`} loading="eager" />
+              </div>
+            </div>
+            <div className="svc-detail-intro-copy">
+              <h2 data-split="words">{service.heroHeadline}</h2>
+              <p data-reveal="up">{service.heroBody}</p>
+              <div className="svc-detail-hero-actions" data-reveal="up">
+                <Pill href={CONTACT_PATH} navigate={navigate}>
+                  Let's talk
+                </Pill>
+              </div>
             </div>
           </div>
-          <div className="svc-detail-intro-copy">
-            <h2 data-split="words">{service.heroHeadline}</h2>
-            <p data-reveal="up">{service.heroBody}</p>
-            <div className="svc-detail-hero-actions" data-reveal="up">
-              <Pill href={CONTACT_PATH} navigate={navigate}>
-                Let's talk
-              </Pill>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="svc-stats" data-reveal="panel">
         <div className="svc-container">
@@ -635,15 +642,17 @@ export function ServiceDetail({ slug, navigate }) {
         </div>
       </section>
 
-      <section className="svc-work-strip" data-reveal="panel">
-        <div className="svc-container">
-          <div className="svc-section-head svc-section-head-row">
-            <DotLabel>Works</DotLabel>
-            <h2 data-split="words">Selected projects</h2>
+      {slug !== 'website-design' ? (
+        <section className="svc-work-strip" data-reveal="panel">
+          <div className="svc-container">
+            <div className="svc-section-head svc-section-head-row">
+              <DotLabel>Works</DotLabel>
+              <h2 data-split="words">Selected projects</h2>
+            </div>
+            <ProjectRail works={works} serviceTitle={service.shortTitle} navigate={navigate} />
           </div>
-          <ProjectRail works={works} serviceTitle={service.shortTitle} navigate={navigate} />
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="svc-pills-nav" data-reveal="panel">
         <div className="svc-container">

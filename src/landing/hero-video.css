@@ -7,8 +7,9 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: inherit;
-  overflow: hidden;
+  /* no radius/overflow: the hero card element is the single clip owner —
+     nested same-edge rounded clips compound their antialiasing at the
+     fractional widths of the size morph (dark hairline on the right edge) */
   background: #08130d;
   /* same inner slide/scale entrance the proof ledger played (hero.css) */
   animation: pm2HeroCardImg 1.9s cubic-bezier(0.22, 0.8, 0.24, 1) 0.55s backwards;
@@ -20,9 +21,13 @@
 
 .pm2-hero-video {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  /* bleeds past the card's clip on every side: video layers pixel-snap
+     their size, and a snapped edge falling short of the card's fractional
+     edge showed the black base as a flickering line during the size morph.
+     object-fit: cover means the 1.5px overscan crops invisibly. */
+  inset: -1.5px;
+  width: calc(100% + 3px);
+  height: calc(100% + 3px);
   object-fit: cover; /* the portrait card crops the 16:9 reel, like any card media */
   pointer-events: none; /* the wrap owns hover/click */
 }

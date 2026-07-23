@@ -260,36 +260,64 @@ export default function VoiceAgent({ navigate }) {
   return (
     <section className="va-section" id="live-demo" aria-labelledby="va-heading" data-reveal="panel">
       <div className="va-card">
-        <div className="va-head">
-          <span className="va-eyebrow" data-reveal="up">Live clinic demo</span>
-          <h2 id="va-heading" data-reveal="line">Talk to a clinic AI receptionist</h2>
-          <p className="va-sub" data-reveal="up">A live inbound agent demo. In production it connects to your CRM, pulls up patient records, books, and reschedules in real time. Hit play and talk to it.</p>
+        <div className="va-ambient" aria-hidden="true">
+          <span /><span /><span />
         </div>
 
-        {/* Agent Card — animates subtly when live */}
-        <div className={`va-agent-box ${isTalking ? 'va-agent-box--live' : ''}`}>
-          <AgentOrb active={isTalking} onClick={!isTalking && conversationState !== 'ended' ? requestMicAndStart : undefined} />
-          <span className="va-card-sector">{AGENT.sector}</span>
-          <strong className="va-card-title">{AGENT.title}</strong>
-          <span className="va-card-desc">{AGENT.description}</span>
+        <div className="va-demo-grid">
+          <div className="va-head">
+            <span className="va-eyebrow" data-reveal="up">
+              Live clinic demo
+            </span>
+            <h2 id="va-heading" data-reveal="line">
+              <span className="va-heading-line">Don’t just read about it.</span>
+              <span className="va-heading-line">Talk to it.</span>
+            </h2>
+            <p className="va-sub" data-reveal="up">This is a real live inbound agent, not a recording. In production it connects to your CRM, pulls up patient records, books, and reschedules in real time.</p>
 
-          {conversationState === 'active' && (
-            <div className="va-card-live">
-              <span className="va-live-dot" />
-              <span className="va-card-live-label">Live</span>
-              <TimerBadge secondsLeft={secondsLeft} />
+            <div className="va-capabilities" data-reveal="up" aria-label="Demo capabilities">
+              <span>Books appointments</span>
+              <span>Reschedules visits</span>
+              <span>Answers patient questions</span>
             </div>
-          )}
-          {conversationState === 'connecting' && (
-            <div className="va-card-live va-card-live--connecting">
-              <span className="va-spinner" />
-              <span className="va-card-live-label">Connecting…</span>
-            </div>
-          )}
-        </div>
 
-        {/* Controls */}
-        <div className="va-controls">
+            <div className="va-try-prompt" data-reveal="up">
+              <span className="va-try-label">Try saying</span>
+              <p>“I’d like to book a consultation for next Tuesday.”</p>
+            </div>
+          </div>
+
+          <div className="va-stage">
+            <div className="va-stage-top">
+              <span className="va-stage-status"><i aria-hidden="true" /> Agent online</span>
+              <span>60 sec live session</span>
+            </div>
+
+            {/* Agent Card — animates subtly when live */}
+            <div className={`va-agent-box ${isTalking ? 'va-agent-box--live' : ''}`}>
+              <span className="va-sound-orbit" aria-hidden="true" />
+              <AgentOrb active={isTalking} onClick={!isTalking && conversationState !== 'ended' ? requestMicAndStart : undefined} />
+              <span className="va-card-sector">{AGENT.sector}</span>
+              <strong className="va-card-title">{AGENT.title}</strong>
+              <span className="va-card-desc">{AGENT.description}</span>
+
+              {conversationState === 'active' && (
+                <div className="va-card-live">
+                  <span className="va-live-dot" />
+                  <span className="va-card-live-label">Live</span>
+                  <TimerBadge secondsLeft={secondsLeft} />
+                </div>
+              )}
+              {conversationState === 'connecting' && (
+                <div className="va-card-live va-card-live--connecting">
+                  <span className="va-spinner" />
+                  <span className="va-card-live-label">Connecting…</span>
+                </div>
+              )}
+            </div>
+
+            {/* Controls */}
+            <div className="va-controls">
           {conversationState === 'idle' && (
             <button className="va-start-btn" onClick={requestMicAndStart} type="button">
               <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
@@ -382,6 +410,15 @@ export default function VoiceAgent({ navigate }) {
               Microphone access is blocked. Enable it in your browser settings to use voice chat.
             </p>
           )}
+            </div>
+
+            <p className="va-privacy-note">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 10V8a5 5 0 0 1 10 0v2M6 10h12v10H6V10Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Microphone access is used only for this conversation.
+            </p>
+          </div>
         </div>
       </div>
     </section>

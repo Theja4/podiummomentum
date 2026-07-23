@@ -68,7 +68,7 @@ function LoopConnector() {
   return (
     <div className="auc-connector" aria-hidden="true">
       <svg viewBox="0 0 40 24" fill="none">
-        <path d="M4 12h28m0 0l-6-6m6 6l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path className="auc-connector-path" d="M4 12h28m0 0l-6-6m6 6l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </div>
   )
@@ -92,16 +92,19 @@ function LoopCard({ item, index }) {
 
   return (
     <article
-      className="auc-card"
+      className={`auc-card auc-card--${item.id}`}
       ref={ref}
       style={{ '--auc-i': index }}
       aria-labelledby={`auc-title-${item.id}`}
     >
       <div className="auc-card-glow" aria-hidden="true" />
       <div className="auc-card-inner">
-        <div className="auc-icon-wrap">
-          <LoopIcon type={item.icon} />
-          <span className="auc-icon-pulse" aria-hidden="true" />
+        <div className="auc-card-top">
+          <div className="auc-icon-wrap">
+            <LoopIcon type={item.icon} />
+            <span className="auc-icon-pulse" aria-hidden="true" />
+          </div>
+          <span className="auc-card-index" aria-hidden="true">0{index + 1}</span>
         </div>
         <span className="auc-tag">{item.tag}</span>
         <h3 id={`auc-title-${item.id}`}>{item.title}</h3>
@@ -123,6 +126,7 @@ export default function AgentUseCases() {
   return (
     <section className="auc-section" id="agent-use-cases" aria-labelledby="auc-heading" data-reveal="panel">
       <div className="auc-card-shell">
+        <div className="auc-ambient" aria-hidden="true"><span /><span /></div>
         <div className="auc-head">
           <span className="auc-eyebrow" data-reveal="up">The growth loop</span>
           <h2 id="auc-heading" data-reveal="line">One agent. Three moves. A loop that feeds itself.</h2>
@@ -155,9 +159,15 @@ export default function AgentUseCases() {
                 <path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 7.7l5.4-.8L12 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
-            <p>
-              <strong>The result:</strong> A self feeding growth engine. More bookings, happier patients, and a rising Google rating that pulls in new leads while you sleep.
-            </p>
+            <div className="auc-result-copy">
+              <span className="auc-result-label">The result</span>
+              <p>A self feeding growth engine. More bookings, happier patients, and a rising Google rating that pulls in new leads while you sleep.</p>
+            </div>
+            <ul className="auc-result-metrics" aria-label="Growth loop advantages">
+              <li>Always on</li>
+              <li>CRM connected</li>
+              <li>Self feeding</li>
+            </ul>
           </div>
         </div>
       </div>

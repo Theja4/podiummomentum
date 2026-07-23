@@ -1,8 +1,13 @@
 /* Privacy Policy page */
-.pp-page {
+main.pp-page {
   min-height: 100vh;
-  background: var(--paper, #fff);
-  padding: 140px 24px 80px;
+  display: block !important;
+  gap: 0 !important;
+  background: var(--paper, #fff) !important;
+  /* Clear the fixed 5rem navigation and preserve a comfortable title gap.
+     The route-specific !important is required because eloqwnt-fidelity.css
+     applies its generic main padding with !important. */
+  padding: 128px 24px 80px !important;
 }
 
 .pp-container {
@@ -80,8 +85,8 @@
 }
 
 @media (max-width: 600px) {
-  .pp-page {
-    padding: 120px 20px 60px;
+  main.pp-page {
+    padding: 112px 20px 64px !important;
   }
 
   .pp-header {
