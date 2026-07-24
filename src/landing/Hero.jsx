@@ -171,6 +171,7 @@ export default function Hero({ navigate }) {
     reducedCleared: false,
     heroPointerEvents: '',
     wipeSettled: false,
+    offscreenHidden: false,
   })
   // Static mode: small screens (no sticky/tilt) or reduced motion — on small
   // screens the compressed MOBILE_JOURNEY runs (wipe → fly → seat into the
@@ -511,7 +512,6 @@ export default function Hero({ navigate }) {
   })
 
   useRafLoop(() => {
-    if (!visible) return
     const panel = panelRef.current
     const card = cardRef.current
     const wipe = wipeRef.current
@@ -524,6 +524,28 @@ export default function Hero({ navigate }) {
       frame.heroPointerEvents = pointerEvents
       if (sectionRef.current) sectionRef.current.style.pointerEvents = pointerEvents
     }
+
+    // When the hero scrolls out of view the loop stops driving the card, but on
+    // the desktop the card is position:fixed — so a scroll that skips the whole
+    // handoff (e.g. the "View selected work" anchor jump to #work) can freeze
+    // its viewport-fixed ghost mid-journey and leave it floating over a later
+    // section. The smoothed clock hasn't caught up to the jumped scroll, so the
+    // last-written opacity is still the resting card's. Force the ghost hidden
+    // and click-through while off-screen; the next visible frame re-derives the
+    // real state, so re-entering the hero on reverse scroll restores it.
+    if (!visible) {
+      if (!frame.offscreenHidden && card) {
+        frame.offscreenHidden = true
+        heroHandoff.ghostOpacity = 0
+        if (!staticRef.current) {
+          card.style.opacity = '0'
+          card.style.pointerEvents = 'none'
+          setHeroPassThrough(true)
+        }
+      }
+      return
+    }
+    frame.offscreenHidden = false
 
     if (staticRef.current) {
       if (!card) return
