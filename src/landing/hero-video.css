@@ -3,16 +3,89 @@
    uses crisp, high-contrast translucent surfaces. */
 
 /* —— card-face preview ——————————————————————————————— */
+/* The mat. The reel shows client work in other brands' colours (cobalt,
+   purple, red), which sat raw against the forest field. A neutral card-stock
+   surround frames that colour instead of letting it collide with the brand
+   palette, and turns the card into a presented object rather than a video
+   pasted into a rectangle.
+   This lives on the PHOTO face only. The scroll wipe covers it bottom-up long
+   before the coverflow handoff, so the seat swap stays pixel-identical to
+   card zero — the mat never reaches that frame. */
 .pm2-hero-video-wrap {
   position: relative;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--pm2-mat, 14px);
   /* no radius/overflow: the hero card element is the single clip owner —
      nested same-edge rounded clips compound their antialiasing at the
      fractional widths of the size morph (dark hairline on the right edge) */
-  background: #08130d;
+  background: linear-gradient(180deg, #f8f6f0 0%, #efece3 100%);
+  /* Defines the bone mat where the card overhangs onto the white page. It is
+     an INSET ring on the mat rather than a ring on .pm2-hero-card, because
+     the card's own box-shadow has to stay byte-identical to the coverflow's
+     first card — the seat swap trades one for the other and any difference
+     would pop. The mat is covered by the wipe long before that frame. */
+  box-shadow: inset 0 0 0 1px rgba(8, 19, 13, 0.09);
   /* same inner slide/scale entrance the proof ledger played (hero.css) */
   animation: pm2HeroCardImg 1.9s cubic-bezier(0.22, 0.8, 0.24, 1) 0.55s backwards;
+}
+
+.pm2-hero-video-frame {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: calc(var(--pm2-card-radius, 26px) - var(--pm2-mat, 14px));
+  overflow: hidden;
+  background: #08130d;
+}
+
+/* caption bar: the reel's identity, and a play affordance that does not
+   depend on a pointer */
+.pm2-hero-video-cap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 2px 1px;
+  color: #0a140f;
+}
+
+.pm2-hero-video-cap-label {
+  font-family: var(--v-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(10, 20, 15, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pm2-hero-video-cap-play {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #08130d;
+  color: #7cf0bd;
+  transition: transform 0.35s var(--v-ease), background 0.35s var(--v-ease);
+}
+
+.pm2-hero-video-cap-play svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+
+.pm2-hero-video-wrap:hover .pm2-hero-video-cap-play,
+.pm2-hero-video-wrap:focus-visible .pm2-hero-video-cap-play {
+  transform: scale(1.12);
+  background: #123a26;
 }
 
 .pm2-hero-video-wrap.is-cursor-on {
@@ -21,13 +94,13 @@
 
 .pm2-hero-video {
   position: absolute;
-  /* bleeds past the card's clip on every side: video layers pixel-snap
-     their size, and a snapped edge falling short of the card's fractional
-     edge showed the black base as a flickering line during the size morph.
-     object-fit: cover means the 1.5px overscan crops invisibly. */
-  inset: -1.5px;
-  width: calc(100% + 3px);
-  height: calc(100% + 3px);
+  /* The 1.5px overscan this used to carry existed because the video edge WAS
+     the card's clipped edge, and a pixel-snapped video layer falling short of
+     the card's fractional edge flashed the black base during the size morph.
+     The mat now owns that edge, so the video sits flush inside its frame. */
+  inset: 0;
+  width: 100%;
+  height: 100%;
   /* The preview is now cut to the card's own aspect (876x1080 ≈ 0.81), so
      cover only absorbs the 1.5px overscan above — it no longer discards half
      the frame. The old .is-end-card rule that switched to object-fit: contain

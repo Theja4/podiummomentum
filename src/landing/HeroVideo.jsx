@@ -165,19 +165,35 @@ export default function HeroVideo() {
           }
         }}
       >
-        <video
-          ref={videoRef}
-          className="pm2-hero-video"
-          src={PREVIEW_SRC}
-          poster={PREVIEW_POSTER}
-          muted
-          loop
-          autoPlay
-          playsInline
-          preload="metadata"
-          tabIndex={-1}
-          aria-hidden="true"
-        />
+        {/* the mat: the reel is a window into OTHER brands' palettes, so it
+            gets a neutral card-stock surround rather than bleeding straight
+            into the forest field */}
+        <div className="pm2-hero-video-frame">
+          <video
+            ref={videoRef}
+            className="pm2-hero-video"
+            src={PREVIEW_SRC}
+            poster={PREVIEW_POSTER}
+            muted
+            loop
+            autoPlay
+            playsInline
+            preload="metadata"
+            tabIndex={-1}
+            aria-hidden="true"
+          />
+        </div>
+        {/* caption bar — also the only PERSISTENT play affordance: the "View"
+            cursor chip is pointer-only, so on touch nothing previously showed
+            that the card opens anything */}
+        <span className="pm2-hero-video-cap">
+          <span className="pm2-hero-video-cap-label">Showreel 2025</span>
+          <span className="pm2-hero-video-cap-play" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 7.5v9l7.5-4.5z" />
+            </svg>
+          </span>
+        </span>
       </div>
       <TrailCursor label="View" show={hovering && !open} moveRef={moveRef} />
       {createPortal(

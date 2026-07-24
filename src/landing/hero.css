@@ -11,8 +11,13 @@
      ultrawide screens so the headline and card never drift apart */
   --pm2-hero-boxw: min(calc(100vw - 2 * var(--pm2-hero-inset)), 1760px);
   --pm2-hero-boxl: calc((100vw - var(--pm2-hero-boxw)) / 2);
-  /* main-branch responsive card column; Hero.jsx mirrors these values */
-  --pm2-hero-cardw: clamp(440px, 32vw, 580px);
+  /* The card's resting width. Hero.jsx's rAF owns the real geometry
+     (portraitW = min(490, max(360, 26vw))); this MUST mirror it exactly,
+     because the forest block's right edge is derived from it below. The two
+     had drifted apart (32vw vs 26vw), which is harmless while the value is
+     only a text-column subtrahend and wrong the moment anything is aligned
+     to the card itself. */
+  --pm2-hero-cardw: clamp(360px, 26vw, 490px);
   --pm2-hero-cardoff: clamp(48px, calc(10vw - 56px), 128px);
   --pm2-hero-colgap: clamp(48px, 4vw, 72px);
   --pm2-hero-padx: clamp(24px, 4vw, 64px);
@@ -45,16 +50,35 @@
 
 /* —— the forest panel ———————————————————————— */
 
+/* The forest field: full bleed on desktop, no inset and no radius. It is the
+   page at this point rather than a block sitting on it, which is what lets the
+   type run at full editorial scale and the bottom rule read as architecture
+   instead of a box edge. (Mobile keeps its inset card treatment below.) */
 .pm2-hero-panel {
   position: absolute;
-  inset: var(--pm2-hero-inset);
+  inset: 0;
   z-index: 2;
-  border-radius: var(--v-radius-panel);
-  /* A restrained brand field: deep forest with one quiet lift toward the
-     showreel. The cleaner surface gives the editorial type room to lead. */
+  border-radius: 0;
+  /* GREEN, not black-with-a-green-tint. The field this replaces measured a
+     median lightness of L8 with 85% of its pixels under L12 — the point where
+     a hue stops being perceived as colour at all. Raising its saturation did
+     nothing, because saturation is invisible at that lightness. Mint is L64
+     and --v-core is L46, so the brand's own signature appeared nowhere at the
+     scale that matters: a studio selling brand work opened on a black page.
+     The legibility argument for staying near-black does not survive checking.
+     Against this field white body copy measures 9.2:1 and the card's bone mat
+     8.5:1 — both still past AAA, with headroom to spare.
+     Structure is a single soft key from the upper left falling off to the
+     lower right: it lands light on the type block so the headline has ground
+     to sit in, and leaves the lower right deepest, which is where the card
+     lives — so the mat separates against the darkest part of the frame rather
+     than fighting a glow behind it. The vignette contains the field now that
+     it bleeds to the viewport edge with no border to stop it. */
   background:
-    radial-gradient(58% 76% at 92% 44%, rgba(103, 224, 163, 0.16), transparent 72%),
-    linear-gradient(128deg, #07160f 0%, #0a2418 58%, #0b3021 100%);
+    radial-gradient(125% 100% at 44% 40%, transparent 50%, rgba(3, 16, 10, 0.42) 100%),
+    radial-gradient(115% 95% at 2% 0%, rgba(124, 240, 189, 0.15), transparent 62%),
+    radial-gradient(75% 62% at 26% 92%, rgba(47, 191, 127, 0.1), transparent 72%),
+    linear-gradient(150deg, #1c6b47 0%, #175838 34%, #124630 66%, #0e3625 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     inset 0 0 0 1px rgba(255, 255, 255, 0.05),
@@ -94,8 +118,11 @@
      viewports; the previous fluid top inset could slide underneath the pill. */
   padding: clamp(68px, 4vw, 76px) var(--pm2-hero-padx)
     clamp(24px, 4vw, 64px);
-  /* the copy centers with the composition box on ultrawide screens, so it
-     stays married to the card instead of hugging the far edge */
+  /* Full-bleed FIELD, contained CONTENT. The field runs edge to edge, but the
+     copy stays inside the composition box so it keeps its measure — and, more
+     importantly, stays married to the card, which is anchored to that same box
+     on the right. Letting the copy hug the true left edge while the card stayed
+     in the box opened a 656px hole between them at 2560. */
   max-width: var(--pm2-hero-boxw);
   margin-inline: auto;
 }
@@ -125,7 +152,10 @@
   font-size: 13px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.66);
+  /* 0.66 was tuned against the old near-black field. The eyebrow sits on the
+     brightest part of the lit field (the key falls top-left, right where it
+     is), so on the emerald ground that alpha measured 3.7:1 — under AA. */
+  color: rgba(255, 255, 255, 0.85);
   animation: pm2HeroFade 0.9s var(--v-ease) 0.05s backwards;
 }
 
@@ -212,8 +242,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
-  /* lead → proof ledger */
-  margin-bottom: clamp(24px, 3.2vh, 42px);
+  /* lead → CTA row */
+  margin-bottom: clamp(26px, 3.4vh, 44px);
   max-width: var(--pm2-hero-colw);
   animation: pm2HeroFade 0.9s var(--v-ease) 0.45s backwards;
 }
@@ -334,10 +364,9 @@
 .pm2-hero-stats {
   display: flex;
   flex-wrap: wrap;
-  max-width: var(--pm2-hero-colw);
-  gap: clamp(20px, 2.4vw, 42px);
-  /* proof ledger → CTA row */
-  margin: 0 0 clamp(28px, 3.6vh, 48px);
+  flex: 0 1 auto;
+  gap: clamp(24px, 3vw, 56px);
+  margin: 0;
   /* load cascade: eyebrow → title → lead → ledger → CTAs → colophon */
   animation: pm2HeroFade 0.9s var(--v-ease) 0.52s backwards;
 }
@@ -374,7 +403,9 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   line-height: 1.3;
-  color: rgba(255, 255, 255, 0.52);
+  /* likewise: 0.52 measured 3.8:1 on the emerald ground. 10.5px mono is small
+     text, so it needs the full 4.5:1, not the large-text allowance. */
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* THE hero card — photo face on top, the mint brand face wiping in from the
@@ -538,7 +569,10 @@
   /* radius kept for the background shape; no overflow clip — the card
      element is the single clip owner */
   border-radius: inherit;
-  background: #08130d;
+  /* matches the mat above it: this layer is only ever visible as the
+     card clip's fractional edge residue, and near-black residue under a
+     bone mat is exactly the dark hairline the clip rules fight elsewhere */
+  background: #f8f6f0;
   transform: none;
   /* NO outward shadows here: they were always fully clipped by the card's
      overflow (invisible), but their near-black paint sits exactly outside
@@ -682,17 +716,29 @@
 
 /* —— bottom row ———————————————————————— */
 
+/* the foot band: proof ledger left, client colophon right, ruled off by one
+   hairline that runs the full width of the field. It is the only element that
+   uses the whole measure, which is what stops the hero reading as a single
+   narrow column of stacked items. */
+.pm2-hero-band {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(28px, 4vw, 80px);
+  /* anchors to the field's floor and collects the composition's leftover
+     height into ONE deliberate gap */
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  /* a floor under that gap, so the band never crowds the CTA row on short
+     viewports where there is no slack left to distribute */
+  padding-top: clamp(20px, 2.8vh, 36px);
+}
+
 .pm2-hero-bottom {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  /* the colophon anchors to the panel's floor; this auto margin is what
-     collects the composition's leftover height into ONE deliberate gap */
-  margin-top: auto;
-  /* and a floor under that gap, so the colophon never crowds the CTA row on
-     short viewports where there is no slack left to distribute */
-  padding-top: clamp(28px, 4vh, 56px);
   animation: pm2HeroFade 0.9s var(--v-ease) 0.66s backwards;
 }
 
@@ -814,7 +860,11 @@
    same animated card; only its resting width steps down with the composition. */
 @media (min-width: 901px) and (max-width: 1100px) {
   .pm2-hero {
-    --pm2-hero-cardw: 400px;
+    /* NO --pm2-hero-cardw override here: the base clamp already resolves to
+       its 360px floor across this whole range, and Hero.jsx's portraitW does
+       too. Pinning 400px made CSS and the rAF disagree, which was invisible
+       while the value only trimmed the text column and became a 20px straddle
+       error the moment the forest block's edge was derived from it. */
     --pm2-hero-cardoff: 28px;
     --pm2-hero-padx: clamp(28px, 4vw, 44px);
   }
@@ -840,6 +890,9 @@
   .pm2-hero-panel {
     position: relative;
     inset: auto;
+    /* the stacked panel is still an inset card here, so it keeps the radius
+       the full-bleed desktop field drops */
+    border-radius: var(--v-radius-panel);
     /* sits BELOW the floating nav pill (10px offset + ~61px tall) with the
        same 10px breathing room the sides get — an even border, the bar
        never inside the green field */
@@ -996,13 +1049,22 @@
     border-radius: inherit;
   }
 
+  /* the stacked panel has no width to place the ledger and the colophon side
+     by side, so the band becomes two rows with the rule still above it */
+  .pm2-hero-band {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    /* the card slot's flex:1 already collects the stacked panel's slack, so
+       the desktop floor would only add dead space here — but the hairline
+       still needs room to breathe off the card above it */
+    padding-top: 16px;
+  }
+
   .pm2-hero-bottom {
     flex-direction: column;
     align-items: flex-start;
     gap: 14px;
-    /* the card slot's flex:1 already collects the stacked panel's slack, so
-       the desktop colophon floor would only add dead space here */
-    padding-top: 0;
   }
 
   .pm2-hero-trust-label {

@@ -998,18 +998,6 @@ export default function Hero({ navigate }) {
               <p className="pm2-hero-lead">{HERO.lead}</p>
             </div>
 
-            {/* proof ledger: the claim above is abstract, these are not. It
-                sits between the lead and the CTA because that is the order the
-                visitor needs it in — claim, evidence, action. */}
-            <dl className="pm2-hero-stats" ref={statsRef}>
-              {HERO.stats.map(stat => (
-                <div className="pm2-hero-stat" key={stat.label}>
-                  <dt className="pm2-hero-stat-value">{stat.value}</dt>
-                  <dd className="pm2-hero-stat-label">{stat.label}</dd>
-                </div>
-              ))}
-            </dl>
-
             <div className="pm2-hero-mid" ref={ctasRef}>
               <div className="pm2-hero-ctas">
                 <a
@@ -1044,40 +1032,57 @@ export default function Hero({ navigate }) {
               </div>
             )}
 
-            <div className="pm2-hero-bottom" ref={bottomRef}>
-              <div className="pm2-hero-trust">
-                <span className="pm2-hero-trust-label">{HERO.trust}</span>
-                <span className="pm2-hero-logos">
-                  {HERO.logos.map(logo => (
-                    <span className="pm2-hero-logo" key={logo.name}>
-                      {logo.mark && (
-                        <img
-                          src={logo.mark}
-                          alt=""
-                          className={logo.chip ? 'is-chip' : 'is-mark'}
-                          width="22"
-                          height="22"
-                          loading="lazy"
-                          decoding="async"
-                          draggable="false"
-                        />
-                      )}
-                      {logo.word ? (
-                        <img
-                          src={logo.word}
-                          alt={logo.name}
-                          className="is-word"
-                          height="15"
-                          loading="lazy"
-                          decoding="async"
-                          draggable="false"
-                        />
-                      ) : (
-                        <span className="pm2-hero-logo-name">{logo.name}</span>
-                      )}
-                    </span>
-                  ))}
-                </span>
+            {/* The foot of the composition: one full-bleed band carrying the
+                proof ledger and the client colophon, ruled off by a hairline
+                that runs the whole width of the field. This is what uses the
+                width — everything above it lives in the left column beside the
+                card, and stacking the ledger there too made the hero one long
+                narrow strip of centred-ish content. */}
+            <div className="pm2-hero-band">
+              <dl className="pm2-hero-stats" ref={statsRef}>
+                {HERO.stats.map(stat => (
+                  <div className="pm2-hero-stat" key={stat.label}>
+                    <dt className="pm2-hero-stat-value">{stat.value}</dt>
+                    <dd className="pm2-hero-stat-label">{stat.label}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <div className="pm2-hero-bottom" ref={bottomRef}>
+                <div className="pm2-hero-trust">
+                  <span className="pm2-hero-trust-label">{HERO.trust}</span>
+                  <span className="pm2-hero-logos">
+                    {HERO.logos.map(logo => (
+                      <span className="pm2-hero-logo" key={logo.name}>
+                        {logo.mark && (
+                          <img
+                            src={logo.mark}
+                            alt=""
+                            className={logo.chip ? 'is-chip' : 'is-mark'}
+                            width="22"
+                            height="22"
+                            loading="lazy"
+                            decoding="async"
+                            draggable="false"
+                          />
+                        )}
+                        {logo.word ? (
+                          <img
+                            src={logo.word}
+                            alt={logo.name}
+                            className="is-word"
+                            height="15"
+                            loading="lazy"
+                            decoding="async"
+                            draggable="false"
+                          />
+                        ) : (
+                          <span className="pm2-hero-logo-name">{logo.name}</span>
+                        )}
+                      </span>
+                    ))}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
