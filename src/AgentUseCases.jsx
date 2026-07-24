@@ -224,7 +224,7 @@ export default function AgentUseCases() {
           <span className="auc-eyebrow" data-reveal="up">The growth loop</span>
           <h2 id="auc-heading" data-reveal="line">A loop that feeds itself.</h2>
           <p className="auc-sub" data-reveal="up">
-            Outbound converts your leads. Inbound books them. The review engine turns happy patients into Google reviews that bring in the next wave. It never stops.
+            Outbound converts your leads. Inbound books them. The review engine turns happy customers into Google reviews that bring in the next wave. It never stops.
           </p>
         </div>
 
