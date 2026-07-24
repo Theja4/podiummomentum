@@ -842,10 +842,11 @@ export default function Carousel({ navigate }) {
     const p = progress.current
     const f = p * (N - 1)
     fRef.current = f
-    // The hero handoff is intentionally artwork-only. Once its ghost has
-    // disappeared into the first real card, reveal the live title and support
-    // copy over a near-immediate beat. Reset immediately when reverse-scroll
-    // re-enters the handoff so no clipped type can reappear on the moving card.
+    // Card zero's live copy arrives with the incoming artwork, not after it: a
+    // card showing only an image reads as broken. The moving ghost rises its
+    // title and action on its own --m window, and this card holds the identical
+    // value until the swap, so the ghost→deck handoff is continuous in both
+    // scroll directions. Once seated, top the reveal up to full.
     const sectionTop = readState.current.sectionTop
     const handoffIsMoving = heroHandoff.ghostOpacity > 0.01
     const handoffIsSeated = !handoffIsMoving && sectionTop <= (window.innerHeight || 1) * 0.08
@@ -854,7 +855,7 @@ export default function Carousel({ navigate }) {
         firstCardCopyRef.current + dt / FIRST_CARD_COPY_REVEAL_MS,
       )
     } else {
-      firstCardCopyRef.current = 0
+      firstCardCopyRef.current = clamp01(heroHandoff.copyReveal || 0)
     }
     const firstCardCopyReveal = easeInOutCubic(firstCardCopyRef.current)
     // The journey owns the displayed size until the pixel-matched swap; the

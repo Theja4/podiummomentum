@@ -438,15 +438,22 @@
   transform: translateY(calc(clamp(0, (var(--m, 0) - 0.3) / 0.35, 1) * 110%));
 }
 
-/* face B contributes only the artwork/visual layer during the handoff. */
+/* Face B carries the coverflow card's whole face during the handoff. Artwork,
+   title and the Explore action share one --m window (see GHOST_FACE_IN_* in
+   Hero.jsx) so the card is never a lone image with no words — that middle state
+   read as a broken card. The copy trails the art by a hair, enough to feel
+   layered rather than pasted on. Carousel.jsx mirrors the same value onto card
+   zero, so the ghost→deck swap cannot blink the copy back out. */
 .pm2-hero-ghost-faceB {
   display: contents; /* children join the ghost's own flex flow */
 }
 
 .pm2-hero-ghost-faceB .pm2-carousel-card-top,
 .pm2-hero-ghost-faceB .pm2-carousel-card-bottom {
-  opacity: 0;
-  visibility: hidden;
+  opacity: clamp(0, calc((var(--m, 0) - 0.54) / 0.3), 1);
+  transform: translateY(
+    calc((1 - clamp(0, (var(--m, 0) - 0.54) / 0.3, 1)) * 12px)
+  );
 }
 
 .pm2-hero-ghost-faceB .pm2-carousel-card-mid {

@@ -7,6 +7,11 @@ export const heroHandoff = {
   ghostOpacity: 0,
   // Desktop shape choreography shared by the moving hero and card zero.
   cardExpansion: 0,
+  // How far the card face's live copy (title, support line, Explore) has risen
+  // in. The ghost drives it off its own --m window so the copy arrives with the
+  // artwork instead of after the seat; card zero mirrors the value so the
+  // ghost→deck swap can never blink the text back out.
+  copyReveal: 0,
   // Exactly one layer owns card zero on desktop. The phase is latched at the
   // pinned boundary so fast scroll reversals cannot make the hero ghost and
   // the coverflow card trade places while running on different clocks.

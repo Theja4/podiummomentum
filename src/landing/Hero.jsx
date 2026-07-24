@@ -82,6 +82,12 @@ const CLOCK_MAX_SPEED = 0.9 // normalized choreography progress / second
 const CLOCK_BOUND_MAX_SPEED = 1.2
 const CLOCK_BOUND_SNAP_EPS = 0.003
 const HANDOFF_REVERSE_HYSTERESIS = 3
+// The ghost's copy (title, support line, Explore) rises on this slice of the
+// content morph (--m), a hair behind its artwork, so the card in flight is
+// never a lone image with no words. Keep in sync with hero.css.
+const GHOST_COPY_IN_FROM = 0.54
+const GHOST_COPY_IN_SPAN = 0.3
+const ghostCopyIn = m => clamp01((m - GHOST_COPY_IN_FROM) / GHOST_COPY_IN_SPAN)
 const MOBILE_CLOCK_MAX_SPEED = 1.8
 // Cross the services sticky boundary by a couple of CSS pixels when the
 // magnetic handoff seats. A mathematically exact section-top target can be
@@ -361,6 +367,7 @@ export default function Hero({ navigate }) {
       // release the coverflow's first card when the hero unmounts
       heroHandoff.ghostOpacity = 0
       heroHandoff.cardExpansion = 0
+      heroHandoff.copyReveal = 0
       heroHandoff.phase = 'journey'
     }
   }, [])
@@ -546,6 +553,7 @@ export default function Hero({ navigate }) {
         if (!frame.reducedCleared) {
           frame.reducedCleared = true
           heroHandoff.ghostOpacity = 0
+          heroHandoff.copyReveal = 1
           card.style.transform = ''
           card.style.opacity = ''
           card.style.removeProperty('--m')
@@ -581,6 +589,7 @@ export default function Hero({ navigate }) {
         // reduced motion on mobile: the card holds its rest fit, no journey
         setHeroPassThrough(false)
         heroHandoff.ghostOpacity = 0
+        heroHandoff.copyReveal = 1
         card.style.transform = `rotate(${M.restTilt}deg) scale(${restS.toFixed(4)})`
         card.style.opacity = ''
         card.style.pointerEvents = ''
@@ -641,6 +650,7 @@ export default function Hero({ navigate }) {
       card.style.setProperty('--m', m.toFixed(4))
       // the coverflow keeps its own first card hidden until we've landed
       heroHandoff.ghostOpacity = rise >= M.flyFrom ? cOp : 0
+      heroHandoff.copyReveal = ghostCopyIn(m)
       return
     }
 
@@ -862,6 +872,7 @@ export default function Hero({ navigate }) {
       card.style.setProperty('--m', m.toFixed(4))
       // the coverflow keeps its own first card hidden until we've landed
       heroHandoff.ghostOpacity = s >= CARD_JOURNEY.slideFrom ? cOp : 0
+      heroHandoff.copyReveal = ghostCopyIn(m)
     }
   })
 
