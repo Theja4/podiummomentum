@@ -16,6 +16,13 @@
   --pm2-hero-cardoff: clamp(48px, calc(10vw - 56px), 128px);
   --pm2-hero-colgap: clamp(48px, 4vw, 72px);
   --pm2-hero-padx: clamp(24px, 4vw, 64px);
+  /* the copy column: everything in the left stack is bounded by this so no
+     member can run under the card. Was inlined at each call site, which is
+     how the proof ledger initially escaped the column and spanned the panel. */
+  --pm2-hero-colw: calc(
+    var(--pm2-hero-boxw) - var(--pm2-hero-padx) - var(--pm2-hero-cardoff) -
+      var(--pm2-hero-cardw) - var(--pm2-hero-colgap)
+  );
   position: relative;
   height: 230vh;
   /* transparent: the landing root (.pm2) provides the white; the carousel's
@@ -75,7 +82,14 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* The copy stack reads as ONE composed block — title, lead, proof ledger,
+     CTAs — held together by its own deliberate margins; the trust colophon is
+     pushed to the panel's floor by its own auto margin. The old
+     space-between distributed every spare pixel into voids BETWEEN members of
+     that block, so the taller the viewport the emptier the hero looked (268px
+     of dead air at 1440, 385px at 1728 — over a third of the screen). Slack
+     now collects in exactly one intentional place, above the colophon. */
+  justify-content: flex-start;
   /* Keep the eyebrow below the floating navigation even on short desktop
      viewports; the previous fluid top inset could slide underneath the pill. */
   padding: clamp(68px, 4vw, 76px) var(--pm2-hero-padx)
@@ -92,6 +106,13 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  /* This auto margin and the colophon's split the panel's leftover height
+     between them, which optically centres the copy stack against the card
+     (fixed at 50vh) instead of pinning the stack to the top padding and
+     dumping every spare pixel into one hole above the colophon. An auto
+     margin can only ever ADD to the top padding, so the eyebrow keeps its
+     clearance under the floating nav pill at every height. */
+  margin-top: auto;
   margin-bottom: clamp(20px, 2.5vh, 36px);
 }
 
@@ -121,10 +142,7 @@
 
 .pm2-hero-title {
   margin: 0;
-  max-width: calc(
-    var(--pm2-hero-boxw) - var(--pm2-hero-padx) - var(--pm2-hero-cardoff) -
-      var(--pm2-hero-cardw) - var(--pm2-hero-colgap)
-  );
+  max-width: var(--pm2-hero-colw);
   font-size: clamp(
     62px,
     5.8vw,
@@ -180,12 +198,13 @@
 /* —— middle row: copy + floating card ———————————————————————— */
 
 .pm2-hero-mid {
-  flex: 1 1 auto;
+  /* never absorb slack: the block's spacing is set by its members' margins,
+     and the leftover height belongs to the gap above the colophon */
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: clamp(20px, 3vw, 48px);
   min-height: 0;
-  padding: clamp(8px, 1.2vh, 16px) 0;
 }
 
 .pm2-hero-copy {
@@ -193,10 +212,9 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
-  max-width: calc(
-    var(--pm2-hero-boxw) - var(--pm2-hero-padx) - var(--pm2-hero-cardoff) -
-      var(--pm2-hero-cardw) - var(--pm2-hero-colgap)
-  );
+  /* lead → proof ledger */
+  margin-bottom: clamp(24px, 3.2vh, 42px);
+  max-width: var(--pm2-hero-colw);
   animation: pm2HeroFade 0.9s var(--v-ease) 0.45s backwards;
 }
 
@@ -235,7 +253,7 @@
   flex-wrap: wrap;
   gap: 24px;
   margin-top: 0;
-  animation: pm2HeroFade 0.9s var(--v-ease) 0.5s backwards;
+  animation: pm2HeroFade 0.9s var(--v-ease) 0.59s backwards;
 }
 
 .pm2-hero-ctas .pm2-pill {
@@ -310,18 +328,26 @@
   height: 16px;
 }
 
+/* the proof ledger — three outcomes divided by hairlines, the same editorial
+   device the service cards use. It is a <dl>, so the browser's own list
+   margins have to be cleared before the flex row will sit flush. */
 .pm2-hero-stats {
   display: flex;
-  gap: clamp(16px, 2vw, 32px);
-  margin-top: clamp(4px, 1vh, 12px);
+  flex-wrap: wrap;
+  max-width: var(--pm2-hero-colw);
+  gap: clamp(20px, 2.4vw, 42px);
+  /* proof ledger → CTA row */
+  margin: 0 0 clamp(28px, 3.6vh, 48px);
+  /* load cascade: eyebrow → title → lead → ledger → CTAs → colophon */
+  animation: pm2HeroFade 0.9s var(--v-ease) 0.52s backwards;
 }
 
 .pm2-hero-stat {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding-left: 16px;
-  border-left: 1px solid rgba(255, 255, 255, 0.14);
+  gap: 7px;
+  padding-left: clamp(20px, 2.4vw, 42px);
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .pm2-hero-stat:first-child {
@@ -330,19 +356,25 @@
 }
 
 .pm2-hero-stat-value {
-  font-size: 28px;
+  margin: 0;
+  /* the headline runs 62–96px; at a flat 28px the proof read as a footnote
+     rather than the second voice in the composition */
+  font-size: clamp(30px, 2.3vw, 38px);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   line-height: 1;
   color: #fff;
+  font-variant-numeric: tabular-nums;
 }
 
 .pm2-hero-stat-label {
+  margin: 0;
   font-family: var(--v-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.52);
 }
 
 /* THE hero card — photo face on top, the mint brand face wiping in from the
@@ -655,8 +687,13 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  margin-top: clamp(12px, 2vh, 20px);
-  animation: pm2HeroFade 0.9s var(--v-ease) 0.55s backwards;
+  /* the colophon anchors to the panel's floor; this auto margin is what
+     collects the composition's leftover height into ONE deliberate gap */
+  margin-top: auto;
+  /* and a floor under that gap, so the colophon never crowds the CTA row on
+     short viewports where there is no slack left to distribute */
+  padding-top: clamp(28px, 4vh, 56px);
+  animation: pm2HeroFade 0.9s var(--v-ease) 0.66s backwards;
 }
 
 /* trust strip: a quiet editorial colophon, not a pill-on-pill widget */
@@ -854,11 +891,13 @@
     flex: 0 0 auto;
     flex-direction: column;
     align-items: stretch;
-    margin-top: -10px; /* Bring buttons closer to subtext */
   }
 
+  /* the stacked panel spaces its children with .pm2-hero-inner's own gap —
+     the desktop block's margins would stack on top of it */
   .pm2-hero-copy {
     max-width: 38ch;
+    margin-bottom: 0;
   }
 
   .pm2-hero-lead {
@@ -892,17 +931,27 @@
     font-size: 12px;
   }
 
+  /* --pm2-hero-colw is a DESKTOP measure (box minus the card column); below
+     900px the card column is wider than the viewport, so it resolves
+     negative and a max-width built on it collapses to zero. The title and
+     lead release it here too. */
   .pm2-hero-stats {
-    gap: 12px 16px;
-    margin-top: 0;
+    max-width: none;
+    gap: 12px 18px;
+    margin: 0;
+  }
+
+  .pm2-hero-stat {
+    padding-left: 18px;
   }
 
   .pm2-hero-stat-value {
-    font-size: 19px;
+    font-size: 22px;
   }
 
   .pm2-hero-stat-label {
     font-size: 9px;
+    letter-spacing: 0.1em;
   }
 
   /* the open field in the panel's lower half — the card's rest slot; the
@@ -951,6 +1000,9 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 14px;
+    /* the card slot's flex:1 already collects the stacked panel's slack, so
+       the desktop colophon floor would only add dead space here */
+    padding-top: 0;
   }
 
   .pm2-hero-trust-label {
@@ -980,13 +1032,22 @@
     clip-path: inset(100% 0 0 0 round 22px);
   }
 
+  /* hold the three-up ledger on one row at phone widths: the columns shrink
+     and the labels wrap to two lines, which reads far better than the row
+     breaking and stranding a lone stat with a divider under the other two */
   .pm2-hero-stats {
-    flex-wrap: wrap;
-    gap: 14px 18px;
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .pm2-hero-stat {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 12px;
   }
 
   .pm2-hero-stat-value {
-    font-size: 20px;
+    font-size: 21px;
   }
 
   .pm2-hero-logos {
@@ -1059,10 +1120,14 @@
     animation: none !important;
   }
 
+  /* every member of the load cascade, or the ones left out keep animating
+     for exactly the visitors who asked us not to */
   .pm2-hero-panel,
   .pm2-hero-line-in,
   .pm2-hero-eyebrow,
   .pm2-hero-copy,
+  .pm2-hero-stats,
+  .pm2-hero-ctas,
   .pm2-hero-card,
   .pm2-hero-bottom {
     animation: none !important;

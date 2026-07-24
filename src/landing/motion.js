@@ -117,10 +117,19 @@ export function useProgress(
   { smooth = 0.16, mode = 'travel', maxSpeed = 0.9, active = true } = {},
 ) {
   const out = useRef(0)
+  // False whenever the follower below sat out a frame — at mount, and for
+  // every span the section spent inactive (off-screen). Scroll keeps moving
+  // without it, so on resume the stored progress describes a position the page
+  // has long left: easing from there scrubs the section forward on its own
+  // clock while the visitor is scrolling the other way. Snap instead.
+  const synced = useRef(false)
   // Read phase: rect reads land on clean layout, and every write-phase
   // consumer sees this frame's fresh value regardless of mount order.
   useRafRead(dt => {
-    if (!active) return
+    if (!active) {
+      synced.current = false
+      return
+    }
     const el = ref.current
     if (!el) return
     const r = el.getBoundingClientRect()
@@ -130,9 +139,11 @@ export function useProgress(
     else if (mode === 'enter') raw = clamp01((vh - r.top) / (vh * 0.65))
     else raw = clamp01((vh - r.top) / (vh + r.height))
     // Snap to bounds so resting states are exact.
-    if (raw === 0 && out.current < 0.001) out.current = 0
+    if (!synced.current) out.current = raw
+    else if (raw === 0 && out.current < 0.001) out.current = 0
     else if (raw === 1 && out.current > 0.999) out.current = 1
     else out.current = smoothToward(out.current, raw, smooth, dt, maxSpeed)
+    synced.current = true
   })
   return out
 }

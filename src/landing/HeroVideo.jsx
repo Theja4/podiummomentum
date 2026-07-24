@@ -9,14 +9,60 @@ import { createPortal } from 'react-dom'
 import TrailCursor from './TrailCursor.jsx'
 import './hero-video.css'
 
-const SRC = '/assets/showreel-2025.mp4'
-const POSTER = '/assets/showreel-2025-poster.jpg'
-const END_CARD_SECONDS = 4
+// Two cuts of one reel. The card is a PORTRAIT box (aspect ~0.81), so the
+// 16:9 master lost 54% of every frame's width to object-fit: cover — slicing
+// type mid-word — and 28% of its running time was near-blank at that crop, so
+// the hero's centrepiece regularly rendered as a flat white slab. PREVIEW is a
+// purpose-built vertical cut: six segments chosen to survive the portrait
+// frame, each with its own crop offset, every flash and blank run removed.
+// 18.6s / 2.8MB against the master's 111s / 35MB.
+const PREVIEW_SRC = '/assets/showreel-2025-portrait.mp4'
+const PREVIEW_POSTER = '/assets/showreel-2025-portrait-poster.jpg'
+// The lightbox still plays the full 16:9 master, with sound and nothing cropped.
+const FULL_SRC = '/assets/showreel-2025.mp4'
 
-function isEndCardFrame(video, time = video?.currentTime) {
-  if (!video || !Number.isFinite(video.duration) || !Number.isFinite(time)) return false
-  const remaining = video.duration - time
-  return remaining > 0 && remaining <= END_CARD_SECONDS
+// Where each preview segment was lifted from in the master, so opening and
+// closing the lightbox still continues from the frame on screen rather than
+// jumping. Keep in sync with the ffmpeg trim list that built the preview.
+const SEGMENTS = [
+  { out: 0.0, src: 29.9, dur: 2.2 },
+  { out: 2.2, src: 8.6, dur: 3.2 },
+  { out: 5.4, src: 60.2, dur: 3.2 },
+  { out: 8.6, src: 71.8, dur: 2.8 },
+  { out: 11.4, src: 84.8, dur: 3.6 },
+  { out: 15.0, src: 99.8, dur: 3.6 },
+]
+
+// preview timeline → master timeline
+function previewToFull(t) {
+  if (!Number.isFinite(t)) return 0
+  for (const s of SEGMENTS) {
+    if (t >= s.out && t < s.out + s.dur) return s.src + (t - s.out)
+  }
+  return SEGMENTS[0].src
+}
+
+// master timeline → preview timeline. The master runs 111s and the preview
+// only samples 18.6s of it, so a viewer who scrubs the lightbox into footage
+// the preview never shows has no exact seat: fall back to the start of the
+// segment nearest in the MASTER's timeline. Note SEGMENTS is ordered by `out`,
+// not by `src` (the preview opens on footage from 29.9s), so this has to
+// search by distance rather than assume the list is sorted by source time.
+function fullToPreview(t) {
+  if (!Number.isFinite(t)) return 0
+  for (const s of SEGMENTS) {
+    if (t >= s.src && t < s.src + s.dur) return s.out + (t - s.src)
+  }
+  let best = SEGMENTS[0]
+  let bestGap = Infinity
+  for (const s of SEGMENTS) {
+    const gap = t < s.src ? s.src - t : t - (s.src + s.dur)
+    if (gap < bestGap) {
+      bestGap = gap
+      best = s
+    }
+  }
+  return best.out
 }
 
 export default function HeroVideo() {
@@ -24,7 +70,6 @@ export default function HeroVideo() {
   const modalVideoRef = useRef(null)
   const moveRef = useRef({ x: 0, y: 0 }) // viewport coords for the cursor chip
   const [hovering, setHovering] = useState(false)
-  const [showingEndCard, setShowingEndCard] = useState(false)
   const [open, setOpen] = useState(false)
 
   // muted inline autoplay — set as a property; the attribute alone is flaky.
@@ -62,11 +107,11 @@ export default function HeroVideo() {
     const t = v && Number.isFinite(v.currentTime) ? v.currentTime : 0
     v?.pause()
     setOpen(true)
-    // continue where the preview left off, now with sound
+    // continue from the frame on screen, now uncropped and with sound
     requestAnimationFrame(() => {
       const mv = modalVideoRef.current
       if (!mv) return
-      try { mv.currentTime = t } catch {}
+      try { mv.currentTime = previewToFull(t) } catch {}
       mv.muted = false
       mv.play().catch(() => {})
     })
@@ -77,18 +122,13 @@ export default function HeroVideo() {
     const t = mv && Number.isFinite(mv.currentTime) ? mv.currentTime : 0
     mv?.pause()
     setOpen(false)
-    // hand the time back to the muted preview so the reel never restarts
+    // hand the position back to the muted preview so the reel never restarts
     const v = videoRef.current
     if (v) {
-      try { v.currentTime = t } catch {}
+      try { v.currentTime = fullToPreview(t) } catch {}
       v.muted = true
-      setShowingEndCard(isEndCardFrame(v, t))
       v.play().catch(() => {})
     }
-  }
-
-  const syncInlineFraming = e => {
-    setShowingEndCard(isEndCardFrame(e.currentTarget))
   }
 
   useEffect(() => {
@@ -105,11 +145,9 @@ export default function HeroVideo() {
   return (
     <>
       <div
-        className={[
-          'pm2-hero-video-wrap',
-          hovering ? 'is-cursor-on' : '',
-          showingEndCard ? 'is-end-card' : '',
-        ].filter(Boolean).join(' ')}
+        className={['pm2-hero-video-wrap', hovering ? 'is-cursor-on' : '']
+          .filter(Boolean)
+          .join(' ')}
         role="button"
         tabIndex={0}
         aria-label="Play the Podium Momentum showreel"
@@ -130,8 +168,8 @@ export default function HeroVideo() {
         <video
           ref={videoRef}
           className="pm2-hero-video"
-          src={SRC}
-          poster={POSTER}
+          src={PREVIEW_SRC}
+          poster={PREVIEW_POSTER}
           muted
           loop
           autoPlay
@@ -139,10 +177,6 @@ export default function HeroVideo() {
           preload="metadata"
           tabIndex={-1}
           aria-hidden="true"
-          onLoadedMetadata={syncInlineFraming}
-          onDurationChange={syncInlineFraming}
-          onTimeUpdate={syncInlineFraming}
-          onSeeked={syncInlineFraming}
         />
       </div>
       <TrailCursor label="View" show={hovering && !open} moveRef={moveRef} />
@@ -162,7 +196,7 @@ export default function HeroVideo() {
                 <video
                   ref={modalVideoRef}
                   className="pm2-video-modal-vid"
-                  src={SRC}
+                  src={FULL_SRC}
                   controls
                   playsInline
                   autoPlay

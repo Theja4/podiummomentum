@@ -129,6 +129,8 @@ export default function Hero({ navigate }) {
   const photoRef = useRef(null)
   const titleRef = useRef(null)
   const copyBlockRef = useRef(null)
+  const statsRef = useRef(null)
+  const ctasRef = useRef(null)
   const bottomRef = useRef(null)
   const carouselRef = useRef(null)
   const card0Ref = useRef(null)
@@ -138,7 +140,11 @@ export default function Hero({ navigate }) {
   // Every layout measurement for the frame, gathered in the shared READ
   // phase (clean layout — no forced reflow), plus the unified clock.
   const measured = useRef({
-    init: false,
+    // False whenever the clocks below have NOT been advanced against live
+    // scroll on the previous frame — at mount, and after every span the read
+    // phase sat out because the hero was off-screen. The next visible frame
+    // snaps them to the raw scroll position instead of easing toward it.
+    synced: false,
     heroTop: 0,
     heroLeft: 0,
     heroHeight: 0,
@@ -158,7 +164,6 @@ export default function Hero({ navigate }) {
     rise: 0, // derived: services-rise progress, SAME clock as s
     rawRise: 0, // unsmoothed rise — the mobile journey stays scroll-locked
     mobileRise: 0,
-    mobileInit: false,
   })
 
   const cardCur = useRef({ x: 0, y: 0, r: 0 })
@@ -378,7 +383,17 @@ export default function Hero({ navigate }) {
   // the unified clock update. The write loop below only consumes. ——
   useRafRead(dt => {
     const m = measured.current
-    if (!visible) return
+    if (!visible) {
+      // The clocks below only advance on visible frames, so every off-screen
+      // span leaves them frozen at the position the hero was last seen in.
+      // Re-arm the snap: without it, returning after an in-page anchor jump
+      // (the hero's own "View selected work" → #work) resumed easing from that
+      // frozen value, replaying the whole flight FORWARD — at the clock's
+      // capped speed, over about a second of wall time — while the visitor was
+      // scrolling up. That is the reverse-scroll chop this guards.
+      m.synced = false
+      return
+    }
     const card = cardRef.current
     const vh = window.innerHeight || 1
 
@@ -435,9 +450,9 @@ export default function Hero({ navigate }) {
     const stickyEnd = Math.max(0.0001, clamp01(stickySpan / seatSpan))
     const riseStart = Math.min(0.9999, clamp01((seatSpan - vh) / seatSpan))
     const rawU = clamp01((scrollY - heroDocY) / seatSpan)
-    if (!m.init) {
-      // a restored scroll position must not play a catch-up flight on load
-      m.init = true
+    if (!m.synced) {
+      // a restored scroll position — or a return from off-screen — must not
+      // play a catch-up flight; the clock simply IS wherever scroll says
       m.u = rawU
     } else if (rawU === 0 && m.u < 0.001) {
       m.u = 0 // exact bounds so resting transforms clear and text is crisp
@@ -461,8 +476,7 @@ export default function Hero({ navigate }) {
         : CLOCK_MAX_SPEED
       m.u = smoothToward(m.u, rawU, clockSmooth, dt, clockMaxSpeed)
     }
-    if (!m.mobileInit) {
-      m.mobileInit = true
+    if (!m.synced) {
       m.mobileRise = m.rawRise
     } else if (m.rawRise === 0 && m.mobileRise < 0.001) {
       m.mobileRise = 0
@@ -480,6 +494,7 @@ export default function Hero({ navigate }) {
         mobileAtBound ? Infinity : MOBILE_CLOCK_MAX_SPEED,
       )
     }
+    m.synced = true
     m.s = range(m.u, 0, stickyEnd)
     m.rise = range(m.u, riseStart, 1)
 
@@ -536,7 +551,17 @@ export default function Hero({ navigate }) {
     if (!visible) {
       if (!frame.offscreenHidden && card) {
         frame.offscreenHidden = true
+        // Hand card zero to the deck outright. The hero is the page's first
+        // section, so out of view can only mean the visitor is somewhere past
+        // the entire handoff — the journey is over by definition. Leaving the
+        // last mid-flight values published here stranded the coverflow: it
+        // read `phase: 'journey'`, pinned its own progress to zero and kept
+        // card zero hidden, so scrolling back up through services after the
+        // #work jump showed an empty deck with no card zero at all.
         heroHandoff.ghostOpacity = 0
+        heroHandoff.phase = 'deck'
+        heroHandoff.cardExpansion = 1
+        heroHandoff.copyReveal = 1
         if (!staticRef.current) {
           card.style.opacity = '0'
           card.style.pointerEvents = 'none'
@@ -722,12 +747,18 @@ export default function Hero({ navigate }) {
     }
 
     // —— hero copy exit: as the scroll begins the text lifts out in a
-    // stagger (title → lead/CTAs/stats → trust strip), ahead of the panel's
-    // spin. Progress-driven, so it plays in reverse on the way back up. ——
+    // stagger (title → lead → stats → CTAs → trust strip), ahead of the
+    // panel's spin. Progress-driven, so it plays in reverse on the way back
+    // up. Every member of the copy stack must appear here: the CTA row was
+    // once omitted, so it stayed at full opacity while everything around it
+    // lifted away, leaving an orphaned button floating in a bare panel until
+    // the panel's own fade began at s=0.62. ——
     const exits = [
       [titleRef.current, 0, 0.18],
       [copyBlockRef.current, 0.05, 0.23],
-      [bottomRef.current, 0.1, 0.28],
+      [statsRef.current, 0.08, 0.26],
+      [ctasRef.current, 0.11, 0.29],
+      [bottomRef.current, 0.14, 0.32],
     ]
     for (const [el, from, to] of exits) {
       if (!el) continue
@@ -967,7 +998,19 @@ export default function Hero({ navigate }) {
               <p className="pm2-hero-lead">{HERO.lead}</p>
             </div>
 
-            <div className="pm2-hero-mid">
+            {/* proof ledger: the claim above is abstract, these are not. It
+                sits between the lead and the CTA because that is the order the
+                visitor needs it in — claim, evidence, action. */}
+            <dl className="pm2-hero-stats" ref={statsRef}>
+              {HERO.stats.map(stat => (
+                <div className="pm2-hero-stat" key={stat.label}>
+                  <dt className="pm2-hero-stat-value">{stat.value}</dt>
+                  <dd className="pm2-hero-stat-label">{stat.label}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className="pm2-hero-mid" ref={ctasRef}>
               <div className="pm2-hero-ctas">
                 <a
                   className="pm2-pill pm2-pill--white"

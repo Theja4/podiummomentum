@@ -28,21 +28,13 @@
   inset: -1.5px;
   width: calc(100% + 3px);
   height: calc(100% + 3px);
-  object-fit: cover; /* the portrait card crops the 16:9 reel, like any card media */
+  /* The preview is now cut to the card's own aspect (876x1080 ≈ 0.81), so
+     cover only absorbs the 1.5px overscan above — it no longer discards half
+     the frame. The old .is-end-card rule that switched to object-fit: contain
+     went with it: it existed solely to rescue the 16:9 master's brand lockup
+     from this crop, and the lockup now plays uncropped in the lightbox. */
+  object-fit: cover;
   pointer-events: none; /* the wrap owns hover/click */
-}
-
-/* The reel is intentionally cinematic/cropped while it plays in the hero
-   card. For its final four-second brand lockup, fit the complete 16:9 frame
-   inside any card shape so "WE ARE", the star, and the wordmark stay centered
-   and title-safe on desktop, mobile, portrait, or landscape layouts. */
-.pm2-hero-video-wrap.is-end-card {
-  background: #040a07;
-}
-
-.pm2-hero-video-wrap.is-end-card .pm2-hero-video {
-  object-fit: contain;
-  object-position: 50% 50%;
 }
 
 /* —— "View" cursor chip: shared TrailCursor (trail-cursor.css) ———————— */
