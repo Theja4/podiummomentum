@@ -131,6 +131,7 @@ export default function Hero({ navigate }) {
   const copyBlockRef = useRef(null)
   const statsRef = useRef(null)
   const ctasRef = useRef(null)
+  const glowRef = useRef(null)
   const bottomRef = useRef(null)
   const carouselRef = useRef(null)
   const card0Ref = useRef(null)
@@ -730,6 +731,28 @@ export default function Hero({ navigate }) {
     const tx = TILT.driftXvw * e
     const ty = TILT.driftYvh * e
     const op = 1 - range(s, TILT.fadeStart, TILT.fadeEnd)
+
+    // —— the field's key light follows the pointer ——
+    // Its own composited layer inside the panel, so this is a transform-only
+    // write: it never touches the panel (whose text must stay uncomposited)
+    // and never repaints the gradient. Eased toward the pointer so the light
+    // trails the cursor like a real source rather than snapping to it.
+    const glow = glowRef.current
+    if (glow && !staticRef.current) {
+      // usePointer reports a CENTRED, NORMALISED position in [-1, 1] and has
+      // already eased it (smooth = 0.075) — so this maps to pixels rather than
+      // treating those values as coordinates, and does not smooth a second
+      // time. Feeding the raw values in as pixels pinned the light to the
+      // top-left corner and never moved it more than half a pixel.
+      const gx = (px + 1) * 0.5 * vw
+      const gy = (py + 1) * 0.5 * vh
+      // fades out as the panel spins away — a light source on a plane that is
+      // no longer facing the viewer reads as a mistake
+      const gop = idle * (1 - range(s, 0.05, 0.4))
+      glow.style.transform = `translate3d(${gx.toFixed(1)}px, ${gy.toFixed(1)}px, 0) translate(-50%, -50%)`
+      glow.style.opacity = gop.toFixed(3)
+    }
+
     if (panel) {
       // At rest write NO transform: a per-frame 3D string — even an identity
       // one — pins the panel to a composited layer and its text rasterizes
@@ -975,6 +998,17 @@ export default function Hero({ navigate }) {
       <div className="pm2-hero-stage">
         {/* the forest panel that spins ~90° away on scroll */}
         <div className="pm2-hero-panel" ref={panelRef}>
+          {/* The field's material. A flat CSS gradient reads as a background;
+              these give it a surface: two very slowly drifting blooms, a soft
+              key that tracks the pointer, and film grain over the lot. All of
+              it is composited transform/opacity work on layers BELOW the copy,
+              never on the panel itself — the panel carries the text and must
+              stay off the compositor at rest or its glyphs rasterize soft. */}
+          <div className="pm2-hero-field" aria-hidden="true">
+            <span className="pm2-hero-bloom pm2-hero-bloom--a" />
+            <span className="pm2-hero-bloom pm2-hero-bloom--b" />
+            <span className="pm2-hero-key" ref={glowRef} />
+          </div>
           <div className="pm2-hero-inner">
             <div className="pm2-hero-head" ref={titleRef}>
               <span className="pm2-hero-eyebrow">

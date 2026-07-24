@@ -158,7 +158,7 @@ export default function AboutPage({ navigate }) {
           </AboutLink>
         </div>
 
-        <div className="about-hero-media" aria-label="A selection of our industry work">
+        <div className="about-hero-media" aria-label="A selection of our industry work" data-reveal-group="hero-media">
           <MediaCard item={MEDIA[0]} className="is-wide" />
           <MediaCard item={MEDIA[1]} />
           <MediaCard item={MEDIA[2]} />

@@ -557,6 +557,135 @@ html[data-theme] body #root .about-page .about-close .pill-dark:hover .pill-base
   transform: none;
 }
 
+/* --------------------------------------------------------------------------
+   Card-family entrances, mirroring the services pages: a keyframe settle
+   (rise + de-rotate + un-zoom + un-blur) in `backwards` fill, so cards that
+   are already in view on load still play their entrance — the plain
+   transition above can only run for cards revealed after first paint. Each
+   group staggers from its own --reveal-index; ungrouped cards (the AI media
+   panel) fall back to --reveal-order.
+   -------------------------------------------------------------------------- */
+.motion-ready .about-page [data-reveal="card"].is-inview {
+  animation: aboutRevealCard 0.98s cubic-bezier(0.16, 1, 0.3, 1)
+    calc(var(--reveal-index, var(--reveal-order, 0)) * 90ms) backwards;
+}
+
+.motion-ready .about-page [data-reveal-group] > [data-reveal="card"].is-inview:nth-child(odd) {
+  animation-name: aboutRevealCardLeft;
+}
+
+.motion-ready .about-page [data-reveal-group] > [data-reveal="card"].is-inview:nth-child(even) {
+  animation-name: aboutRevealCardRight;
+}
+
+/* Testimonial cards enter along the rail's own direction, like the services
+   carousel, instead of rocking side to side. */
+.motion-ready .about-page [data-reveal-group="testimonials"] > [data-reveal="card"].is-inview:nth-child(n) {
+  animation-name: aboutRevealRail;
+}
+
+/* Secondary content lands after the card surface instead of appearing flat.
+   Scoped to the text-card groups so it never fights the media settle below. */
+.motion-ready .about-page [data-reveal-group="facts"] > [data-reveal="card"].is-inview > *,
+.motion-ready .about-page [data-reveal-group="ai-metrics"] > [data-reveal="card"].is-inview > *,
+.motion-ready .about-page [data-reveal-group="impact"] > [data-reveal="card"].is-inview > *,
+.motion-ready .about-page [data-reveal-group="testimonials"] > [data-reveal="card"].is-inview > * {
+  animation: aboutRevealInner 0.72s cubic-bezier(0.16, 1, 0.3, 1)
+    calc(var(--reveal-index, 0) * 90ms + 180ms) backwards;
+}
+
+/* Media settles a little slower than its card, giving the imagery depth.
+   Backwards fill only, so the hover zoom regains control afterwards. */
+.motion-ready .about-page [data-reveal="card"].is-inview video {
+  animation: aboutRevealMedia 1.35s cubic-bezier(0.16, 1, 0.3, 1)
+    calc(var(--reveal-index, var(--reveal-order, 0)) * 90ms + 60ms) backwards;
+}
+
+@keyframes aboutRevealCard {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 4.75rem, 0) scale(0.935);
+    clip-path: inset(0 0 13% 0 round 1.75rem);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes aboutRevealCardLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-1.25rem, 4.75rem, 0) rotate(-2deg) scale(0.935);
+    clip-path: inset(0 0 13% 0 round 1.75rem);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes aboutRevealCardRight {
+  from {
+    opacity: 0;
+    transform: translate3d(1.25rem, 4.75rem, 0) rotate(2deg) scale(0.935);
+    clip-path: inset(0 0 13% 0 round 1.75rem);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes aboutRevealRail {
+  from {
+    opacity: 0;
+    transform: translate3d(5rem, 1.75rem, 0) rotate(1.2deg) scale(0.94);
+    clip-path: inset(0 9% 0 0 round 1.4rem);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 round 0);
+    filter: none;
+  }
+}
+
+@keyframes aboutRevealInner {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.15rem, 0);
+  }
+}
+
+@keyframes aboutRevealMedia {
+  from {
+    transform: scale(1.14);
+    filter: saturate(0.72) contrast(0.9);
+  }
+  to {
+    transform: scale(1);
+    filter: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .motion-ready .about-page [data-reveal="card"].is-inview {
+    animation-duration: 0.82s;
+    animation-delay: calc(var(--reveal-index, var(--reveal-order, 0)) * 65ms);
+  }
+}
+
 @media (max-width: 900px) {
   .about-page {
     padding: 78px 12px 0 !important;
@@ -743,6 +872,12 @@ html[data-theme] body #root .about-page .about-close .pill-dark:hover .pill-base
     opacity: 1;
     transform: none;
     transition: none;
+    animation: none;
+  }
+
+  .motion-ready .about-page [data-reveal] > *,
+  .motion-ready .about-page [data-reveal] video {
+    animation: none;
   }
 
   .about-media-card video,

@@ -718,6 +718,17 @@ html {
   white-space: nowrap;
 }
 
+/* The line reveal rests on clip-path: inset(0), which slices any glyph ink
+   that overhangs the heading's box — at wide viewports the nowrap first line
+   is a few px wider than its grid track, so the trailing "t." gets cut, and
+   tight tracking can shave the left bearing of "T". Expand the resting clip
+   box a little; the overflow only ever reaches into the empty grid gap. The
+   wipe transition still interpolates to this inset, so the reveal is
+   unchanged. */
+.motion-ready .va-head h2[data-reveal="line"].is-inview {
+  clip-path: inset(-0.12em -0.55em -0.12em -0.12em);
+}
+
 .va-sub {
   max-width: 48ch;
   margin: 0;

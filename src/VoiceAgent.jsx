@@ -279,6 +279,7 @@ export default function VoiceAgent({ navigate }) {
               <span>Books appointments</span>
               <span>Reschedules visits</span>
               <span>Answers patient questions</span>
+              <span>HIPAA compliant</span>
             </div>
 
             <div className="va-try-prompt" data-reveal="up">
