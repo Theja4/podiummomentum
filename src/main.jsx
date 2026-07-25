@@ -40,6 +40,7 @@ const CONTACT_PATH = '/contact-us'
 const PRIVACY_PATH = '/privacy-policy'
 const MCP2099_PATH = '/mcp-2099'
 const ABOUT_PATH = '/about'
+const CANONICAL_ORIGIN = 'https://www.podiummomentum.com'
 
 function navigate(path) {
   if (!path || path === '#') return
@@ -1563,6 +1564,20 @@ function App() {
   // Track pageview on every SPA route change
   useEffect(() => {
     trackPageView(path)
+  }, [path])
+
+  // Point the canonical URL at one host per route. Without this every path
+  // resolves under both the apex and www, so Google picks a hostname itself
+  // and any per-site signal (favicon included) can land on the wrong one.
+  useEffect(() => {
+    const clean = path !== '/' && path.endsWith('/') ? path.slice(0, -1) : path
+    let link = document.head.querySelector('link[rel="canonical"]')
+    if (!link) {
+      link = document.createElement('link')
+      link.rel = 'canonical'
+      document.head.appendChild(link)
+    }
+    link.href = `${CANONICAL_ORIGIN}${clean}`
   }, [path])
 
   const withPreloader = content => (
