@@ -12,7 +12,27 @@ import posthog from 'posthog-js'
 // ─── Config ────────────────────────────────────────────────────────────────────
 const GA4_ID = import.meta.env.VITE_GA4_MEASUREMENT_ID || ''
 const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY || ''
-const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com'
+
+// PostHog is proxied through our own origin (see the /ingest rewrites in
+// vercel.json). Calling us.i.posthog.com directly gets blocked by the standard
+// tracker blocklists, which is why PostHog kept undercounting against GA4.
+// VITE_POSTHOG_HOST is no longer read — the proxy path is fixed.
+const POSTHOG_PROXY = '/ingest'
+const POSTHOG_UI_HOST = 'https://us.posthog.com'
+
+// ─── Environment gate ──────────────────────────────────────────────────────────
+// Only the real production site should report. Without this, every `npm run dev`
+// session lands in PostHog as a localhost pageview and pollutes the session list.
+const PRODUCTION_HOSTS = ['podiummomentum.com', 'www.podiummomentum.com']
+
+function isProductionHost() {
+  if (typeof window === 'undefined') return false
+  return PRODUCTION_HOSTS.includes(window.location.hostname)
+}
+
+const TRACKING_ENABLED = isProductionHost()
+const PH_ON = TRACKING_ENABLED && !!POSTHOG_KEY && !POSTHOG_KEY.includes('XXXX')
+const GA_ON = TRACKING_ENABLED && !!GA4_ID && !GA4_ID.includes('XXXX')
 
 let initialized = false
 
@@ -22,23 +42,25 @@ export function initAnalytics() {
   initialized = true
 
   // PostHog
-  if (POSTHOG_KEY && !POSTHOG_KEY.includes('XXXX')) {
+  if (PH_ON) {
     posthog.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
+      api_host: POSTHOG_PROXY,
+      ui_host: POSTHOG_UI_HOST,
       // SPA mode — we fire pageviews manually
       capture_pageview: false,
       capture_pageleave: true,
+      // Anonymous marketing traffic never calls identify(), and the SDK default
+      // of 'identified_only' means those visitors get no person profile at all.
+      person_profiles: 'always',
       // Session replay & heatmaps enabled by default on PostHog free tier
       session_recording: {
         recordCrossOriginIframes: false,
       },
-      // Respect Do Not Track
-      respect_dnt: true,
     })
   }
 
   // GA4 — dynamically inject gtag.js
-  if (GA4_ID && !GA4_ID.includes('XXXX')) {
+  if (GA_ON) {
     window.dataLayer = window.dataLayer || []
     window.gtag = function gtag() { window.dataLayer.push(arguments) }
     window.gtag('js', new Date())
@@ -58,19 +80,24 @@ export function initAnalytics() {
 export function trackPageView(path) {
   if (!path) return
 
+  // origin + path drops the query string, which is where utm_* and gclid live.
+  // PostHog parses campaign attribution out of $current_url, so sending the
+  // trimmed URL left every visit looking like direct traffic.
+  const url = window.location.href
+
   // GA4
-  if (GA4_ID && !GA4_ID.includes('XXXX') && typeof window.gtag === 'function') {
+  if (GA_ON && typeof window.gtag === 'function') {
     window.gtag('event', 'page_view', {
       page_path: path,
-      page_location: window.location.origin + path,
+      page_location: url,
       page_title: document.title,
     })
   }
 
   // PostHog
-  if (POSTHOG_KEY && !POSTHOG_KEY.includes('XXXX')) {
+  if (PH_ON) {
     posthog.capture('$pageview', {
-      $current_url: window.location.origin + path,
+      $current_url: url,
       path,
     })
   }
@@ -79,12 +106,12 @@ export function trackPageView(path) {
 // ─── Generic Event Tracking ────────────────────────────────────────────────────
 export function trackEvent(eventName, properties = {}) {
   // GA4
-  if (GA4_ID && !GA4_ID.includes('XXXX') && typeof window.gtag === 'function') {
+  if (GA_ON && typeof window.gtag === 'function') {
     window.gtag('event', eventName, properties)
   }
 
   // PostHog
-  if (POSTHOG_KEY && !POSTHOG_KEY.includes('XXXX')) {
+  if (PH_ON) {
     posthog.capture(eventName, properties)
   }
 }
